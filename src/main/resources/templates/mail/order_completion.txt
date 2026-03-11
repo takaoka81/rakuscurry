@@ -1,0 +1,29 @@
+${customerName}様
+
+ラクラクカリーをご利用いただき、誠にありがとうございます。
+
+以下のご注文が正常に完了いたしました。
+
+【注文情報】
+注文番号: ${orderId}
+注文日時: ${orderDate}
+お届け先: ${destinationName}様
+          ${destinationAddress}
+          ${destinationTel}
+
+【注文商品】
+${orderItems}
+
+【合計金額】
+${totalPrice}円 (税込)
+
+【お支払い方法】
+${paymentMethod}
+
+ご注文いただいた商品は、指定されたお届け日時に配送いたします。
+商品到着まで今しばらくお待ちください。
+
+何かご質問がございましたら、お気軽にお問い合わせください。
+
+ラクラクカリー
+curry-admin@example.com
