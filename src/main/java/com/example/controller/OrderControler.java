@@ -153,6 +153,7 @@ public class OrderControler {
 		User user = (User)session.getAttribute("user");
 		//もしログインしていなければログインに戻す
 		if(user == null) {
+			session.setAttribute("returnUrl", "/orderHistory");
 			return "forward:/toLogin";
 		}
 		
