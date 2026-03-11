@@ -7,12 +7,12 @@ span.price {
   display: inline-block;
 
   /* サイズ指定 */
-  width: 40px;
-  height: 40px;
+  width: 25px;
+  height: 25px;
 
   /* 中身の配置（文字をど真ん中に） */
   text-align: center;
-  line-height: 40px;
+  line-height: 25px;
 
   /* デザイン・装飾（色や形） */
   background-color: #ff4500;
@@ -20,6 +20,7 @@ span.price {
    border-radius: 50%;
 
 }
+
 /* 合計金額の文字の大きさを変える */
 span#total-price {
   font-size: 35px;
