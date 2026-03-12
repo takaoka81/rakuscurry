@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- logsのパスを保存 -->
+    <property name="LOG_PATH" value="logs"/>
+    <!-- Appenderの定義：ログの出⼒先を設定 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- ログファイルの出⼒先を指定 -->
+        <file>${LOG_PATH}/batch.log</file>
+        <!-- ログファイルのローテーション（切り替え）⽅法を定義 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/batch.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <!-- Encoderの設定：ログのフォーマットを定義 -->
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <!-- Root Loggerの設定 -->
+    <root level="INFO">
+        <!-- 使⽤するAppenderを参照（FILEとEMAILの両⽅を使⽤） -->
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>
