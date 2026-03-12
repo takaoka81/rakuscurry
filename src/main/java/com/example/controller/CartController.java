@@ -3,6 +3,8 @@ package com.example.controller;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,6 +27,8 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("")
 public class CartController {
+
+	private static final Logger logger = LoggerFactory.getLogger(CartController.class);
 	
 	@Autowired
 	private CartService service;
@@ -97,7 +101,8 @@ public class CartController {
 	
 	@RequestMapping("/delete")
 	public String delete(String index, Model model) {
-		System.out.println(index);
+		//System.out.println(index);
+		logger.info(index);
 		@SuppressWarnings("unchecked")
 		List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
 		cartItemList.remove(Integer.parseInt(index));

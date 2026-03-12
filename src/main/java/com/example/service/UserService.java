@@ -2,6 +2,8 @@ package com.example.service;
 
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -17,6 +19,8 @@ import jakarta.servlet.http.HttpSession;
 @Service
 @Transactional
 public class UserService {
+
+	private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 	
 	@Autowired
 	private HttpSession session;
@@ -82,7 +86,8 @@ public class UserService {
 			int num = rand.nextInt(10);
 			randomStr += Integer.toString(num);
 		}
-		System.out.println(randomStr);
+		//System.out.println(randomStr);
+		logger.info("randomStr={}", randomStr);
 		return randomStr;
 	}
 	

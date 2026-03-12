@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,6 +30,8 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("")
 public class OrderControler {
+
+	private static final Logger logger = LoggerFactory.getLogger(OrderControler.class);
 	
 	@ModelAttribute
 	public OrderForm setOrderForm() {
@@ -163,17 +167,20 @@ public class OrderControler {
 		} else {
 			model.addAttribute("orderList", orderList);
 		}
-		System.out.println(orderList);
+		//System.out.println(orderList);
+		logger.info("orderList={}", orderList);	
 	
 		return "order/order_history";
 	}
 	
 	@RequestMapping("orderdetail")
 	public String orderDetail(Integer id, Model model) {
-		System.out.println(id);
+		//System.out.println(id);
+		logger.info("id={}", id);
 		List<Order> orderList = service.orderLoad(id);
 		model.addAttribute("orderList",orderList);
-		System.out.println(orderList);
+		//System.out.println(orderList);
+		logger.info("orderList={}", orderList);
 		return "/order/order_detail";
 	}
 }

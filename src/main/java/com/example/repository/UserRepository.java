@@ -1,6 +1,8 @@
 package com.example.repository;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -13,6 +15,8 @@ import com.example.domain.User;
 
 @Repository
 public class UserRepository {
+
+	private static final Logger logger = LoggerFactory.getLogger(UserRepository.class);
 	
 	private static final RowMapper<User> USER_ROW_MAPPER =(rs,i)->{
 		User user = new User();
@@ -35,7 +39,8 @@ public class UserRepository {
 		
 		try {
 			User user= template.queryForObject(sql, param, USER_ROW_MAPPER);
-			System.out.println(user);
+			//System.out.println(user);
+			logger.info("user={}", user);
 			return user;
 		}catch(Exception e) {
 			return null;
@@ -44,7 +49,8 @@ public class UserRepository {
 	}
 	
 	public void insert(User user) {
-		System.out.println(user);
+		//System.out.println(user);
+		logger.info("user={}", user);
 		SqlParameterSource param = new BeanPropertySqlParameterSource(user);
 		String sql = "INSERT INTO users (name, email, password, zipcode, address, telephone) "
 				+ "VALUES (:name, :email, :password, :zipcode, :address, :telephone);";	

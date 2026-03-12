@@ -2,6 +2,8 @@ package com.example.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,7 +22,8 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("")
 public class LoginController {
-	
+
+	private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 	
 	@Autowired
 	private UserService service;
@@ -43,9 +46,11 @@ public class LoginController {
 	
 	@RequestMapping("/login")
 	public String  login(LoginForm form,Model model) {
-		System.out.println(form);
+		//System.out.println(form);
+		logger.info("form={}", form);
 		User user =service.login(form.getPassword(), form.getEmail());
-		System.out.println(user+"です");
+		//System.out.println(user+"です");
+		logger.info("user={} + です", user);
 		if(user == null) {
 			model.addAttribute("loginError", "メールアドレス、またはパスワードが間違っています");
 			return toLogin();//RequestMappingのアドレスを指定
