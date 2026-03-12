@@ -58,6 +58,11 @@ public class LoginController {
 		
 		session.setAttribute("user",user);
 		
+		String returnUrl=(String) session.getAttribute("returnUrl");
+		if(returnUrl!=null){
+			session.removeAttribute("returnUrl");
+			return "redirect:"+returnUrl;
+		}
 		@SuppressWarnings("unchecked")
 		List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
 		
