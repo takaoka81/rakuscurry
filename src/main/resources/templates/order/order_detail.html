@@ -125,7 +125,8 @@
           		</tr>
           		<tr th:each=" orderItem : ${orders.orderItemList}">
           			<th>
-          				<img th:src="@{/img_curry/} + ${orderItem.item.imagePath}" width="250" height="150"></img>
+          				<img th:src="@{/img_curry/} + ${orderItem.item.imagePath}" 
+                  style="max-width: 100%; height: auto;"></img>
           			</th>
           			<th th:text="${orderItem.item.name}"></th>
           			<th>
