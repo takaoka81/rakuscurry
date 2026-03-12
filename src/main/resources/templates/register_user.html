@@ -52,21 +52,23 @@
                   <label for="inputEmail">メールアドレス:</label>
                   <label th:text="${emailRegistedError}" style="color: red" for="inputError">
                   そのメールアドレスはすでに使われています</label>
-                  <label th:errors="*{email}"
+                  <!-- <label th:errors="*{email}"
                     class="control-label"
                     style="color: red"
                     for="inputError"
                     >メールアドレスを入力してください</label
-                  >
-                  <input
+                  > -->
+                  <!-- <input
                     type="text"
                     id="inputEmail"
                     class="form-control"
                     placeholder="xxx@xxx"
-                    name="email"
                     th:value="${session.email}"
                     readonly
-                  />
+                  /> -->
+                  <p>
+                    <span th:text="${session.email}">xxx@xxx</span>
+                  </p>
                 </div>
                 <div class="form-group">
                   <label for="inputZipcode">郵便番号:</label>
