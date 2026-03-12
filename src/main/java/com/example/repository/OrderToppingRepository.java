@@ -29,8 +29,8 @@ public class OrderToppingRepository {
 	 */
 	public void insert(OrderTopping orderTopping) {
 		SqlParameterSource param = new BeanPropertySqlParameterSource(orderTopping);
-		String insertSql = "INSERT INTO order_toppings (topping_id, order_item_id) "
-				+ "VALUES (:toppingId, :orderItemId);";
+		String insertSql = "INSERT INTO order_toppings (topping_id, order_item_id, order_price) "
+				+ "VALUES (:toppingId, :orderItemId, :orderPrice);";
 		template.update(insertSql, param);
 	}
 }
