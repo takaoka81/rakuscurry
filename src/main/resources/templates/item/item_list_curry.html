@@ -106,14 +106,14 @@
           </table>
          </div> 
           <!-- ページング機能 -->
-         		<div style="text-align:center">
-				<div th:if="${itemPage.totalPages>0}" class="pagination"
-				    th:each="pageNumber : ${pageNumbers}" >
-				   <a th:href="@{/showList(size=${itemPage.size}, page=${pageNumber},searchName=${searchName})}"
+          <div style="text-align:center">
+				    <div th:if="${itemPage.totalPages>0}" class="pagination">
+				      <a th:each="pageNumber : ${pageNumbers}" 
+				        th:href="@{/showList(size=${itemPage.size}, page=${pageNumber},searchName=${searchName})}"
 				        th:text=${pageNumber} 
-				        th:class="${pageNumber==itemPage.number + 1} ? active"></a>
-				</div>
-				 </div>
+				        th:classappend="${pageNumber==itemPage.number + 1} ? 'active'"></a>
+				    </div>
+				  </div>
           
         </div>
       </div>
