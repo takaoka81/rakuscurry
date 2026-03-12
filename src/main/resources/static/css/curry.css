@@ -2,16 +2,25 @@
 
 /* サイズをオレンジ〇で囲む */
 span.price {
+ 
+  /*レイアウトの性質(どう並ぶか)*/
+  display: inline-block;
+
   /* サイズ指定 */
-  width: 175px;
-  height: 175px;
-  /* 背景色 */
+  width: 25px;
+  height: 25px;
+
+  /* 中身の配置（文字をど真ん中に） */
+  text-align: center;
+  line-height: 25px;
+
+  /* デザイン・装飾（色や形） */
   background-color: #ff4500;
-  /* 角を丸くする */
-  border-radius: 50%;
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
+  color:white;
+   border-radius: 50%;
+
 }
+
 /* 合計金額の文字の大きさを変える */
 span#total-price {
   font-size: 35px;
