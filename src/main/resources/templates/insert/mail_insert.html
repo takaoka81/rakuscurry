@@ -29,7 +29,7 @@
           "
         >
           <div class="well">
-            <form method="post" action="item_list_pizza.html" th:action="@{/mailsend}" th:object="${randomCheckForm}">
+            <form method="post" action="item_list_curry.html" th:action="@{/mailsend}" th:object="${randomCheckForm}">
               <fieldset>
                 <legend>２段階認証確認</legend>
                
@@ -69,5 +69,8 @@
     <!-- end container -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="../static/js/bootstrap.min.js"></script>
+
+    <!--ハンバーガー機能追加-->
+  <script th:src="@{/js/bootstrap.min.js}"></script>
   </body>
 </html>
