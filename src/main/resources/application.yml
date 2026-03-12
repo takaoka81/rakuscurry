@@ -2,7 +2,7 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:rakuraku-curry}
-    username: ${DB_USER:asahi}
+    username: ${DB_USER:postgres}
     password: ${DB_PASS:postgres}
   mail:
     host: ${MAIL_HOST:localhost}
