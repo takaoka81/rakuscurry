@@ -33,6 +33,8 @@ public class InsertForm {
 	//パスワード
 	@NotBlank(message="パスワードを入力して下さい")
 	@Size(min=8, max=16, message="パスワードは８文字以上１６文字以内で設定してください")
+	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$",
+			 message = "パスワードには英大文字、英小文字、数字をそれぞれ1文字以上含めてください")
 	private String password;
 	//確認用パスワード
 	@NotBlank(message="確認用パスワードを入力して下さい")
