@@ -32,7 +32,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#components/schemas/item"
+                $ref: "#components/schemas/items"
         500:
           description: 商品一覧情報取得失敗
           content:
@@ -62,7 +62,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/items"
+                $ref: "#/components/schemas/item"
         "404":
           description: 指定したidに存在しない
           content:
@@ -110,7 +110,7 @@ components:
           items:
             $ref: "#/components/schemas/toppings"
 
-    item:
+    items:
       type: object
       properties:
         id:
@@ -134,7 +134,7 @@ components:
           description: 画像ファイル
           default: 1.jpg
 
-    items:
+    item:
       type: array
       items:
         $ref: "#/components/schemas/itemDetail"
