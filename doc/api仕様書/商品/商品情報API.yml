@@ -1,0 +1,181 @@
+openapi: "3.0.3"
+
+info:
+  title: User Management API
+  version: "1.0.0"
+  description: |
+    このAPIは商品情報の管理を目的としています。
+
+servers:
+  - url: https://api.example.com
+    description: 本番環境
+  - url: https://staging.example.com
+    description: ステージング環境
+  - url: http://localhost:8080
+    description: ローカル環境
+
+paths:
+  /items:
+    get:
+      summary: 商品一覧情報を取得
+      description: 商品を全件取得して返します
+      parameters:
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+            default: カツカレー
+      responses:
+        200:
+          description: 商品一覧情報取得成功
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/item"
+        500:
+          description: 商品一覧情報取得失敗
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                badRequest:
+                  summary: "500エラー"
+                  value:
+                    status: 500
+                    message: "Internal Server Error"
+
+  /item/{id}:
+    get:
+      summary: 特定の商品詳細情報を取得
+      description: 指定IDの商品詳細情報を取得します
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/items"
+        "404":
+          description: 指定したidに存在しない
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                badRequest:
+                  summary: "404エラー"
+                  value:
+                    status: 404
+                    message: "Not Found"
+
+components:
+  schemas:
+    itemDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: id
+          default: 1
+        name:
+          type: string
+          description: メニュー名
+          default: カツカレー
+        discription:
+          type: string
+          description: 説明
+          default: 食べると勝負に勝てると言われる勝つカレー。ラクラクカレー定番の１品です
+        priceM:
+          type: integer
+          description: Mサイズの値段
+          default: 1490
+        priceL:
+          type: integer
+          description: Lサイズの値段
+          default: 2570
+        imagePath:
+          type: string
+          description: 画像ファイル
+          default: 1.jpg
+        toppings:
+          type: array
+          items:
+            $ref: "#/components/schemas/toppings"
+
+    item:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: id
+          default: 1
+        name:
+          type: string
+          description: メニュー名
+          default: カツカレー
+        priceM:
+          type: integer
+          description: Mサイズの値段
+          default: 1490
+        priceL:
+          type: integer
+          description: Lサイズの値段
+          default: 2570
+        imagePath:
+          type: string
+          description: 画像ファイル
+          default: 1.jpg
+
+    items:
+      type: array
+      items:
+        $ref: "#/components/schemas/itemDetail"
+
+    topping:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: id
+          default: 1
+        name:
+          type: string
+          description: トッピング名
+          default: オニオン
+        priceM:
+          type: integer
+          description: Mサイズのトッピングの値段
+          default: 200
+        priceL:
+          type: integer
+          description: Lサイズのトッピングの値段
+          default: 300
+
+    toppings:
+      type: array
+      items:
+        $ref: "#/components/schemas/topping"
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: "HTTPステータスコード"
+          example:
+            - 404
+            - 500
+        message:
+          type: string
+          description: "エラー内容を示すメッセージ"
+          example:
+            - "Not Found"
+            - "Internal Server Error"
