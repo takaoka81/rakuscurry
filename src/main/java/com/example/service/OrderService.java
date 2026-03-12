@@ -159,7 +159,7 @@ public class OrderService {
 	 * 
 	 * @param order 注文情報
 	 */
-	public void sendMail(Order order) {
+	public void sendMail(Order order,String email) {
 		try {
 			// テンプレート読み込み
 			Resource resource = new ClassPathResource("templates/mail/order_completion.txt");
@@ -216,6 +216,7 @@ public class OrderService {
 			// メール送信
 			SimpleMailMessage msg = new SimpleMailMessage();
 			msg.setFrom(mailFrom);
+			msg.setTo(email);
 			msg.setTo(order.getDestinationEmail());
 			msg.setSubject(mailSubject);
 			msg.setText(body);
