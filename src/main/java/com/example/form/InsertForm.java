@@ -30,6 +30,7 @@ public class InsertForm {
 	@NotBlank(message="電話番号を入力して下さい")
 	@Pattern(regexp = "^[0-9]+-[0-9]+-[0-9]+$", message="電話番号はXXXX-XXXX-XXXXの形式で入力してください")
 	private String telephone;
+	
 	//パスワード
 	@NotBlank(message="パスワードを入力して下さい")
 	@Size(min=8, max=16, message="パスワードは８文字以上１６文字以内で設定してください")

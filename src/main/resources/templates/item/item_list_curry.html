@@ -106,14 +106,14 @@
           </table>
          </div> 
           <!-- ページング機能 -->
-         		<div style="text-align:center">
-				<div th:if="${itemPage.totalPages>0}" class="pagination"
-				    th:each="pageNumber : ${pageNumbers}" >
-				   <a th:href="@{/showList(size=${itemPage.size}, page=${pageNumber},searchName=${searchName})}"
+          <div style="text-align:center">
+				    <div th:if="${itemPage.totalPages>0}" class="pagination">
+				      <a th:each="pageNumber : ${pageNumbers}" 
+				        th:href="@{/showList(size=${itemPage.size}, page=${pageNumber},searchName=${searchName})}"
 				        th:text=${pageNumber} 
-				        th:class="${pageNumber==itemPage.number + 1} ? active"></a>
-				</div>
-				 </div>
+				        th:classappend="${pageNumber==itemPage.number + 1} ? 'active'"></a>
+				    </div>
+				  </div>
           
         </div>
       </div>
@@ -121,12 +121,10 @@
     <!-- end container -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script th:src="@{/js/auto_complete.js}"></script>
-    <script src="/js/bootstrap.min.js"></script>
     <script th:src="@{/js/reset.js}"></script>
-	<script type="text/javascript"
-	  src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-	<script type="text/javascript"
-	  src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+
+    <!--ハンバーガー機能追加-->
+    <script th:src="@{/js/bootstrap.min.js}"></script>
 	
   </body>
 </html>
