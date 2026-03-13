@@ -30,7 +30,7 @@
           "
         >
           <h3 class="text-center">ショッピングカート</h3>
-          <table class="table table-striped item-list-table">
+          <table class="table">
             <tbody>
               <tr>
                 <th>
@@ -47,9 +47,8 @@
                 </th>
                 <th></th>
               </tr>
-              <tr>
+              <tr th:if="${cartNothing != null}">
               	<th colspan="5">
-              		<br>
               		<h3 th:if="${cartNothing != null}" th:text="${cartNothing}"></h3>
               	</th>
               </tr>
