@@ -1,13 +1,19 @@
 package com.example.service;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StreamUtils;
 
 import com.example.domain.CartItem;
 import com.example.domain.Order;
@@ -43,6 +49,12 @@ public class OrderService {
 	@Autowired
 	private HttpSession session;
 
+	@Value("${spring.mail.from}")
+	private String mailFrom;
+
+	@Value("${spring.mail.subject}")
+	private String mailSubject;
+
 	@Autowired
 	private MailSender sender;
 
@@ -77,6 +89,11 @@ public class OrderService {
 		Integer orderId = orderRepository.insert(order);
 		insertOrderItem(orderId);
 
+		// orderオブジェクトに商品情報をセットしておく（メール送信などで必要）
+		List<Order> loaded = orderRepository.orderLoad(orderId);
+		if (loaded != null && !loaded.isEmpty()) {
+			order.setOrderItemList(loaded.get(0).getOrderItemList());
+		}
 	}
 
 	/**
@@ -150,16 +167,73 @@ public class OrderService {
 	/**
 	 * 引数で受け取ったemailに完了メールを送付
 	 * 
-	 * @param email
+	 * @param order 注文情報
 	 */
-	public void sendMail(String email) {
-		SimpleMailMessage msg = new SimpleMailMessage();
+	public void sendMail(Order order, String email) {
+		try {
+			// テンプレート読み込み
+			Resource resource = new ClassPathResource("templates/mail/order_completion.txt");
+			String template = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
 
-		msg.setFrom("curry-admin@example.com");
-		msg.setTo(email);
-		msg.setSubject("注文完了！！！");// タイトルの設定
-		msg.setText("ラクラクカリー より　注文完了"); // 本文の設定
+			// プレースホルダー置換
+			String customerName = order.getDestinationName();
+			String orderId = String.valueOf(order.getId());
+			String orderDate = order.getDeliveryTime().toString();
+			String destinationName = order.getDestinationName();
+			String destinationAddress = order.getDestinationAddress();
+			String destinationTel = order.getDestinationTel();
+			String totalPrice = String.format("%,d", order.getTotalPrice());
+			String paymentMethod = order.getPaymentMethod() == 1 ? "代金引換" : "クレジットカード";
 
-		this.sender.send(msg);
+			// 注文商品情報の構築
+			StringBuilder orderItems = new StringBuilder();
+			List<OrderItem> items = order.getOrderItemList();
+			if (items == null) {
+				// まだセットされていない場合はDBから読み直す
+				List<Order> loaded = orderRepository.orderLoad(order.getId());
+				if (loaded != null && !loaded.isEmpty()) {
+					items = loaded.get(0).getOrderItemList();
+				}
+			}
+			if (items != null) {
+				for (OrderItem item : items) {
+					orderItems.append(item.getItem().getName())
+							.append(" (").append(item.getSize()).append(") x").append(item.getQuantity())
+							.append(" - 小計: ").append(String.format("%,d", item.getSubTotal())).append("円\n");
+					// トッピング情報
+					if (item.getOrderTopping() != null && !item.getOrderTopping().isEmpty()) {
+						orderItems.append("  トッピング: ");
+						for (OrderTopping topping : item.getOrderTopping()) {
+							orderItems.append(topping.getTopping().getName()).append(", ");
+						}
+						orderItems.setLength(orderItems.length() - 2); // 最後のカンマを削除
+						orderItems.append("\n\n");
+					}
+				}
+			}
+
+			// 置換
+			String body = template.replace("${customerName}", customerName)
+					.replace("${orderId}", orderId)
+					.replace("${orderDate}", orderDate)
+					.replace("${destinationName}", destinationName)
+					.replace("${destinationAddress}", destinationAddress)
+					.replace("${destinationTel}", destinationTel)
+					.replace("${orderItems}", orderItems.toString().trim())
+					.replace("${totalPrice}", totalPrice)
+					.replace("${paymentMethod}", paymentMethod);
+
+			// メール送信
+			SimpleMailMessage msg = new SimpleMailMessage();
+			msg.setFrom(mailFrom);
+			msg.setTo(email);
+			msg.setSubject(mailSubject);
+			msg.setText(body);
+
+			this.sender.send(msg);
+		} catch (IOException e) {
+			// ログ出力やエラーハンドリング
+			e.printStackTrace();
+		}
 	}
 }
