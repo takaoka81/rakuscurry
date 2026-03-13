@@ -6,7 +6,7 @@ ${customerName}様
 
 【注文情報】
 注文番号: ${orderId}
-注文日時: ${orderDate}
+お届け日時: ${orderDate}
 お届け先: ${destinationName}様
           ${destinationAddress}
           ${destinationTel}

@@ -197,7 +197,7 @@ public class OrderService {
 							orderItems.append(topping.getTopping().getName()).append(", ");
 						}
 						orderItems.setLength(orderItems.length() - 2); // 最後のカンマを削除
-						orderItems.append("\n");
+						orderItems.append("\n\n");
 					}
 				}
 			}
