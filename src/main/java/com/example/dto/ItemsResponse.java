@@ -1,5 +1,7 @@
 package com.example.dto;
 
+import com.example.domain.Item;
+
 public class ItemsResponse {
     private Integer id;
     private String name;
@@ -49,6 +51,14 @@ public class ItemsResponse {
         this.priceM = priceM;
         this.priceL = priceL;
         this.imagePath = imagePath;
+    }
+
+    public ItemsResponse(Item item){
+        this.id=item.getId();
+        this.name=item.getName();
+        this.priceM=item.getPriceM();
+        this.priceL=item.getPriceL();
+        this.imagePath=item.getImagePath();
     }
 
 }
