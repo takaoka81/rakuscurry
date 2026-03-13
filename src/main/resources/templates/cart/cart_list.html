@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ピザ屋のネット注文</title>
+    <title>カレー屋のネット注文</title>
    <link th:href="@{/css/bootstrap.css}" href="../../static/css/bootstrap.css" rel="stylesheet" />
     <link th:href="@{/css/curry.css}" href="../../static/css/curry.css" rel="stylesheet" />
     <!--[if lt IE 9]>
@@ -127,6 +127,10 @@
     </div>
     <!-- end container -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="../static/js/bootstrap.min.js"></script>
+    <script th:src="@{/js/auto_complete.js}"></script>
+
+    <!--ハンバーガー機能追加-->
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+
   </body>
 </html>

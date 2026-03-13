@@ -1,8 +1,29 @@
 @charset "UTF-8";
 
 div.pagination {
-	font-size:40px;
+	font-family: "Noto Sans JP", sans-serif;
+	font-size:25px;
 	color:green;
+
+	display: flex;
+	justify-content: center;
+	gap: 15px;
+}
+div.pagination a {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	width: 40px;
+	height: 40px;
+	border-radius: 4px;
+
+	text-decoration: none;
+}
+div.pagination a.active {
+	font-size: 25px;
+	background-color: #337ab7;
+	color: honeydew;
 }
 tbody.table{
 	display:flex;
@@ -14,4 +35,3 @@ div.text-center-2{
 div.text-center-3{
 	display:flex;
 }
-
