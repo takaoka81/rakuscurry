@@ -8,6 +8,10 @@ spring:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:1025}
 
+logging:
+  file:
+    name: ${LOG_FILE_PATH:logs/batch.log}
+
 # 商品一覧の画像のURLにsessionidが勝手に混入し画像がリンク切れになる不具合対応の設定
 server:
   servlet:
