@@ -55,6 +55,8 @@ public class CartController {
 		List<Topping> toppingList = (List<Topping>) application.getAttribute("toppingList");
 		List<Topping> toppings = service.getToppingIndex(toppingList, form.getToppingIndex());
 		cartItem.setToppingList(toppings);
+
+		
 		
 		//小計を代入
 //		Integer subPrices = service.calcSubTotal(cartItem);
