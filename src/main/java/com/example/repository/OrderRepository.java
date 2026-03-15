@@ -58,9 +58,8 @@ public class OrderRepository {
 
 			// 現在のidと前回のidが被ってないか確認
 			if (nowIdNum != beforeIdNum) {
-				
-	
-				//orderオブジェクトにSQLのデータをセット
+
+				// orderオブジェクトにSQLのデータをセット
 				Order order = new Order();
 				order.setId(nowIdNum);
 				order.setUserId(rs.getInt("o_user_id"));
@@ -243,73 +242,101 @@ public class OrderRepository {
 		return order.getId();
 	}
 
-/**
-     * 特定のユーザーとステータスに紐づく注文情報を1件取得する
-     * 関連するOrderItemとOrderToppingもすべて結合して取得
-     */
-    public Order findByUserIdAndStatus(Integer userId, Integer status) {
-        String sql = "SELECT "
-                   + "o.id AS o_id, o.user_id, o.status, o.total_price, "
-                   + "oi.id AS oi_id, oi.item_id, oi.quantity, oi.size, "
-                   + "ot.id AS ot_id, ot.topping_id "
-                   + "FROM orders o "
-                   + "LEFT OUTER JOIN order_items oi ON o.id = oi.order_id "
-                   + "LEFT OUTER JOIN order_toppings ot ON oi.id = ot.order_item_id "
-                   + "WHERE o.user_id = :userId AND o.status = :status;";
+	/**
+	 * 特定のユーザーとステータスに紐づく注文情報を1件取得する
+	 * 関連するOrderItemとOrderToppingもすべて結合して取得
+	 */
+	/**
+	 * カート情報（注文前データ）を1件取得する
+	 */
+	public Order findByUserIdAndStatus(Integer userId, Integer status) {
+		String sql = "SELECT o.id AS o_id, o.user_id, o.status, o.total_price, "
+				+ "oi.id AS oi_id, oi.item_id, oi.quantity, oi.size, "
+				+ "ot.id AS ot_id, ot.topping_id "
+				+ "FROM orders o "
+				+ "LEFT OUTER JOIN order_items oi ON o.id = oi.order_id "
+				+ "LEFT OUTER JOIN order_toppings ot ON oi.id = ot.order_item_id "
+				+ "WHERE o.user_id = :userId AND o.status = :status";
 
-        SqlParameterSource param = new MapSqlParameterSource()
-                .addValue("userId", userId)
-                .addValue("status", status);
+		SqlParameterSource param = new MapSqlParameterSource()
+				.addValue("userId", userId)
+				.addValue("status", status);
 
-        return template.query(sql, param, orderResultSetExtractor);
-    }
+		// 前回作成した、Mapを使って階層構造を作るExtractorを呼び出す
+		return template.query(sql, param, orderResultSetExtractor);
+	}
 
-    /**
-     * ResultSetをOrderオブジェクトの階層構造にマッピングする抽出器
-     */
-    private final ResultSetExtractor<Order> orderResultSetExtractor = (rs) -> {
-        Order order = null;
-        List<OrderItem> orderItemList = null;
-        Map<Integer, OrderItem> itemMap = new LinkedHashMap<>();
+	/**
+	 * 新規カートを作成し、発行されたIDを返す
+	 */
+	public Integer insertOrder(Integer userId) {
+		String sql = "INSERT INTO orders (user_id, status, total_price) "
+				+ "VALUES (:userId, :status, total_price) RETURNING id";
+		SqlParameterSource param = new MapSqlParameterSource().addValue("userId", userId);
+		return template.queryForObject(sql, param, Integer.class);
+	}
 
-        while (rs.next()) {
-            // 1. 最初に行がヒットした時だけOrder本体を作成
-            if (order == null) {
-                order = new Order();
-                order.setId(rs.getInt("o_id"));
-                order.setUserId(rs.getInt("user_id"));
-                order.setStatus(rs.getInt("status"));
-                order.setTotalPrice(rs.getInt("total_price"));
-                orderItemList = new ArrayList<>();
-                order.setOrderItemList(orderItemList);
-            }
+	private final ResultSetExtractor<Order> orderResultSetExtractor = (rs) -> {
+		Order order = null;
+		Map<Integer, OrderItem> itemMap = new LinkedHashMap<>();
 
-            // 2. OrderItem（注文商品）の処理
-            int oiId = rs.getInt("oi_id");
-            if (oiId != 0) { // LEFT JOINなのでnull(0)の可能性がある
-                OrderItem orderItem = itemMap.get(oiId);
-                if (orderItem == null) {
-                    orderItem = new OrderItem();
-                    orderItem.setId(oiId);
-                    orderItem.setItemId(rs.getInt("item_id"));
-                    orderItem.setQuantity(rs.getInt("quantity"));
-                    orderItem.setSize(rs.getString("size"));
-                    orderItem.setOrderTopping(new ArrayList<>());
-                    
-                    itemMap.put(oiId, orderItem);
-                    orderItemList.add(orderItem);
-                }
+		while (rs.next()) {
+			// 1. Orderの作成（ここはそのまま）
+			if (order == null) {
+				order = new Order();
+				order.setId(rs.getInt("o_id"));
+				order.setUserId(rs.getInt("user_id"));
+				order.setStatus(rs.getInt("status"));
+				order.setTotalPrice(rs.getInt("total_price"));
+				order.setOrderItemList(new ArrayList<>());
+			}
 
-                // 3. OrderTopping（トッピング）の処理
-                int otId = rs.getInt("ot_id");
-                if (otId != 0) {
-                    OrderTopping topping = new OrderTopping();
-                    topping.setId(otId);
-                    topping.setToppingId(rs.getInt("topping_id"));
-                    orderItem.getOrderTopping().add(topping);
-                }
-            }
-        }
-        return order;
-    };
+			// 2. OrderItemの処理（computeIfAbsentをやめて、ifでチェックする）
+			int oiId = rs.getInt("oi_id");
+			if (oiId != 0) {
+				OrderItem orderItem = itemMap.get(oiId);
+
+				if (orderItem == null) {
+					// まだMapにない場合だけ新しく作る
+					orderItem = new OrderItem();
+					orderItem.setId(oiId);
+					orderItem.setItemId(rs.getInt("item_id"));
+					orderItem.setQuantity(rs.getInt("quantity"));
+					orderItem.setSize(rs.getString("size"));
+					orderItem.setOrderTopping(new ArrayList<>());
+
+					// Mapに保存
+					itemMap.put(oiId, orderItem);
+					// ★ここなら order が再代入された後でも、ラムダの外なのでエラーになりません！
+					order.getOrderItemList().add(orderItem);
+				}
+
+				// 3. トッピングの処理
+				int otId = rs.getInt("ot_id");
+				if (otId != 0) {
+					OrderTopping topping = new OrderTopping();
+					topping.setId(otId);
+					topping.setToppingId(rs.getInt("topping_id"));
+					orderItem.getOrderTopping().add(topping);
+				}
+			}
+		}
+		return order;
+	};
+
+	/**
+	 * 指定した注文の合計金額を更新する
+	 * 
+	 * @param orderId    注文ID
+	 * @param totalPrice 計算済みの合計金額
+	 */
+	public void updateTotalPrice(Integer orderId, Integer totalPrice) {
+		String sql = "UPDATE orders SET total_price = :totalPrice WHERE id = :orderId";
+
+		SqlParameterSource param = new MapSqlParameterSource()
+				.addValue("totalPrice", totalPrice)
+				.addValue("orderId", orderId);
+
+		template.update(sql, param);
+	}
 }

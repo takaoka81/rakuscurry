@@ -164,7 +164,7 @@ public class OrderService {
 		}
 	}
 
-	public void saveCartToDb()
+	
 
 	/**
 	 * 引数で受け取ったemailに完了メールを送付
