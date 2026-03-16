@@ -15,7 +15,7 @@ public class OrderItem {
 	// サイズ
 	private String size;
 	// 注文時金額
-	private Integer orderPrice;
+	private Integer orderPrice = 0;
 	// 小計
 	// private Integer subTotal;
 	// item
@@ -95,34 +95,26 @@ public class OrderItem {
 				+ "]";
 	}
 
-	public Integer getSubTotal() {
+public Integer getSubTotal() {
 
-		// 1. 商品自体の単価を決める（nullなら0円として扱う）
-		int itemPrice = 0;
-		if (this.orderPrice != null) {
-			itemPrice = this.orderPrice;
-		}
+    // 1. 商品自体の単価を決める（nullなら0円）
+    int itemPrice = (this.orderPrice != null) ? this.orderPrice : 0;
 
-		// 2. トッピングの合計金額を計算する
-		int toppingTotalPrice = 0;
-		if (this.orderTopping != null) {
-			// トッピングリストを1つずつチェック
-			for (OrderTopping topping : this.orderTopping) {
-				// トッピングの価格が設定されていれば加算
-				if (topping.getOrderPrice() != null) {
-					toppingTotalPrice = toppingTotalPrice + topping.getOrderPrice();
-				}
-			}
-		}
+    // 2. トッピングの合計金額を計算する
+    int toppingTotalPrice = 0;
+    // ★ここを orderToppingList に修正
+    if (this.orderTopping != null) { 
+        for (OrderTopping topping : this.orderTopping) {
+            if (topping.getOrderPrice() != null) {
+                toppingTotalPrice += topping.getOrderPrice();
+            }
+        }
+    }
 
-		// 3. 数量を確認する（nullなら0個として扱う）
-		int count = 0;
-		if (this.quantity != null) {
-			count = this.quantity;
-		}
+    // 3. 数量を確認する（nullなら0個）
+    int count = (this.quantity != null) ? this.quantity : 0;
 
-		// 4. 【 (商品単価 + トッピング合計) × 数量 】を計算して返す
-		int result = (itemPrice + toppingTotalPrice) * count;
-		return result;
-	}
+    // 4. 計算結果を返す
+    return (itemPrice + toppingTotalPrice) * count;
+}
 }

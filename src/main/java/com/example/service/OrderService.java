@@ -172,6 +172,8 @@ public class OrderService {
 		}
 	}
 
+	
+
 	/**
 	 * 引数で受け取ったemailに完了メールを送付
 	 * 
