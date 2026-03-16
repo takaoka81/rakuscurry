@@ -55,7 +55,7 @@ public class CartController {
         } else {
             saveToSessionCart(cartItem);
         }
-        // /* 修正点：redirect先のパスを修正 */
+        
         return "redirect:/showCart"; 
     }
 
@@ -101,21 +101,43 @@ public class CartController {
         return "cart/cart_list";
     }
 
-    @RequestMapping("/delete")
-    public String delete(String index, Integer orderItemId, Model model) {
-        User user = (User) session.getAttribute("user");
+@RequestMapping("/delete")
+public String delete(Integer index, Integer orderItemId) {
+    User user = (User) session.getAttribute("user");
 
-        // /* 修正点：未ログイン時の削除を有効化 */
-        if (user != null && orderItemId != null) {
-            // service.deleteOrderItem(orderItemId); // Service未実装なら一旦止める
-        } else if (index != null) {
-            @SuppressWarnings("unchecked")
-            List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
-            if (cartItemList != null) {
-                cartItemList.remove(Integer.parseInt(index));
-                // 削除後の合計金額を再計算するため、直接 redirect する
+    if (user != null) {
+        if (orderItemId != null) {
+            // 1. DBから削除 & DB上の合計金額を更新
+            service.deleteOrderItem(orderItemId, user.getId());
+            
+            // 2. ★追加：最新の注文情報をDBから取得し直す
+            Order order = service.getCartByUserId(user.getId());
+            
+            // 3. ★重要：セッションの totalPrice を最新の注文合計で上書きする
+            if (order != null) {
+                session.setAttribute("totalPrice", order.getTotalPrice());
+            } else {
+                session.setAttribute("totalPrice", 0);
             }
         }
-        return "redirect:/showCart"; 
+    } else {
+        // --- 未ログインの場合（Sessionから削除） ---
+        @SuppressWarnings("unchecked")
+        List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
+        
+        if (cartItemList != null && index != null && index < cartItemList.size()) {
+            cartItemList.remove(index.intValue());
+            
+            int total = 0;
+            for (CartItem item : cartItemList) {
+                total += item.getSubTotal();
+            }
+            // 未ログイン時はここでセッションを更新しているため、反映されます
+            session.setAttribute("totalPrice", total);
+            session.setAttribute("cartItemList", cartItemList);
+        }
     }
+    
+    return "redirect:/showCart"; 
+}
 }

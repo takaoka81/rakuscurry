@@ -52,68 +52,69 @@ public class CartService {
 	 * @param userId ログインユーザーのID
 	 */
 	@Transactional
-public void addItemToCart(CartItem cartItem, Integer userId) {
+	public void addItemToCart(CartItem cartItem, Integer userId) {
 
-    // 1. カート(Order)があるか確認
-    Order order = orderRepository.findByUserIdAndStatus(userId, 0);
-    Integer orderId;
+		// 1. カート(Order)があるか確認
+		Order order = orderRepository.findByUserIdAndStatus(userId, 0);
+		Integer orderId;
 
-    if (order == null) {
-        // カートがなければ新規作成
-        order = new Order();
-        order.setUserId(userId);
-        order.setStatus(0);
-        order.setTotalPrice(0);
-        orderId = orderRepository.insert(order); // ここで1回だけinsert
-    } else {
-        // 既存のカートがあればそのIDを使う
-        orderId = order.getId();
-    }
+		if (order == null) {
+			// カートがなければ新規作成
+			order = new Order();
+			order.setUserId(userId);
+			order.setStatus(0);
+			order.setTotalPrice(0);
+			orderId = orderRepository.insert(order); // ここで1回だけinsert
+		} else {
+			// 既存のカートがあればそのIDを使う
+			orderId = order.getId();
+		}
 
-    // ★修正ポイント：ここの余分な orderRepository.insert(order) は削除してください
+		// ★修正ポイント：ここの余分な orderRepository.insert(order) は削除してください
 
-    // 2. 子(OrderItem)の登録
-    OrderItem orderItem = new OrderItem();
-    BeanUtils.copyProperties(cartItem, orderItem);
-    orderItem.setOrderId(orderId); // 確定したorderIdをセット
-    orderItem.setOrderPrice(cartItem.getItemPrice());
+		// 2. 子(OrderItem)の登録
+		OrderItem orderItem = new OrderItem();
+		BeanUtils.copyProperties(cartItem, orderItem);
+		orderItem.setOrderId(orderId); // 確定したorderIdをセット
+		orderItem.setOrderPrice(cartItem.getItemPrice());
 
-    // リポジトリのメソッド名が order() になっている場合はそのままでOK
-    Integer orderItemId = orderItemRepository.order(orderItem);
+		// リポジトリのメソッド名が order() になっている場合はそのままでOK
+		Integer orderItemId = orderItemRepository.order(orderItem);
 
-    // 3. 孫(OrderTopping)の登録
-    List<Topping> toppingList = cartItem.getToppingList();
-    if (toppingList != null && !toppingList.isEmpty()) {
-        for (Topping topping : toppingList) {
-            OrderTopping ot = new OrderTopping();
-            ot.setOrderItemId(orderItemId);
-            ot.setToppingId(topping.getId());
+		// 3. 孫(OrderTopping)の登録
+		List<Topping> toppingList = cartItem.getToppingList();
+		if (toppingList != null && !toppingList.isEmpty()) {
+			for (Topping topping : toppingList) {
+				OrderTopping ot = new OrderTopping();
+				ot.setOrderItemId(orderItemId);
+				ot.setToppingId(topping.getId());
 
-            if ("M".equals(cartItem.getSize())) {
-                ot.setOrderPrice(topping.getPriceM());
-            } else {
-                ot.setOrderPrice(topping.getPriceL());
-            }
-            orderToppingRepository.insert(ot);
-        }
-    }
+				if ("M".equals(cartItem.getSize())) {
+					ot.setOrderPrice(topping.getPriceM());
+				} else {
+					ot.setOrderPrice(topping.getPriceL());
+				}
+				orderToppingRepository.insert(ot);
+			}
+		}
 
-    // 4. 合計金額の再計算と更新
-    // これを行うことで、DBの total_price が null や 0 でなくなるため、HTMLでの掛け算エラーが消えます
-  Order updatedOrder = orderRepository.findByUserIdAndStatus(userId, 0); 
-    
-    int newTotal = 0;
-    // 取得したデータ（updatedOrder）がnullでないこと、商品リストがあることを確認
-    if (updatedOrder != null && updatedOrder.getOrderItemList() != null) {
-        for (OrderItem item : updatedOrder.getOrderItemList()) {
-            // 商品ごとの(価格+トッピング価格) * 数量 を加算
-            newTotal += item.getSubTotal(); 
-        }
-        // ここでDBの orders テーブルの total_price カラムを書き換える
-        orderRepository.updateTotalPrice(orderId, newTotal);
-    }
-}
-	
+		// 4. 合計金額の再計算と更新
+		// これを行うことで、DBの total_price が null や 0 でなくなるため、HTMLでの掛け算エラーが消えます
+		Order updatedOrder = orderRepository.findByUserIdAndStatus(userId, 0);
+
+		// 取得したデータ（updatedOrder）がnullでないこと、商品リストがあることを確認
+		if (updatedOrder != null && updatedOrder.getOrderItemList() != null) {
+			int newTotal = 0;
+			for (OrderItem item : updatedOrder.getOrderItemList()) {
+				// 商品ごとの(価格+トッピング価格) * 数量 を加算
+				newTotal += item.getSubTotal();
+			}
+			// ここでDBの orders テーブルの total_price カラムを書き換える
+			orderRepository.updateTotalPrice(orderId, newTotal);
+
+			System.out.println("DBの合計金額を更新しました: " + newTotal + "円");
+		}
+	}
 
 	/**
 	 * ユーザーIDから未注文のカート情報を取得する
@@ -167,25 +168,33 @@ public void addItemToCart(CartItem cartItem, Integer userId) {
 	}
 
 	/**
- * カート内の商品を削除し、合計金額を再更新する
- * @param orderItemId 削除する商品のID
- */
-/* @Transactional
-public void deleteOrderItem(Integer orderItemId) {
-    // 1. 削除前に、どの注文(orderId)に紐付いているか確認しておく
-    OrderItem item = orderItemRepository.load(orderItemId);
-    Integer orderId = item.getOrderId();
+	 * カート内の商品を削除し、合計金額を再更新する
+	 * 
+	 * @param orderItemId 削除する商品のID
+	 */
+	@Transactional
+	public void deleteOrderItem(Integer orderItemId, Integer userId) {
+		// 1. 商品を削除
+		orderRepository.deleteOrderItem(orderItemId);
 
-    // 2. トッピングと商品を順番に削除
-    orderToppingRepository.deleteByOrderItemId(orderItemId);
-    orderItemRepository.deleteById(orderItemId);
+		// 2. orderRepository に既にある「最新のOrderを取得するメソッド」を呼びます
+		Order order = orderRepository.findByUserIdAndStatus(userId, 0);
 
-    // 3. 削除後の最新状態で合計金額を再計算してUPDATE（重要）
-    Order updatedOrder = orderRepository.load(orderId);
-    int newTotal = 0;
-    for (OrderItem orderItem : updatedOrder.getOrderItemList()) {
-        newTotal += orderItem.getSubTotal();
-    }
-    orderRepository.updateTotalPrice(orderId, newTotal);
-} */
+		if (order != null) {
+			// 3. ★ここで「再計算」を強制的に行う
+			int latestTotal = 0;
+			if (order.getOrderItemList() != null) {
+				for (OrderItem item : order.getOrderItemList()) {
+					// 各商品の小計を足し合わせる
+					latestTotal += item.getSubTotal();
+				}
+			}
+
+			// 4. ★計算した「最新の金額」でDBを更新する
+			orderRepository.updateTotalPrice(order.getId(), latestTotal);
+
+			// 5. Controllerで使うために、オブジェクト内の金額も更新しておく
+			order.setTotalPrice(latestTotal);
+		}
+	}
 }

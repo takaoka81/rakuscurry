@@ -178,7 +178,7 @@ public class OrderRepository {
 				+ "RIGHT JOIN items i ON oi.item_id = i.id "
 				+ "LEFT OUTER JOIN order_toppings ot ON oi.id = ot.order_item_id "
 				+ "LEFT OUTER JOIN toppings t ON ot.topping_id = t.id "
-				+ "WHERE o.id = :orderId ORDER BY i.id DESC";
+				+ "WHERE o.id = :orderId AND o.status IN (1, 2) ORDER BY i.id DESC";
 
 		SqlParameterSource param = new MapSqlParameterSource().addValue("orderId", orderId);
 
@@ -210,7 +210,7 @@ public class OrderRepository {
 				+ "RIGHT JOIN items i ON oi.item_id = i.id "
 				+ "LEFT OUTER JOIN order_toppings ot ON oi.id = ot.order_item_id "
 				+ "LEFT OUTER JOIN toppings t ON ot.topping_id = t.id "
-				+ "WHERE o.user_id = :userId ORDER BY o.order_date DESC, o.id DESC, i.id DESC";
+				+ "WHERE o.user_id = :userId AND o.status IN (1,2) ORDER BY o.order_date DESC, o.id DESC, i.id DESC";
 
 		SqlParameterSource param = new MapSqlParameterSource().addValue("userId", userId);
 
@@ -243,6 +243,27 @@ public class OrderRepository {
 	}
 
 	/**
+	 * 注文情報を更新する（注文確定用）
+	 */
+	public void update(Order order) {
+		String sql = "UPDATE orders SET "
+				+ "status = :status, "
+				+ "total_price = :totalPrice, "
+				+ "order_date = :orderDate, "
+				+ "destination_name = :destinationName, "
+				+ "destination_email = :destinationEmail, "
+				+ "destination_zipcode = :destinationZipcode, "
+				+ "destination_address = :destinationAddress, "
+				+ "destination_tel = :destinationTel, "
+				+ "delivery_time = :deliveryTime, "
+				+ "payment_method = :paymentMethod "
+				+ "WHERE id = :id"; // orderのidで指定
+
+		SqlParameterSource param = new BeanPropertySqlParameterSource(order);
+		template.update(sql, param);
+	}
+
+	/**
 	 * 特定のユーザーとステータスに紐づく注文情報を1件取得する
 	 * 関連するOrderItemとOrderToppingもすべて結合して取得
 	 */
@@ -250,21 +271,22 @@ public class OrderRepository {
 	 * カート情報（注文前データ）を1件取得する
 	 */
 	public Order findByUserIdAndStatus(Integer userId, Integer status) {
-String sql = "SELECT o.id AS o_id, o.user_id, o.status, o.total_price AS o_total_price, "
-            + "oi.id AS oi_id, oi.item_id, "
-            + "oi.quantity AS oi_quantity, " 
-            + "oi.size AS oi_size, "         
-            + "oi.order_price AS oi_order_price, "
-            + "i.name AS i_name, i.image_path AS i_image_path, "
-            + "ot.id AS ot_id, ot.topping_id, "
-            + "ot.order_price AS ot_order_price, "
-            + "t.name AS t_name, t.price_m AS t_price_m, t.price_l AS t_price_l "
-            + "FROM orders o "
-            + "LEFT OUTER JOIN order_items oi ON o.id = oi.order_id "
-            + "LEFT OUTER JOIN items i ON oi.item_id = i.id "
-            + "LEFT OUTER JOIN order_toppings ot ON oi.id = ot.order_item_id "
-            + "LEFT OUTER JOIN toppings t ON ot.topping_id = t.id "
-            + "WHERE o.user_id = :userId AND o.status = :status";
+
+		String sql = "SELECT o.id AS o_id, o.user_id AS user_id, o.status AS status, o.total_price AS o_total_price, "
+				+ "oi.id AS oi_id, oi.item_id, "
+				+ "oi.quantity AS oi_quantity, "
+				+ "oi.size AS oi_size, "
+				+ "oi.order_price AS oi_order_price, "
+				+ "i.name AS i_name, i.image_path AS i_image_path, "
+				+ "ot.id AS ot_id, ot.topping_id AS ot_topping_id, "
+				+ "ot.order_price AS ot_order_price, "
+				+ "t.name AS t_name, t.price_m AS t_price_m, t.price_l AS t_price_l "
+				+ "FROM orders o "
+				+ "LEFT OUTER JOIN order_items oi ON o.id = oi.order_id "
+				+ "LEFT OUTER JOIN items i ON oi.item_id = i.id "
+				+ "LEFT OUTER JOIN order_toppings ot ON oi.id = ot.order_item_id "
+				+ "LEFT OUTER JOIN toppings t ON ot.topping_id = t.id "
+				+ "WHERE o.user_id = :userId AND o.status = :status";
 
 		SqlParameterSource param = new MapSqlParameterSource()
 				.addValue("userId", userId)
@@ -329,7 +351,7 @@ String sql = "SELECT o.id AS o_id, o.user_id, o.status, o.total_price AS o_total
 				if (otId != 0) {
 					OrderTopping orderTopping = new OrderTopping();
 					orderTopping.setId(otId);
-					orderTopping.setToppingId(rs.getInt("topping_id"));
+					orderTopping.setToppingId(rs.getInt("ot_topping_id"));
 					orderTopping.setOrderPrice(rs.getInt("ot_order_price"));
 
 					Topping topping = new Topping();
@@ -360,4 +382,16 @@ String sql = "SELECT o.id AS o_id, o.user_id, o.status, o.total_price AS o_total
 
 		template.update(sql, param);
 	}
+
+	/**
+	 * 注文商品を削除する（カスケードによりトッピングも自動削除される）
+	 * 
+	 * @param orderItemId 削除したいOrderItemのID
+	 */
+	public void deleteOrderItem(Integer orderItemId) {
+		String sql = "DELETE FROM order_items WHERE id = :orderItemId";
+		SqlParameterSource param = new MapSqlParameterSource().addValue("orderItemId", orderItemId);
+		template.update(sql, param);
+	}
+
 }
