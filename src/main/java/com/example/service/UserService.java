@@ -51,6 +51,20 @@ public class UserService {
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		repository.insert(user);
 	}
+
+	/**ユーザー情報を更新
+	 * @param user
+	 */
+	public void update(User user) {
+		repository.update(user);
+	}
+
+	/**ユーザー情報を削除
+	 * @param id
+	 */
+	public void delete(Integer id) {
+		repository.delete(id);
+	}
 	
 	/**
 	 * ２段階認証のパスワードを入力されたメールアドレスに送信

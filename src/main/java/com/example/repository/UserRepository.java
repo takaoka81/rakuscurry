@@ -28,7 +28,7 @@ public class UserRepository {
 	private NamedParameterJdbcTemplate template;
 
 	public User findByMailAddress(String email) {
-		String sql = "SELECT * FROM users WHERE email=:email";
+		String sql = "SELECT * FROM users WHERE email=:email AND status = 0";
 
 		SqlParameterSource param = new MapSqlParameterSource().addValue("email", email);
 
@@ -56,7 +56,7 @@ public class UserRepository {
 	 */
 	public void update(User user){
 		SqlParameterSource param = new BeanPropertySqlParameterSource(user);
-		String sql = "UPDATE users SET name = :name, email = :email, zipcode = :zipcode, address = :address, telephone = :telephone";
+		String sql = "UPDATE users SET name = :name, email = :email, zipcode = :zipcode, address = :address, telephone = :telephone WHERE id = :id";
 		template.update(sql, param);
 	}
 
