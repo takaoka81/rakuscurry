@@ -27,3 +27,17 @@ WHERE status = 0                 -- カート内の注文のみ
     FROM order_items 
     WHERE item_id = 10           -- ★ここに対象の商品IDを入力 (例: 10)
   );
+  
+-- ステータスごとの注文件数を集計して確認する
+SELECT 
+    status, 
+    CASE 
+        WHEN status = 0 THEN 'カート内（有効）'
+        WHEN status = 9 THEN '価格改定による無効'
+        WHEN status = 1 THEN '注文確定（未入金）'
+        ELSE 'その他'
+    END AS 状態名,
+    COUNT(*) AS 件数
+FROM orders
+GROUP BY status
+ORDER BY status;
