@@ -1,0 +1,2 @@
+//ユーザーの論理削除（status=0 :登録済, status=1 :削除済）
+ALTER TABLE users ADD delete integer;
