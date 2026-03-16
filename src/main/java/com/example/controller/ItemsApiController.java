@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.domain.Item;
 import com.example.dto.ItemsResponse;
+import com.example.exception.MyApiSpecificException;
 import com.example.service.ItemService;
 /**
  * 商品一覧情報を取得するためのコントローラー
@@ -34,11 +35,16 @@ private ItemService itemService;
 @GetMapping("")
 public ResponseEntity<List<ItemsResponse>> getItems(
     @RequestParam(required = false) String name){
-        List<Item> items=itemService.findByName(name);
+       try{ List<Item> items=itemService.findByName(name);
         List<ItemsResponse> itemsResponses=new ArrayList<>();
         for (Item item:items){
             itemsResponses.add(new ItemsResponse(item));
         }
         return ResponseEntity.ok(itemsResponses);
+    }catch(RuntimeException e){
+       throw new MyApiSpecificException("Internal Server Error occurred");
+    }catch(Exception ex){
+       throw ex;
+    }
     }
 }
