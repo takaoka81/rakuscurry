@@ -110,14 +110,6 @@ public class OrderService {
 		}
 	}
 
-	public Integer shoppingMethodJude(Order order){
-		if(order.getStatus() == 0){
-			return 0;
-		}else{
-			return 1;
-		}
-	}
-
 	/**
 	 * ユーザーのIdを返すメゾット
 	 * 
