@@ -14,12 +14,12 @@
   </head>
   <body>
     <div class="container">
-	<span th:insert="header::header"></span>
+  <span th:insert="header::header"></span>
       <form th:action="@{/inCart}" method="post" th:object="${itemCartInForm}">
-      	<input type="hidden" name="id" th:value="${item.id}">
+        <input type="hidden" name="id" th:value="${item.id}">
         <div class="row">
           <div class="col-xs-offset-2 col-xs-8">
-          	
+            
             <h3 class="text-center">商品詳細</h3>
             <div class="row">
               <div class="col-xs-5">
@@ -52,8 +52,8 @@
                     </div>
                     <div class="col-sm-12">
                       <label class="radio-inline">
-                      	<!--  jsで値を渡す為に記入  -->
-                		<input type="hidden" id="sizeM" th:value="${item.priceM}"/> 
+                        <!--  jsで値を渡す為に記入  -->
+                    <input type="hidden" id="sizeM" th:value="${item.priceM}"/> 
                         <input
                           type="radio"
                           name="size"
@@ -62,7 +62,7 @@
                           checked="checked"/>
                         <span class="price">&nbsp;М&nbsp;</span>
                         <!--  jsで値を渡す為に記入  -->
-                		<input type="hidden" id="sizeM" name="priceM" th:value="${item.priceM}"/> 
+                    <input type="hidden" id="sizeM" name="priceM" th:value="${item.priceM}"/> 
                          <span class="sizeM" th:text="${#numbers.formatInteger(item.priceM,1,'COMMA')}"></span>円(税込み)
                       </label>
                       <label class="radio-inline">
@@ -84,17 +84,16 @@
                   <div class="row">
                     <div class="col-sm-12">
                       <label for="inputResponsibleCompany">
-                        トッピング：&nbsp;1つにつき
-                        <span>&nbsp;М&nbsp;</span>&nbsp;&nbsp;200円(税込み)
-                        <span>&nbsp;Ｌ</span>&nbsp;&nbsp;300円(税込み)
+                        トッピング：
                       </label>
                     </div>
                     <div class="col-sm-12" id="topping">
-                    	<div th:each="topping, status : ${application.toppingList}">
-	                      <label class="checkbox-inline">
-	                        <input th:text="${topping.name}" type="checkbox" class="checkbox" name="toppingIndex" th:value="${status.index}"/>
-	                      </label>
-                      	</div>
+                      <div th:each="topping, status : ${application.toppingList}">
+                        <label class="checkbox-inline">
+                          <input type="checkbox" class="checkbox" name="toppingIndex" th:value="${status.index}" th:data-price-m="${topping.priceM}" th:data-price-l="${topping.priceL}"/>
+                          <span th:text="${topping.name}"></span>
+                        </label>
+                        </div>
                     </div>
                   </div>
                 </div>
@@ -158,11 +157,7 @@
     </div>
     <!-- end container -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-	<script type="text/javascript" src="js/item_deail.js"></script>
+  <script type="text/javascript" src="js/item_deail.js"></script>
     <script src="../static/js/bootstrap.min.js"></script>
-
-    <!--ハンバーガー機能追加-->
-  <script th:src="@{/js/bootstrap.min.js}"></script>
-    
   </body>
 </html>
