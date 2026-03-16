@@ -1,9 +1,7 @@
 package com.example.repository;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -243,73 +241,4 @@ public class OrderRepository {
 		return order.getId();
 	}
 
-/**
-     * 特定のユーザーとステータスに紐づく注文情報を1件取得する
-     * 関連するOrderItemとOrderToppingもすべて結合して取得
-     */
-    public Order findByUserIdAndStatus(Integer userId, Integer status) {
-        String sql = "SELECT "
-                   + "o.id AS o_id, o.user_id, o.status, o.total_price, "
-                   + "oi.id AS oi_id, oi.item_id, oi.quantity, oi.size, "
-                   + "ot.id AS ot_id, ot.topping_id "
-                   + "FROM orders o "
-                   + "LEFT OUTER JOIN order_items oi ON o.id = oi.order_id "
-                   + "LEFT OUTER JOIN order_toppings ot ON oi.id = ot.order_item_id "
-                   + "WHERE o.user_id = :userId AND o.status = :status;";
-
-        SqlParameterSource param = new MapSqlParameterSource()
-                .addValue("userId", userId)
-                .addValue("status", status);
-
-        return template.query(sql, param, orderResultSetExtractor);
-    }
-
-    /**
-     * ResultSetをOrderオブジェクトの階層構造にマッピングする抽出器
-     */
-    private final ResultSetExtractor<Order> orderResultSetExtractor = (rs) -> {
-        Order order = null;
-        List<OrderItem> orderItemList = null;
-        Map<Integer, OrderItem> itemMap = new LinkedHashMap<>();
-
-        while (rs.next()) {
-            // 1. 最初に行がヒットした時だけOrder本体を作成
-            if (order == null) {
-                order = new Order();
-                order.setId(rs.getInt("o_id"));
-                order.setUserId(rs.getInt("user_id"));
-                order.setStatus(rs.getInt("status"));
-                order.setTotalPrice(rs.getInt("total_price"));
-                orderItemList = new ArrayList<>();
-                order.setOrderItemList(orderItemList);
-            }
-
-            // 2. OrderItem（注文商品）の処理
-            int oiId = rs.getInt("oi_id");
-            if (oiId != 0) { // LEFT JOINなのでnull(0)の可能性がある
-                OrderItem orderItem = itemMap.get(oiId);
-                if (orderItem == null) {
-                    orderItem = new OrderItem();
-                    orderItem.setId(oiId);
-                    orderItem.setItemId(rs.getInt("item_id"));
-                    orderItem.setQuantity(rs.getInt("quantity"));
-                    orderItem.setSize(rs.getString("size"));
-                    orderItem.setOrderTopping(new ArrayList<>());
-                    
-                    itemMap.put(oiId, orderItem);
-                    orderItemList.add(orderItem);
-                }
-
-                // 3. OrderTopping（トッピング）の処理
-                int otId = rs.getInt("ot_id");
-                if (otId != 0) {
-                    OrderTopping topping = new OrderTopping();
-                    topping.setId(otId);
-                    topping.setToppingId(rs.getInt("topping_id"));
-                    orderItem.getOrderTopping().add(topping);
-                }
-            }
-        }
-        return order;
-    };
 }

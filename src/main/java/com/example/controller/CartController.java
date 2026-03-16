@@ -10,12 +10,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.domain.CartItem;
-import com.example.domain.Order;
 import com.example.domain.Topping;
 import com.example.form.ItemCartInForm;
-import com.example.form.OrderForm;
 import com.example.service.CartService;
-import com.example.service.OrderService;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
@@ -33,9 +30,6 @@ public class CartController {
 	private CartService service;
 
 	@Autowired
-	private OrderService orderService;
-
-	@Autowired
 	private HttpSession session;
 	
 	@Autowired
@@ -47,7 +41,7 @@ public class CartController {
 	
 	//Cartに商品を追加
 	@RequestMapping("/inCart")
-	public String inCart(ItemCartInForm form, OrderForm orderForm) {
+	public String inCart(ItemCartInForm form) {
 		
 		CartItem cartItem = new CartItem();
 		BeanUtils.copyProperties(form,cartItem);
@@ -77,12 +71,6 @@ public class CartController {
 		List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
 		cartItemList.add(cartItem);
 		session.setAttribute("cartItemList", cartItemList);
-
-		if(session.getAttribute("user") != null){
-			Order order = new Order();
-			BeanUtils.copyProperties(orderForm, order);
-			orderService.order(order);
-		}
 			
 		return "redirect:/showCart";
 	}
