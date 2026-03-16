@@ -28,8 +28,8 @@ public class ItemsApiController {
 private ItemService itemService;
 /**
  * 商品一覧情報を取得
- * @param name
- * @return
+ * @param name あいまい検索に使う商品名
+ * @return　検索結果
  */
 @GetMapping("")
 public ResponseEntity<List<ItemsResponse>> getItems(
