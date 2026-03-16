@@ -15,7 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.domain.Item;
 import com.example.dto.ItemsResponse;
 import com.example.service.ItemService;
-
+/**
+ * 商品一覧情報を取得するためのコントローラー
+ * @author ren.tsuchiya
+ */
 @RestController
 @RequestMapping("/items")
 @CrossOrigin(origins = "*", methods = { RequestMethod.GET})
@@ -23,7 +26,11 @@ public class ItemsApiController {
 
 @Autowired
 private ItemService itemService;
-
+/**
+ * 商品一覧情報を取得
+ * @param name
+ * @return
+ */
 @GetMapping("")
 public ResponseEntity<List<ItemsResponse>> getItems(
     @RequestParam(required = false) String name){

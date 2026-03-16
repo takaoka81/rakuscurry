@@ -3,10 +3,15 @@ package com.example.dto;
 import com.example.domain.Item;
 
 public class ItemsResponse {
+    /**id */
     private Integer id;
+    /**商品名 */
     private String name;
+    /**Mサイズの値段 */
     private Integer priceM;
+    /**Lサイズの値段 */
     private Integer priceL;
+    /** */
     private String imagePath;
     public Integer getId() {
         return id;
