@@ -58,6 +58,16 @@ public class UserService {
 	}
 
 	/**
+	 * メールアドレスが既に登録されているか確認する
+	 * 
+	 * @param email 二段階認証のためのメールアドレス
+	 */
+	public boolean existsByMailAddress(String email) {
+		boolean exitsMailAddress = repository.existsByMailAddress(email);
+		return exitsMailAddress;
+	}
+
+	/**
 	 * ２段階認証のパスワードを入力されたメールアドレスに送信
 	 * 
 	 * @param email

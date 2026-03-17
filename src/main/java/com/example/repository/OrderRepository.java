@@ -1,7 +1,9 @@
 package com.example.repository;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -56,9 +58,8 @@ public class OrderRepository {
 
 			// 現在のidと前回のidが被ってないか確認
 			if (nowIdNum != beforeIdNum) {
-				
-	
-				//orderオブジェクトにSQLのデータをセット
+
+				// orderオブジェクトにSQLのデータをセット
 				Order order = new Order();
 				order.setId(nowIdNum);
 				order.setUserId(rs.getInt("o_user_id"));
@@ -177,7 +178,7 @@ public class OrderRepository {
 				+ "RIGHT JOIN items i ON oi.item_id = i.id "
 				+ "LEFT OUTER JOIN order_toppings ot ON oi.id = ot.order_item_id "
 				+ "LEFT OUTER JOIN toppings t ON ot.topping_id = t.id "
-				+ "WHERE o.id = :orderId ORDER BY i.id DESC";
+				+ "WHERE o.id = :orderId AND o.status IN (1, 2) ORDER BY i.id DESC";
 
 		SqlParameterSource param = new MapSqlParameterSource().addValue("orderId", orderId);
 
@@ -209,7 +210,7 @@ public class OrderRepository {
 				+ "RIGHT JOIN items i ON oi.item_id = i.id "
 				+ "LEFT OUTER JOIN order_toppings ot ON oi.id = ot.order_item_id "
 				+ "LEFT OUTER JOIN toppings t ON ot.topping_id = t.id "
-				+ "WHERE o.user_id = :userId ORDER BY o.order_date DESC, o.id DESC, i.id DESC";
+				+ "WHERE o.user_id = :userId AND o.status IN (1,2) ORDER BY o.order_date DESC, o.id DESC, i.id DESC";
 
 		SqlParameterSource param = new MapSqlParameterSource().addValue("userId", userId);
 
@@ -239,6 +240,158 @@ public class OrderRepository {
 		order.setId(keyHolder.getKey().intValue());
 
 		return order.getId();
+	}
+
+	/**
+	 * 注文情報を更新する（注文確定用）
+	 */
+	public void update(Order order) {
+		String sql = "UPDATE orders SET "
+				+ "status = :status, "
+				+ "total_price = :totalPrice, "
+				+ "order_date = :orderDate, "
+				+ "destination_name = :destinationName, "
+				+ "destination_email = :destinationEmail, "
+				+ "destination_zipcode = :destinationZipcode, "
+				+ "destination_address = :destinationAddress, "
+				+ "destination_tel = :destinationTel, "
+				+ "delivery_time = :deliveryTime, "
+				+ "payment_method = :paymentMethod "
+				+ "WHERE id = :id"; // orderのidで指定
+
+		SqlParameterSource param = new BeanPropertySqlParameterSource(order);
+		template.update(sql, param);
+	}
+
+	/**
+	 * 特定のユーザーとステータスに紐づく注文情報を1件取得する
+	 * 関連するOrderItemとOrderToppingもすべて結合して取得
+	 */
+	/**
+	 * カート情報（注文前データ）を1件取得する
+	 */
+	public Order findByUserIdAndStatus(Integer userId, Integer status) {
+
+		String sql = "SELECT o.id AS o_id, o.user_id AS user_id, o.status AS status, o.total_price AS o_total_price, "
+				+ "oi.id AS oi_id, oi.item_id, "
+				+ "oi.quantity AS oi_quantity, "
+				+ "oi.size AS oi_size, "
+				+ "oi.order_price AS oi_order_price, "
+				+ "i.name AS i_name, i.image_path AS i_image_path, "
+				+ "ot.id AS ot_id, ot.topping_id AS ot_topping_id, "
+				+ "ot.order_price AS ot_order_price, "
+				+ "t.name AS t_name, t.price_m AS t_price_m, t.price_l AS t_price_l "
+				+ "FROM orders o "
+				+ "LEFT OUTER JOIN order_items oi ON o.id = oi.order_id "
+				+ "LEFT OUTER JOIN items i ON oi.item_id = i.id "
+				+ "LEFT OUTER JOIN order_toppings ot ON oi.id = ot.order_item_id "
+				+ "LEFT OUTER JOIN toppings t ON ot.topping_id = t.id "
+				+ "WHERE o.user_id = :userId AND o.status = :status";
+
+		SqlParameterSource param = new MapSqlParameterSource()
+				.addValue("userId", userId)
+				.addValue("status", status);
+
+		return template.query(sql, param, orderResultSetExtractor);
+	}
+
+	/**
+	 * 新規カートを作成し、発行されたIDを返す
+	 */
+	public Integer insertOrder(Integer userId) {
+		String sql = "INSERT INTO orders (user_id, status, total_price) "
+				+ "VALUES (:userId, :status, total_price) RETURNING id";
+		SqlParameterSource param = new MapSqlParameterSource().addValue("userId", userId);
+		return template.queryForObject(sql, param, Integer.class);
+	}
+
+	private final ResultSetExtractor<Order> orderResultSetExtractor = (rs) -> {
+		Order order = null;
+		Map<Integer, OrderItem> itemMap = new LinkedHashMap<>();
+
+		while (rs.next()) {
+			// 1. Orderの作成（ここはそのまま）
+			if (order == null) {
+				order = new Order();
+				order.setId(rs.getInt("o_id"));
+				order.setUserId(rs.getInt("user_id"));
+				order.setStatus(rs.getInt("status"));
+				order.setTotalPrice(rs.getInt("o_total_price"));
+				order.setOrderItemList(new ArrayList<>());
+			}
+
+			// 2. OrderItemの処理（computeIfAbsentをやめて、ifでチェックする）
+			int oiId = rs.getInt("oi_id");
+			if (oiId != 0) {
+				OrderItem orderItem = itemMap.get(oiId);
+
+				if (orderItem == null) {
+					// まだMapにない場合だけ新しく作る
+					orderItem = new OrderItem();
+					orderItem.setId(oiId);
+					orderItem.setItemId(rs.getInt("item_id"));
+					orderItem.setOrderPrice(rs.getInt("oi_order_price"));
+					orderItem.setQuantity(rs.getInt("oi_quantity"));
+					orderItem.setSize(rs.getString("oi_size"));
+					orderItem.setOrderTopping(new ArrayList<>());
+
+					Item item = new Item();
+					item.setName(rs.getString("i_name"));
+					item.setImagePath(rs.getString("i_image_path"));
+					orderItem.setItem(item);
+
+					// Mapに保存
+					itemMap.put(oiId, orderItem);
+					// ★ここなら order が再代入された後でも、ラムダの外なのでエラーになりません！
+					order.getOrderItemList().add(orderItem);
+				}
+
+				// 3. トッピングの処理
+				int otId = rs.getInt("ot_id");
+				if (otId != 0) {
+					OrderTopping orderTopping = new OrderTopping();
+					orderTopping.setId(otId);
+					orderTopping.setToppingId(rs.getInt("ot_topping_id"));
+					orderTopping.setOrderPrice(rs.getInt("ot_order_price"));
+
+					Topping topping = new Topping();
+					topping.setName(rs.getString("t_name"));
+					topping.setPriceM(rs.getInt("t_price_m"));
+					topping.setPriceL(rs.getInt("t_price_l"));
+					orderTopping.setTopping(topping);
+
+					orderItem.getOrderTopping().add(orderTopping);
+				}
+			}
+		}
+		return order;
+	};
+
+	/**
+	 * 指定した注文の合計金額を更新する
+	 * 
+	 * @param orderId    注文ID
+	 * @param totalPrice 計算済みの合計金額
+	 */
+	public void updateTotalPrice(Integer orderId, Integer totalPrice) {
+		String sql = "UPDATE orders SET total_price = :totalPrice WHERE id = :orderId";
+
+		SqlParameterSource param = new MapSqlParameterSource()
+				.addValue("totalPrice", totalPrice)
+				.addValue("orderId", orderId);
+
+		template.update(sql, param);
+	}
+
+	/**
+	 * 注文商品を削除する（カスケードによりトッピングも自動削除される）
+	 * 
+	 * @param orderItemId 削除したいOrderItemのID
+	 */
+	public void deleteOrderItem(Integer orderItemId) {
+		String sql = "DELETE FROM order_items WHERE id = :orderItemId";
+		SqlParameterSource param = new MapSqlParameterSource().addValue("orderItemId", orderItemId);
+		template.update(sql, param);
 	}
 
 }
