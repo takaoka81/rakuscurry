@@ -30,14 +30,14 @@
           "
         >
           <h3 class="text-center">ショッピングカート</h3>
-          <table class="table table-striped item-list-table">
+          <table class="table">
             <tbody>
               <tr>
                 <th>
                   <div class="text-center">商品名</div>
                 </th>
                 <th>
-                  <div class="text-center">サイズ、価格(税抜)、数量</div>
+                  <div class="text-center">サイズ、価格(税込み)、数量</div>
                 </th>
                 <th>
                   <div class="text-center">トッピング、価格(税込み)</div>
@@ -47,9 +47,8 @@
                 </th>
                 <th></th>
               </tr>
-              <tr>
+              <tr th:if="${cartNothing != null}">
               	<th colspan="5">
-              		<br>
               		<h3 th:if="${cartNothing != null}" th:text="${cartNothing}"></h3>
               	</th>
               </tr>
