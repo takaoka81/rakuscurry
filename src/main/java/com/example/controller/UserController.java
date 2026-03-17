@@ -1,5 +1,7 @@
 package com.example.controller;
 
+import java.lang.ProcessBuilder.Redirect;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -10,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.domain.User;
 import com.example.form.InsertForm;
@@ -33,7 +36,7 @@ public class UserController {
      * @return ログイン画面
      */
     @PostMapping("/deleteUser")
-    public String deleteUser() {
+    public String deleteUser(RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("user");
         if (user != null) {
             // 1. データベースのstatusを1にする
@@ -41,6 +44,7 @@ public class UserController {
             // 2. セッションを無効化（ログアウト状態にする）
             session.invalidate();
         }
+        redirectAttributes.addFlashAttribute("deleteMessage", "退会手続きが完了しました。ご利用ありがとうございました。");
         return "redirect:/toLogin";
     }
 
@@ -76,7 +80,7 @@ public class UserController {
      * @return 商品一覧画面
      */
     @PostMapping("/updateUser")
-    public String updateUser(@Validated InsertForm form, BindingResult result, Model model) {
+    public String updateUser(@Validated InsertForm form, BindingResult result,RedirectAttributes redirectAttributes, Model model) {
         // セッションから現在のパスワードを補完してバリデーションを通す（暫定対応）
         User loginuser = (User) session.getAttribute("user");
         if (form.getPassword() == null || form.getPassword().isEmpty()) {
@@ -98,6 +102,7 @@ public class UserController {
         try {
             userService.update(user);
             session.setAttribute("user", user);
+            redirectAttributes.addFlashAttribute("updateMessage", "会員情報を更新しました。再度ログインしてください。");
             return "redirect:/toLogin";
         } catch (DataIntegrityViolationException e) {
             e.printStackTrace();
