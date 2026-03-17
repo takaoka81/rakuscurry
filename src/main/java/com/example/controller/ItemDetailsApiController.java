@@ -15,8 +15,6 @@ import com.example.domain.Item;
 import com.example.domain.Topping;
 import com.example.dto.ItemDetailResponse;
 import com.example.exception.EntityNotFoundException;
-import com.example.exception.MyApiSpecificException;
-import com.example.exception.MyApiSpecificException;
 import com.example.service.ItemService;
 /**
  * 商品詳細を取得するためのコントローラー
@@ -36,8 +34,8 @@ public class ItemDetailsApiController {
  */
     @GetMapping("/{id}")
     public ResponseEntity<ItemDetailResponse> getItemDetail(@PathVariable Integer id){
-        try{
-        Item items=itemService.showItemDetail(id);
+
+        Item items=itemService.ApiShowItemDetail(id);
         if(items==null){
             throw new EntityNotFoundException("商品ID: " + id + " は存在しません");
         }
@@ -45,10 +43,5 @@ public class ItemDetailsApiController {
         List<Topping> toppings=itemService.findAllTopping();
         items.setToppingList(toppings);
         return ResponseEntity.ok(new ItemDetailResponse(items));
-       }catch(EntityNotFoundException e){
-          throw e;
-       }catch(Exception e){
-    throw new MyApiSpecificException("Internal Server Error occurred");
-       }
     }
 }

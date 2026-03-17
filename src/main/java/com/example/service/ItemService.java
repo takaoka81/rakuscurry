@@ -92,4 +92,8 @@ public class ItemService {
 	      = new PageImpl<Item>(list, PageRequest.of(page, size), itemList.size());
 	    return employeePage;
 	}
+
+	public Item ApiShowItemDetail(Integer id){
+		return repository.ApiShowItemDetail(id);
+	}
 }

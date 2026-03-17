@@ -91,4 +91,16 @@ public class ItemRepository {
 		List<String> allNames = template.query(sql, NAME_ROW_MAPPER);
 		return allNames;
 	}
+
+	public Item ApiShowItemDetail(Integer id){
+		String sql="SELECT * FROM items WHERE id = :id;";
+		SqlParameterSource param=new MapSqlParameterSource("id",id);
+		List<Item> items =template.query(sql,param,ITEM_ROW_MAPPER);
+
+		if(items.isEmpty()){
+			return null;
+		}else{
+			return items.get(0);
+		}
+	}
 }
