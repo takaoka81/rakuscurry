@@ -98,7 +98,7 @@ public class UserController {
         try {
             userService.update(user);
             session.setAttribute("user", user);
-            return "redirect:/showList";
+            return "redirect:/toLogin";
         } catch (DataIntegrityViolationException e) {
             e.printStackTrace();
             model.addAttribute("emailRegistedError", "そのメールアドレスはすでに使われています");

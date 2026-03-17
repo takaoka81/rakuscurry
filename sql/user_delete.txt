@@ -1,4 +1,4 @@
 //ユーザーの論理削除（status=0 :登録済, status=1 :削除済）
 ALTER TABLE users ADD status integer;
-//ユーザーid=1　にstatus = 0;を追加する
-UPDATE users SET status = 0 WHERE id = 0;
+//既存のユーザーのstatusを0にする
+UPDATE users SET status = 0 
