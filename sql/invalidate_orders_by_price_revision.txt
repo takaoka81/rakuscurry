@@ -1,0 +1,43 @@
+/*
+ * 商品の価格改定に伴うカート情報の無効化スクリプト
+ * 手順:
+ * 1. 変数 ':target_item_id' を改定した商品のIDに書き換える
+ * 2. 実行して status が 9 に更新されたことを確認する
+ */
+
+-- 影響を受ける注文IDとユーザーIDを事前に確認したい場合はこちら
+SELECT 
+    o.id AS order_id, 
+    o.user_id, 
+    oi.id AS order_item_id, 
+    oi.item_id, 
+    o.status AS old_status
+FROM orders o
+JOIN order_items oi ON o.id = oi.order_id
+WHERE o.status = 0               -- カート内の注文のみ
+  AND oi.item_id = 10;           -- ★ここに対象の商品IDを入力 (例: 10)
+
+
+-- 実際の更新処理 (statusを9に書き換える)
+UPDATE orders
+SET status = 9
+WHERE status = 0                 -- カート内の注文のみ
+  AND id IN (
+    SELECT order_id 
+    FROM order_items 
+    WHERE item_id = 10           -- ★ここに対象の商品IDを入力 (例: 10)
+  );
+  
+-- ステータスごとの注文件数を集計して確認する
+SELECT 
+    status, 
+    CASE 
+        WHEN status = 0 THEN 'カート内（有効）'
+        WHEN status = 9 THEN '価格改定による無効'
+        WHEN status = 1 THEN '注文確定（未入金）'
+        ELSE 'その他'
+    END AS 状態名,
+    COUNT(*) AS 件数
+FROM orders
+GROUP BY status
+ORDER BY status;

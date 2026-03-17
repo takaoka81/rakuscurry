@@ -1,0 +1,40 @@
+
+3/16 タイトル名、説明文を更新
+
+UPDATE items
+SET description = 'じっくり煮込んだやわらかい豚肉と、コク深い特製カレーソースが自慢のポークカレー。'
+WHERE  id= 2;
+
+UPDATE items
+SET description = 'カレーはライスだけではありません。ラクラクカレーが開発したカレーラーメンは絶品の美味しさ！'
+WHERE id = 5;
+
+UPDATE items
+SET description = 'やわらかくあっさりとしたヒレ肉を上質な衣で包み込みました。濃厚な味わいが楽しめるカレーです'
+WHERE id = 6;
+
+UPDATE items
+SET description = 'こだわりのソースで、旨みとコクを堪能！動物由来の原材料を使用していないカレーなのでベジタリアンの方にオススメです'
+WHERE id = 7;
+
+UPDATE items
+SET name = '完熟トマトのスパイスカレー'
+WHERE id = 9;
+
+UPDATE items
+SET name = 'カレードリア'
+WHERE id = 11;
+
+UPDATE items
+SET name = 'マトンカレー',
+    description = 'スパイスの香り豊かなルーに、じっくり煮込んだマトンを合わせた本格マトンカレー。'
+WHERE id = 13;
+
+UPDATE items
+SET name = 'スパイスカレー',
+    description = '数種類のスパイスを丁寧にブレンドし、香りとコクを引き出した本格スパイスカレー。'
+WHERE id = 15;
+
+UPDATE items
+SET description = '人気ナンバー１！魚介と野菜の旨みをじっくり引き出した、コク深いスパイスカレー。'
+WHERE  id= 16;

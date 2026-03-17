@@ -42,30 +42,17 @@ public class ItemsApiControllerTest {
                 .build();
     }
 
-    @Test
-    void testServiceThrow500() throws Exception {
-        // 1. Serviceが「InternalServerError」を投げるように設定
-        Exception expectedEx = org.springframework.web.client.HttpServerErrorException.create(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "Internal Server Error",
-                null, null, null);
-
-        when(itemService.findByName(anyString())).thenThrow(expectedEx);
-
-        // 2. 実行と検証
-        mockMvc.perform(get("/items")
-                .param("name", "test"))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message").value("Internal Server Errortest"));
-    }
-
-    @Test
+/**
+ * Handlerがステータスコード500のエラーを取得できているかのテスト
+ */
+    
+@Test
     void test500Error_ShouldReturnCustomJson() throws Exception {
     // 予期せぬエラー（500相当）を発生させる
     when(itemService.findByName(anyString())).thenThrow(new RuntimeException("DB error"));
 
     mockMvc.perform(get("/items").param("name", "test"))
         .andExpect(status().isInternalServerError()) // 500
-        .andExpect(jsonPath("$.message").value("Internal Server Errortest")); // 独自メッセージ
+        .andExpect(jsonPath("$.message").value("Internal Server Error")); 
   }
 }

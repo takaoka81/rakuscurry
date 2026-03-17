@@ -184,9 +184,11 @@ table {
   border-spacing: 0;
   border-collapse: collapse;
 }
+/* 文字を中央揃え */
 td,
 th {
   padding: 0;
+  text-align: center;
 }
 /*! Source: https://github.com/h5bp/html5-boilerplate/blob/master/src/css/main.css */
 @media print {
@@ -2254,13 +2256,15 @@ table th[class*="col-"] {
   .table-responsive > .table {
     margin-bottom: 0;
   }
+  /* スマホサイズで改行する */
   .table-responsive > .table > thead > tr > th,
   .table-responsive > .table > tbody > tr > th,
   .table-responsive > .table > tfoot > tr > th,
   .table-responsive > .table > thead > tr > td,
   .table-responsive > .table > tbody > tr > td,
   .table-responsive > .table > tfoot > tr > td {
-    white-space: nowrap;
+    white-space: normal;
+    word-break: break-word;
   }
   .table-responsive > .table-bordered {
     border: 0;
@@ -2286,6 +2290,41 @@ table th[class*="col-"] {
   .table-responsive > .table-bordered > tbody > tr:last-child > td,
   .table-responsive > .table-bordered > tfoot > tr:last-child > td {
     border-bottom: 0;
+  }
+  /* テーブル幅を画面に収める */
+  .table {
+    table-layout: fixed;
+    width: 100%;
+  }
+  /* セルの調整 */
+  .table th,
+  .table td {
+    padding: 6px 4px;
+    font-size: 12px;
+    vertical-align: top;
+    white-space: normal;
+    word-break: break-word;
+  }
+  /* 商品画像サイズの調整 */
+  .item-img-center {
+    max-width: 100%;
+    height: auto;
+    width: 70px;
+  }
+  /* 削除ボタンのサイズ調整 */
+  .btn.btn-primary {
+    font-size: 12px;
+    padding: 4px 8px;
+    white-space: nowrap;
+  }
+  /* 価格表示余白・改行調整がしやすく */
+  .price {
+    display: inline-block;
+  }
+  /* トッピングリストの調整。 */
+  ul {
+    padding-left: 16px;
+    margin-bottom: 0;
   }
 }
 fieldset {
@@ -2741,6 +2780,13 @@ select[multiple].form-group-lg .form-control {
   .form-horizontal .form-group-sm .control-label {
     padding-top: 6px;
   }
+}
+/* 追加 */
+.order-btn {
+  white-space: normal;
+  word-break: keep-all;
+  font-size: 16px;
+  padding: 10px 12px;
 }
 .btn {
   display: inline-block;

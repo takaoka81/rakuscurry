@@ -11,7 +11,11 @@ public class ItemsResponse {
     private Integer priceM;
     /**Lサイズの値段 */
     private Integer priceL;
+<<<<<<< HEAD
     /**商品画像*/
+=======
+    /**商品画像 */
+>>>>>>> origin/develop
     private String imagePath;
     public Integer getId() {
         return id;

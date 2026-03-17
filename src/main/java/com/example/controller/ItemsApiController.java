@@ -16,35 +16,40 @@ import com.example.domain.Item;
 import com.example.dto.ItemsResponse;
 import com.example.exception.MyApiSpecificException;
 import com.example.service.ItemService;
+
 /**
  * 商品一覧情報を取得するためのコントローラー
+ * 
  * @author ren.tsuchiya
  */
 @RestController
 @RequestMapping("/items")
-@CrossOrigin(origins = "*", methods = { RequestMethod.GET})
+@CrossOrigin(origins = "*", methods = { RequestMethod.GET })
 public class ItemsApiController {
 
-@Autowired
-private ItemService itemService;
-/**
- * 商品一覧情報を取得
- * @param name あいまい検索に使う商品名
- * @return　検索結果
- */
-@GetMapping("")
-public ResponseEntity<List<ItemsResponse>> getItems(
-    @RequestParam(required = false) String name){
-       try{ List<Item> items=itemService.findByName(name);
-        List<ItemsResponse> itemsResponses=new ArrayList<>();
-        for (Item item:items){
-            itemsResponses.add(new ItemsResponse(item));
+    @Autowired
+    private ItemService itemService;
+
+    /**
+     * 商品一覧情報を取得
+     * 
+     * @param name あいまい検索に使う商品名
+     * @return 検索結果
+     */
+    @GetMapping("")
+    public ResponseEntity<List<ItemsResponse>> getItems(
+            @RequestParam(required = false) String name) {
+        try {
+            List<Item> items = itemService.findByName(name);
+            List<ItemsResponse> itemsResponses = new ArrayList<>();
+            for (Item item : items) {
+                itemsResponses.add(new ItemsResponse(item));
+            }
+            return ResponseEntity.ok(itemsResponses);
+        } catch (RuntimeException e) {
+            throw new MyApiSpecificException("Internal Server Error ");
+        } catch (Exception ex) {
+            throw ex;
         }
-        return ResponseEntity.ok(itemsResponses);
-    }catch(RuntimeException e){
-       throw new MyApiSpecificException("Internal Server Error occurred");
-    }catch(Exception ex){
-       throw ex;
-    }
     }
 }
