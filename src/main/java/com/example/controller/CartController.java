@@ -12,18 +12,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.domain.CartItem;
+import com.example.domain.Order;
 import com.example.domain.Topping;
+import com.example.domain.User;
 import com.example.form.ItemCartInForm;
 import com.example.service.CartService;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
 
-/**
- * @author satakemisako
- * カートに商品を追加する
- *
- */
 @Controller
 @RequestMapping("")
 public class CartController {
@@ -35,70 +32,77 @@ public class CartController {
 
 	@Autowired
 	private HttpSession session;
-	
 	@Autowired
 	private ServletContext application;
-	
+
 	public ItemCartInForm setupForm() {
 		return new ItemCartInForm();
 	}
-	
-	//Cartに商品を追加
+
 	@RequestMapping("/inCart")
 	public String inCart(ItemCartInForm form) {
-		
 		CartItem cartItem = new CartItem();
-		BeanUtils.copyProperties(form,cartItem);
+		BeanUtils.copyProperties(form, cartItem);
 		cartItem.setItemId(form.getId());
-			
-		//cartItemにitemの金額を設置
 		cartItem.setItemPrice(service.getPriceSize(form));
-		
-		//トッピングをcartItemに代入
+
 		@SuppressWarnings("unchecked")
 		List<Topping> toppingList = (List<Topping>) application.getAttribute("toppingList");
-		List<Topping> toppings = service.getToppingIndex(toppingList, form.getToppingIndex());
-		cartItem.setToppingList(toppings);
-		
-		//小計を代入
-//		Integer subPrices = service.calcSubTotal(cartItem);
-//		cartItem.setSubTotal(subPrices);
-			
-		//カート内の商品をリストに格納
-		//初めてセッションスコープに格納する際はLinkedListを入れる
-		if(session.getAttribute("cartItemList")==null) {
-			List<CartItem> cartItemList = new LinkedList<>();
-			session.setAttribute("cartItemList", cartItemList);
+		List<Topping> selectedToppings = service.getToppingIndex(toppingList, form.getToppingIndex());
+		cartItem.setToppingList(selectedToppings);
+
+		User user = (User) session.getAttribute("user");
+		if (user != null) {
+			service.addItemToCart(cartItem, user.getId());
+		} else {
+			saveToSessionCart(cartItem);
 		}
-			
-		@SuppressWarnings("unchecked")
-		List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
-		cartItemList.add(cartItem);
-		session.setAttribute("cartItemList", cartItemList);
-			
+
 		return "redirect:/showCart";
 	}
-	
-	//Cartの中身を表示するメソッド
-	@RequestMapping("/showCart")
-	public String showCart(Model model) {
+
+	private void saveToSessionCart(CartItem cartItem) {
 		@SuppressWarnings("unchecked")
 		List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
-		
-		int totalPrice = 0;
-		if(cartItemList == null) {
-			session.setAttribute("cartItemList", new LinkedList<>());
-			model.addAttribute("cartNothing", "カートの中身はございません");
-		} else if(cartItemList.size() == 0) {
-			model.addAttribute("cartNothing", "カートの中身はございません");
+		if (cartItemList == null) {
+			cartItemList = new LinkedList<>();
 		}
-		else {
-			totalPrice = service.calcTotal(cartItemList);
+		cartItemList.add(cartItem);
+		session.setAttribute("cartItemList", cartItemList);
+	}
+
+	@RequestMapping("/showCart")
+	public String showCart(Model model) {
+		User user = (User) session.getAttribute("user");
+
+		if (user != null) {
+			// --- ログイン時の処理 ---
+			Order order = service.getCartByUserId(user.getId());
+			if (order == null || order.getOrderItemList().isEmpty()) {
+				model.addAttribute("cartNothing", "カートに商品がありません");
+			} else {
+				model.addAttribute("order", order);
+			}
+		} else {
+			// --- 未ログイン時の処理（カッコの構造を修正） ---
+			@SuppressWarnings("unchecked")
+			List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
+
+			if (cartItemList == null || cartItemList.isEmpty()) {
+				model.addAttribute("cartNothing", "カートに商品がありません");
+				session.setAttribute("totalPrice", 0);
+			} else {
+				int total = 0;
+				for (CartItem item : cartItemList) {
+					total += item.getSubTotal();
+				}
+				// /* 修正点：ここでの保存がHTMLの表示に直結します */
+				session.setAttribute("totalPrice", total);
+			}
 		}
-		session.setAttribute("totalPrice", totalPrice);
 		return "cart/cart_list";
 	}
-	
+
 	@RequestMapping("/delete")
 	public String delete(String index, Model model) {
 		logger.info(index);
@@ -107,5 +111,4 @@ public class CartController {
 		cartItemList.remove(Integer.parseInt(index));
 		return showCart(model);
 	}
-	
 }
