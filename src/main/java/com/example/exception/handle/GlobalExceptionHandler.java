@@ -14,7 +14,6 @@ import com.example.exception.dto.ErrorResponse;
     public class GlobalExceptionHandler {
     @ExceptionHandler(MyApiSpecificException.class) 
     public ResponseEntity<ErrorResponse> handleOnlyMyApiError(MyApiSpecificException ex) {
-<<<<<<< HEAD
         ErrorResponse body = new ErrorResponse(500, "Internal Server Errortest", null); 
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -23,11 +22,6 @@ import com.example.exception.dto.ErrorResponse;
     public ResponseEntity<ErrorResponse>handleNotFoundException(EntityNotFoundException ex){
         ErrorResponse body=new ErrorResponse(404,ex.getMessage(), null);
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
-=======
-        ErrorResponse body = new ErrorResponse(500, "Internal Server Error", null); 
-        
-    return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
->>>>>>> origin/develop
     }
 
 }
