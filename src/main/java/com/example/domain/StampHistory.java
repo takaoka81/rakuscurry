@@ -55,4 +55,8 @@ public class StampHistory {
         return stampCountChenges;
     }
 
+    public void setStampCountChenges(Integer stampCountChenges) {
+        this.stampCountChenges = stampCountChenges;
+    }
+
 }
