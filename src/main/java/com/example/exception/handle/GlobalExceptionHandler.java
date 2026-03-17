@@ -13,7 +13,7 @@ import com.example.exception.dto.ErrorResponse;
     public class GlobalExceptionHandler {
     @ExceptionHandler(MyApiSpecificException.class) 
     public ResponseEntity<ErrorResponse> handleOnlyMyApiError(MyApiSpecificException ex) {
-        ErrorResponse body = new ErrorResponse(500, "Internal Server Errortest", null); 
+        ErrorResponse body = new ErrorResponse(500, "Internal Server Error", null); 
         
     return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
