@@ -119,4 +119,13 @@ public class UserService {
 		}
 	}
 
+	/**
+	 * usersテーブルのスタンプカウントを更新する
+	 * 
+	 * @param user
+	 */
+	public void updateStampCounts(User user) {
+		repository.updateStampCounts(user);
+	}
+
 }

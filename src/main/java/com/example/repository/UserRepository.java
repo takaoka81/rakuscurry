@@ -84,4 +84,23 @@ public class UserRepository {
 		template.update(sql, param);
 	}
 
+	/**
+	 * ユーザテーブルのスタンプカウントの更新を行います
+	 * 
+	 * @param user 登録する情報
+	 */
+	public void updateStampCounts(User user) {
+		String sql = """
+				UPDATE
+					users
+				SET
+					stamp_now_count=:stampNowCount,
+					stamp_all_count=:stampAllCount
+				WHERE
+					id=:id;
+				""";
+		SqlParameterSource param = new BeanPropertySqlParameterSource(user);
+		template.update(sql, param);
+	}
+
 }

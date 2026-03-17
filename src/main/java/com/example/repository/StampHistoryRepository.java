@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.stereotype.Repository;
 
 import com.example.domain.StampHistory;
 
@@ -14,6 +15,7 @@ import com.example.domain.StampHistory;
  *
  * @author masashi.saito
  */
+@Repository
 public class StampHistoryRepository {
 
     @Autowired
@@ -24,7 +26,7 @@ public class StampHistoryRepository {
         stampHistory.setId(rs.getInt("id"));
         stampHistory.setUserId(rs.getInt("user_id"));
         stampHistory.setOrderId(rs.getInt("order_id"));
-        stampHistory.setStampCountChenges(rs.getInt("stamp_count_chenges"));
+        stampHistory.setStampCountChanges(rs.getInt("stamp_count_changes"));
         return stampHistory;
     };
 
@@ -40,7 +42,7 @@ public class StampHistoryRepository {
                     id,
                     user_id,
                     order_id,
-                    stamp_count_chenges
+                    stamp_count_changes
                 FROM
                     stamp_history
                 WHERE
@@ -63,12 +65,12 @@ public class StampHistoryRepository {
                     stamp_history(
                         user_id,
                         order_id,
-                        stamp_count_chenges
+                        stamp_count_changes
                         )
                 VALUES(
                     :userId,
                     :orderId,
-                    :stampCountChenges
+                    :stampCountChanges
                 );
                 """;
         SqlParameterSource param = new BeanPropertySqlParameterSource(stampHistory);

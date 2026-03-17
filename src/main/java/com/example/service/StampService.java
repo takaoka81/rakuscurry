@@ -1,8 +1,19 @@
 package com.example.service;
 
-import org.springframework.stereotype.Service;
+import java.util.List;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.example.domain.OrderItem;
+
+/**
+ * スタンプに関連する業務処理を行います
+ *
+ * @author masashi.saito
+ */
 @Service
+@Transactional
 public class StampService {
 
     /**
@@ -34,6 +45,24 @@ public class StampService {
     public Integer getStampOnCardCount(Integer stampCount) {
         while (stampCount > FREE_STAMP_COUNT) {
             stampCount -= FREE_STAMP_COUNT;
+        }
+        return stampCount;
+    }
+
+    /**
+     * 注文ごとのスタンプ付与数を取得します。
+     * 
+     * @param orderItemList 注文情報
+     * @return 注文に対するスタンプ付与数
+     */
+    public Integer getStampCountByOrder(List<OrderItem> orderItemList) {
+        Integer stampCount = 0;
+        for (OrderItem orderItem : orderItemList) {
+            if (orderItem.getSize().equals("M")) {
+                stampCount++;
+            } else {
+                stampCount = stampCount + 2;
+            }
         }
         return stampCount;
     }

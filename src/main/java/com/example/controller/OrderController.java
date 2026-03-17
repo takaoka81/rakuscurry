@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.domain.Order;
+import com.example.domain.StampHistory;
 import com.example.domain.User;
 import com.example.form.OrderForm;
 import com.example.service.CartService;
 import com.example.service.OrderService;
+import com.example.service.StampService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -42,6 +44,9 @@ public class OrderController {
 
 	@Autowired
 	private CartService cartService;
+
+	@Autowired
+	private StampService stampService;
 
 	@Autowired
 	private HttpSession session;
@@ -156,7 +161,12 @@ public class OrderController {
 		order.setDestinationZipcode(form.getDestinationZipcode().replace("-", ""));
 
 		order.setDeliveryTime(form.getTimestamp());
-		service.order(order);
+
+		Integer addStamps = stampService.getStampCountByOrder(order.getOrderItemList());
+		user.setStampNowCount(user.getStampNowCount() + addStamps);
+		user.setStampAllCount(user.getStampAllCount() + addStamps);
+		StampHistory stampHistory = new StampHistory(user.getId(), order.getId(), addStamps);
+		service.order(order, user, stampHistory);
 		// 完了メールを送信
 
 		service.sendMail(order, user.getEmail());
