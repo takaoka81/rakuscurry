@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.form.RandomCheckForm;
 import com.example.service.UserService;
@@ -53,10 +54,14 @@ public class TwoStepVerificationController {
 	 * @return
 	 */
 	@RequestMapping("mailsend")
-	public String mailSend(@Validated RandomCheckForm form, BindingResult result ,Model model) {
+	public String mailSend(@Validated RandomCheckForm form, BindingResult result ,Model model, RedirectAttributes redirectAttributes) {
 		
 		if(result.hasErrors()) {
 			return mailInsert();
+		}
+		if(userService.existsByMailAddress(form.getMail())){
+			redirectAttributes.addFlashAttribute("errorMessage", "このメールアドレスは既に登録されています");
+			return "redirect:/mailInsert";
 		}
 		//ランダム生成された整数を受けとる
 		String checkPass = userService.randomPass();

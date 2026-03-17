@@ -1,6 +1,5 @@
 package com.example.form;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -15,10 +14,6 @@ public class InsertForm {
 	//ユーザー氏名
 	@NotBlank(message="名前を入力して下さい")
 	private String name;
-	@NotBlank(message="メールアドレスを入力して下さい")
-	@Email(message="メールアドレスの形式が不正です")
-	//メールアドレス
-	private String email;
 	//郵便番号
 	@NotBlank(message="郵便番号を入力して下さい")
 	@Pattern(regexp = "^[0-9]{3}-[0-9]{4}$", message="郵便番号はXXX-XXXXの形式で入力してください")
@@ -47,12 +42,6 @@ public class InsertForm {
 	}
 	public void setName(String name) {
 		this.name = name;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
 	}
 	public String getZipcode() {
 		return zipcode;
@@ -88,7 +77,7 @@ public class InsertForm {
 	//toStringのオーバーライド
 	@Override
 	public String toString() {
-		return "InsertForm [name=" + name + ", email=" + email + ", zipcode=" + zipcode + ", address=" + address
+		return "InsertForm [name=" + name + ", zipcode=" + zipcode + ", address=" + address
 				+ ", telephone=" + telephone + ", password=" + password + ", confirmPassword=" + confirmPassword + "]";
 	}
 }

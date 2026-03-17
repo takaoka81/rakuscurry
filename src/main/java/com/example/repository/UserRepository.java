@@ -2,6 +2,7 @@ package com.example.repository;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -27,8 +28,15 @@ public class UserRepository {
 
 	@Autowired
 	private NamedParameterJdbcTemplate template;
+
+	public boolean existsByMailAddress(String email){
+		String sql = "SELECT COUNT(*) FROM users WHERE email=:email";
+		SqlParameterSource param = new MapSqlParameterSource().addValue("email", email);
+		Integer count = template.queryForObject(sql, param, Integer.class);
+		return count > 0;
+	}
 	
-	public User  findByMailAddress(String email) {
+	public User findByMailAddress(String email) {
 		String sql ="SELECT * FROM users WHERE email=:email";
 		
 		SqlParameterSource param = new MapSqlParameterSource().addValue("email",email);
@@ -37,7 +45,7 @@ public class UserRepository {
 			User user= template.queryForObject(sql, param, USER_ROW_MAPPER);
 			System.out.println(user);
 			return user;
-		}catch(Exception e) {
+		}catch(DataAccessException e) {
 			return null;
 		}
 		
