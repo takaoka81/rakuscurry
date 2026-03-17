@@ -10,7 +10,7 @@ spring:
 
 logging:
   file:
-    name: logs/batch.log
+    name: ${LOG_FILE_PATH:logs/batch.log}
 
 # 商品一覧の画像のURLにsessionidが勝手に混入し画像がリンク切れになる不具合対応の設定
 server:
