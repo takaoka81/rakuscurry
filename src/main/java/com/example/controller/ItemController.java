@@ -81,7 +81,6 @@ public class ItemController {
 		 */
 		private List<Integer> calcPageNumbers(Model model, Page<Item> itemPage) {
 			int totalPages = itemPage.getTotalPages();
-			//System.out.println(totalPages);
 			logger.info("totalPages={}", totalPages);
 			List<Integer> pageNumbers = null;
 			if (totalPages > 0) {
@@ -90,7 +89,6 @@ public class ItemController {
 					pageNumbers.add(i);
 				}
 			}
-			//System.out.println(itemPage);
 			logger.info("totalPages={}", totalPages);
 			model.addAttribute("itemPage", itemPage);
 			return pageNumbers;

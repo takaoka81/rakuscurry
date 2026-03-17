@@ -86,7 +86,6 @@ public class UserService {
 			int num = rand.nextInt(10);
 			randomStr += Integer.toString(num);
 		}
-		//System.out.println(randomStr);
 		logger.info("randomStr={}", randomStr);
 		return randomStr;
 	}

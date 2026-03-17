@@ -168,7 +168,6 @@ public class OrderControler {
 		} else {
 			model.addAttribute("orderList", orderList);
 		}
-		//System.out.println(orderList);
 		logger.info("orderList={}", orderList);	
 	
 		return "order/order_history";
@@ -176,11 +175,9 @@ public class OrderControler {
 	
 	@RequestMapping("orderdetail")
 	public String orderDetail(Integer id, Model model) {
-		//System.out.println(id);
 		logger.info("id={}", id);
 		List<Order> orderList = service.orderLoad(id);
 		model.addAttribute("orderList",orderList);
-		//System.out.println(orderList);
 		logger.info("orderList={}", orderList);
 		return "/order/order_detail";
 	}

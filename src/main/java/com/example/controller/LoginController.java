@@ -46,10 +46,8 @@ public class LoginController {
 	
 	@RequestMapping("/login")
 	public String  login(LoginForm form,Model model) {
-		//System.out.println(form);
 		logger.info("form={}", form);
 		User user =service.login(form.getPassword(), form.getEmail());
-		//System.out.println(user+"です");
 		logger.info("user={} + です", user);
 		if(user == null) {
 			model.addAttribute("loginError", "メールアドレス、またはパスワードが間違っています");

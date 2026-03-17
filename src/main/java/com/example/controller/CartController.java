@@ -101,7 +101,6 @@ public class CartController {
 	
 	@RequestMapping("/delete")
 	public String delete(String index, Model model) {
-		//System.out.println(index);
 		logger.info(index);
 		@SuppressWarnings("unchecked")
 		List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");

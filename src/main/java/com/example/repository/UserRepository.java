@@ -39,7 +39,6 @@ public class UserRepository {
 		
 		try {
 			User user= template.queryForObject(sql, param, USER_ROW_MAPPER);
-			//System.out.println(user);
 			logger.info("user={}", user);
 			return user;
 		}catch(Exception e) {
@@ -49,7 +48,6 @@ public class UserRepository {
 	}
 	
 	public void insert(User user) {
-		//System.out.println(user);
 		logger.info("user={}", user);
 		SqlParameterSource param = new BeanPropertySqlParameterSource(user);
 		String sql = "INSERT INTO users (name, email, password, zipcode, address, telephone) "
