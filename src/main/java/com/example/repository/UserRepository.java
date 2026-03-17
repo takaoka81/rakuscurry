@@ -20,6 +20,7 @@ public class UserRepository {
 		user.setEmail(rs.getString("email"));
 		user.setPassword(rs.getString("password"));
 		user.setZipcode(rs.getString("zipcode"));
+		user.setAddress(rs.getString("address"));
 		user.setTelephone(rs.getString("telephone"));
 		return user;
 	};
