@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.example.domain.Order;
 import com.example.domain.User;
 import com.example.form.OrderForm;
+import com.example.service.CartService;
 import com.example.service.OrderService;
 
 import jakarta.servlet.http.HttpSession;
@@ -40,6 +41,9 @@ public class OrderController {
 	private OrderService service;
 
 	@Autowired
+	private CartService cartService;
+
+	@Autowired
 	private HttpSession session;
 
 	public OrderForm setUpOrderForm() {
@@ -47,16 +51,32 @@ public class OrderController {
 	}
 
 	@RequestMapping("/toOrder")
-	public String toOrder() {
+	public String toOrder(Model model) { // Modelを追加
 
-		// セッションにログイン情報があれば確認画面に遷移
-		// ログイン情報がなければログイン画面に遷移
-		if (session.getAttribute("user") == null) {
+		// 1. セッションからユーザー情報を取得
+		User user = (User) session.getAttribute("user");
+
+		// 2. ログインチェック
+		if (user == null) {
 			return "redirect:/toLogin";
-		} else {
-			return "order/order_confirm";
 		}
 
+		// 3. ★重要：DBからログインユーザーの「未注文(status=0)」の注文情報を取得
+		// これにより、さっき保存した商品やトッピング、合計金額がすべて手に入ります
+		Order order = cartService.getCartByUserId(user.getId());
+
+		if (order == null || order.getOrderItemList().isEmpty()) {
+			// カートが空の場合は、エラーにならないよう適切に処理（またはカート画面へ戻す）
+			return "redirect:/cart/showCart";
+		}
+
+		// 4. HTML側で計算に使うためのデータをModelにセット
+		model.addAttribute("order", order);
+
+		// もしHTML側が ${session.totalPrice} を直接参照している場合は、同期をとるためにセット
+		session.setAttribute("totalPrice", order.getTotalPrice());
+
+		return "order/order_confirm";
 	}
 
 	@RequestMapping("/orderCo")
@@ -123,7 +143,13 @@ public class OrderController {
 			return "/order/order_confirm";
 		}
 
-		Order order = new Order();
+		User user = (User) session.getAttribute("user");
+		Order order = cartService.getCartByUserId(user.getId());
+
+		if (order == null) {
+			return "redirect:/toOrder"; // 万が一カートが取れなかった場合
+		}
+
 		BeanUtils.copyProperties(form, order);
 
 		// 郵便番号のハイフンを消してドメインにセット
@@ -132,10 +158,12 @@ public class OrderController {
 		order.setDeliveryTime(form.getTimestamp());
 		service.order(order);
 		// 完了メールを送信
-		User user = (User)session.getAttribute("user");
-		service.sendMail(order,user.getEmail());
+
+		service.sendMail(order, user.getEmail());
 
 		session.removeAttribute("cartItemList");
+
+		session.removeAttribute("totalPrice");
 
 		return "redirect:/orderCompletion";
 	}
