@@ -29,6 +29,30 @@ public class UserRepository {
 	@Autowired
 	private NamedParameterJdbcTemplate template;
 
+	public User findByUserId(Integer id) {
+		String sql = """
+				SELECT
+					id,
+					name,
+					email,
+					password,
+					zipcode,
+					address,
+					telephone,
+					stamp_now_count,
+					stamp_all_count
+				FROM
+					users
+				WHERE
+					id=:id;
+				""";
+
+		SqlParameterSource param = new MapSqlParameterSource().addValue("id", id);
+
+		User user = template.queryForObject(sql, param, USER_ROW_MAPPER);
+		return user;
+	}
+
 	public User findByMailAddress(String email) {
 		String sql = "SELECT * FROM users WHERE email=:email";
 

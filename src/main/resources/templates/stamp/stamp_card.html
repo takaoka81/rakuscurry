@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/stamp.css}">
+    <link th:href="@{/css/bootstrap.css}" href="../../static/css/bootstrap.css" rel="stylesheet" />
+    <link th:href="@{/css/curry.css}" href="../../static/css/curry.css" rel="stylesheet" />
+    <title>カレー屋のネット注文</title>
+</head>
+
+<body>
+    <div class="container">
+        <span th:insert="header::header"></span>
+
+        <div class="stamp-layout">
+            <div class="stamp-board-wrapper">
+                <div class="card-container">
+                    <header class="card-header">
+                        <h1>スタンプカード</h1>
+                        <p>25個溜まるとカレー1杯無料!</p>
+                    </header>
+
+                    <div class="stamp-board" th:style="'border-color:' + ${labelColor}">
+                        <div th:each="i : ${#numbers.sequence(1,25)}"
+                            th:class="'stamp ' + (${i} <= ${stampOnCardCount} ? 'active' : '')"
+                            th:style="${i} <= ${stampOnCardCount} ? 'background-color:' + ${labelColor} : ''">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="reward-info">
+                    <p><span id="free-count" th:text="${freeCurryCount}"></span>杯無料注文可能！</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="rank-side">
+            <div class="rank-status">
+                あなたのランク<br>
+                <strong>ホット</strong>
+            </div>
+
+            <div class="rank-detail">
+                <button id="open-dialog">※ランク詳細</button>
+            </div>
+        </div>
+
+        <dialog id="rank-dialog">
+            <div class="dialog-header">
+                <h2>🔥 ランク一覧</h2>
+            </div>
+            <div class="dialog-body">
+                <ul>
+                    <li><img class="picture" th:src="@{/img_rank/rank1.png}"> ランク1 マイルド</li>
+                    <li><img class="picture" th:src="@{/img_rank/rank2.png}"> ランク2 ミディアム</li>
+                    <li><img class="picture" th:src="@{/img_rank/rank3.png}"> ランク3 ホット</li>
+                    <li><img class="picture" th:src="@{/img_rank/rank4.png}"> ランク4 スパイシー</li>
+                    <li><img class="picture" th:src="@{/img_rank/rank5.png}"> ランク5 マグマ</li>
+                </ul>
+                <div class="current-badge">現在のランク: ホット</div>
+            </div>
+            <form method="dialog">
+                <button class="close-btn">OK</button>
+            </form>
+        </dialog>
+
+        <script>
+            const dialog = document.getElementById('rank-dialog');
+            const openBtn = document.getElementById('open-dialog');
+
+            openBtn.addEventListener('click', () => {
+                dialog.showModal();
+            });
+        </script>
+    </div>
+    <!--ハンバーガー機能追加-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+</body>
+
+</html>
