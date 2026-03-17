@@ -128,14 +128,17 @@ public class OrderService {
 	private void insertOrderItem(Integer orderId) {
 		@SuppressWarnings("unchecked")
 		List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
+
 		for (CartItem cartItem : cartItemList) {
 			OrderItem orderItem = new OrderItem();
+			// カートの時点で保持している商品金額をそのまま記録
 			BeanUtils.copyProperties(cartItem, orderItem);
 
 			orderItem.setOrderId(orderId);
 			Integer orderItemid = orderItemRepository.order(orderItem);
 
-			InsertOrdertopping(orderItemid, cartItem.getToppingList());
+			// サイズ情報も渡してトッピング価格を決定
+			InsertOrdertopping(orderItemid, cartItem.getToppingList(), cartItem.getSize());
 		}
 	}
 
@@ -145,11 +148,17 @@ public class OrderService {
 	 * @param orderItemId 注文商品の主キー
 	 * @param toppingList 注文商品が持っているtoppingList
 	 */
-	private void InsertOrdertopping(Integer orderItemId, List<Topping> toppingList) {
+	private void InsertOrdertopping(Integer orderItemId, List<Topping> toppingList, String size) {
 		for (Topping topping : toppingList) {
 			OrderTopping orderTopping = new OrderTopping();
 			orderTopping.setOrderItemId(orderItemId);
 			orderTopping.setToppingId(topping.getId());
+			// サイズに応じた価格を記録
+			if ("M".equals(size)) {
+				orderTopping.setOrderPrice(topping.getPriceM());
+			} else {
+				orderTopping.setOrderPrice(topping.getPriceL());
+			}
 			orderToppingRepository.insert(orderTopping);
 		}
 	}
