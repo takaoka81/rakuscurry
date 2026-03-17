@@ -138,6 +138,19 @@
                 <span th:text="${#numbers.formatInteger(total,1,'COMMA')}"></span>円 (税込み)</span>
             </th:block>
           </div>
+      <div class="row">
+        <div class="col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
+	        <div th:if="${cartNothing == null}">
+	          <div class="form-group">
+	            <form th:action="@{/toOrder}">
+	              <input
+	                class="btn btn-warning btn-block order-btn"
+	                type="submit"
+	                value="注文に進む"
+	              />
+	            </form>
+	          </div>
+	       </div>
         </div>
       </div>
     </div>

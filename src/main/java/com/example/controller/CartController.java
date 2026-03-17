@@ -15,7 +15,6 @@ import com.example.domain.Topping;
 import com.example.domain.User;
 import com.example.form.ItemCartInForm;
 import com.example.service.CartService;
-import com.example.service.OrderService;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
@@ -24,120 +23,119 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("")
 public class CartController {
 
-    @Autowired
-    private CartService service;
-    @Autowired
-    private OrderService orderService;
-    @Autowired
-    private HttpSession session;
-    @Autowired
-    private ServletContext application;
+	@Autowired
+	private CartService service;
 
-    public ItemCartInForm setupForm() {
-        return new ItemCartInForm();
-    }
+	@Autowired
+	private HttpSession session;
+	@Autowired
+	private ServletContext application;
 
-    @RequestMapping("/inCart")
-    public String inCart(ItemCartInForm form) {
-        CartItem cartItem = new CartItem();
-        BeanUtils.copyProperties(form, cartItem);
-        cartItem.setItemId(form.getId());
-        cartItem.setItemPrice(service.getPriceSize(form));
+	public ItemCartInForm setupForm() {
+		return new ItemCartInForm();
+	}
 
-        @SuppressWarnings("unchecked")
-        List<Topping> toppingList = (List<Topping>) application.getAttribute("toppingList");
-        List<Topping> selectedToppings = service.getToppingIndex(toppingList, form.getToppingIndex());
-        cartItem.setToppingList(selectedToppings);
+	@RequestMapping("/inCart")
+	public String inCart(ItemCartInForm form) {
+		CartItem cartItem = new CartItem();
+		BeanUtils.copyProperties(form, cartItem);
+		cartItem.setItemId(form.getId());
+		cartItem.setItemPrice(service.getPriceSize(form));
 
-        User user = (User) session.getAttribute("user");
-        if (user != null) {
-            service.addItemToCart(cartItem, user.getId());
-        } else {
-            saveToSessionCart(cartItem);
-        }
-        
-        return "redirect:/showCart"; 
-    }
+		@SuppressWarnings("unchecked")
+		List<Topping> toppingList = (List<Topping>) application.getAttribute("toppingList");
+		List<Topping> selectedToppings = service.getToppingIndex(toppingList, form.getToppingIndex());
+		cartItem.setToppingList(selectedToppings);
 
-    private void saveToSessionCart(CartItem cartItem) {
-        @SuppressWarnings("unchecked")
-        List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
-        if (cartItemList == null) {
-            cartItemList = new LinkedList<>();
-        }
-        cartItemList.add(cartItem);
-        session.setAttribute("cartItemList", cartItemList);
-    }
+		User user = (User) session.getAttribute("user");
+		if (user != null) {
+			service.addItemToCart(cartItem, user.getId());
+		} else {
+			saveToSessionCart(cartItem);
+		}
 
-    @RequestMapping("/showCart")
-    public String showCart(Model model) {
-        User user = (User) session.getAttribute("user");
+		return "redirect:/showCart";
+	}
 
-        if (user != null) {
-            // --- ログイン時の処理 ---
-            Order order = service.getCartByUserId(user.getId());
-            if (order == null || order.getOrderItemList().isEmpty()) {
-                model.addAttribute("cartNothing", "カートに商品がありません");
-            } else {
-                model.addAttribute("order", order);
-            }
-        } else {
-            // --- 未ログイン時の処理（カッコの構造を修正） ---
-            @SuppressWarnings("unchecked")
-            List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
-            
-            if (cartItemList == null || cartItemList.isEmpty()) {
-                model.addAttribute("cartNothing", "カートに商品がありません");
-                session.setAttribute("totalPrice", 0);
-            } else {
-                int total = 0;
-                for (CartItem item : cartItemList) {
-                    total += item.getSubTotal();
-                }
-                // /* 修正点：ここでの保存がHTMLの表示に直結します */
-                session.setAttribute("totalPrice", total);
-            }
-        }
-        return "cart/cart_list";
-    }
+	private void saveToSessionCart(CartItem cartItem) {
+		@SuppressWarnings("unchecked")
+		List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
+		if (cartItemList == null) {
+			cartItemList = new LinkedList<>();
+		}
+		cartItemList.add(cartItem);
+		session.setAttribute("cartItemList", cartItemList);
+	}
 
-@RequestMapping("/delete")
-public String delete(Integer index, Integer orderItemId) {
-    User user = (User) session.getAttribute("user");
+	@RequestMapping("/showCart")
+	public String showCart(Model model) {
+		User user = (User) session.getAttribute("user");
 
-    if (user != null) {
-        if (orderItemId != null) {
-            // 1. DBから削除 & DB上の合計金額を更新
-            service.deleteOrderItem(orderItemId, user.getId());
-            
-            // 2. ★追加：最新の注文情報をDBから取得し直す
-            Order order = service.getCartByUserId(user.getId());
-            
-            // 3. ★重要：セッションの totalPrice を最新の注文合計で上書きする
-            if (order != null) {
-                session.setAttribute("totalPrice", order.getTotalPrice());
-            } else {
-                session.setAttribute("totalPrice", 0);
-            }
-        }
-    } else {
-        // --- 未ログインの場合（Sessionから削除） ---
-        @SuppressWarnings("unchecked")
-        List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
-        
-        if (cartItemList != null && index != null && index < cartItemList.size()) {
-            cartItemList.remove(index.intValue());
-            
-            int total = 0;
-            for (CartItem item : cartItemList) {
-                total += item.getSubTotal();
-            }
-            // 未ログイン時はここでセッションを更新しているため、反映されます
-            session.setAttribute("totalPrice", total);
-            session.setAttribute("cartItemList", cartItemList);
-        }
-    }
-    
-    return "redirect:/showCart"; 
-}
+		if (user != null) {
+			// --- ログイン時の処理 ---
+			Order order = service.getCartByUserId(user.getId());
+			if (order == null || order.getOrderItemList().isEmpty()) {
+				model.addAttribute("cartNothing", "カートに商品がありません");
+			} else {
+				model.addAttribute("order", order);
+			}
+		} else {
+			// --- 未ログイン時の処理（カッコの構造を修正） ---
+			@SuppressWarnings("unchecked")
+			List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
+
+			if (cartItemList == null || cartItemList.isEmpty()) {
+				model.addAttribute("cartNothing", "カートに商品がありません");
+				session.setAttribute("totalPrice", 0);
+			} else {
+				int total = 0;
+				for (CartItem item : cartItemList) {
+					total += item.getSubTotal();
+				}
+				// /* 修正点：ここでの保存がHTMLの表示に直結します */
+				session.setAttribute("totalPrice", total);
+			}
+		}
+		return "cart/cart_list";
+	}
+
+	@RequestMapping("/delete")
+	public String delete(Integer index, Integer orderItemId) {
+		User user = (User) session.getAttribute("user");
+
+		if (user != null) {
+			if (orderItemId != null) {
+				// 1. DBから削除 & DB上の合計金額を更新
+				service.deleteOrderItem(orderItemId, user.getId());
+
+				// 2. ★追加：最新の注文情報をDBから取得し直す
+				Order order = service.getCartByUserId(user.getId());
+
+				// 3. ★重要：セッションの totalPrice を最新の注文合計で上書きする
+				if (order != null) {
+					session.setAttribute("totalPrice", order.getTotalPrice());
+				} else {
+					session.setAttribute("totalPrice", 0);
+				}
+			}
+		} else {
+			// --- 未ログインの場合（Sessionから削除） ---
+			@SuppressWarnings("unchecked")
+			List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
+
+			if (cartItemList != null && index != null && index < cartItemList.size()) {
+				cartItemList.remove(index.intValue());
+
+				int total = 0;
+				for (CartItem item : cartItemList) {
+					total += item.getSubTotal();
+				}
+				// 未ログイン時はここでセッションを更新しているため、反映されます
+				session.setAttribute("totalPrice", total);
+				session.setAttribute("cartItemList", cartItemList);
+			}
+		}
+
+		return "redirect:/showCart";
+	}
 }

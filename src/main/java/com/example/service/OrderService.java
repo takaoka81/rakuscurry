@@ -133,7 +133,6 @@ public class OrderService {
 			OrderItem orderItem = new OrderItem();
 			// カートの時点で保持している商品金額をそのまま記録
 			BeanUtils.copyProperties(cartItem, orderItem);
-			orderItem.setOrderPrice(cartItem.getItemPrice());
 
 			orderItem.setOrderId(orderId);
 			Integer orderItemid = orderItemRepository.order(orderItem);
