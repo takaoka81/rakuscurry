@@ -37,7 +37,7 @@ public class ItemDetailsApiController {
 
         Item items=itemService.ApiShowItemDetail(id);
         if(items==null){
-            throw new EntityNotFoundException("商品ID: " + id + " は存在しません");
+            throw new EntityNotFoundException("Not Found");
         }
         
         List<Topping> toppings=itemService.findAllTopping();
