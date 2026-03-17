@@ -1,6 +1,7 @@
 package com.example.domain;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,39 +22,27 @@ public class LoginUserDetails implements UserDetails {
         return user.getPassword();
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // とりあえず空のリストを返してエラーを防ぐ
+        return Collections.emptyList();
+    }
+    
     @Override // ログインで利用するユーザー名を返す
     public String getUsername() {
         return user.getEmail();
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAuthorities'");
-    }
+    @Override // ユーザーが期限切れでなければtrueを返す
+    public boolean isAccountNonExpired() { return true; }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isAccountNonExpired'");
-    }
+    @Override // ユーザーがロックされていなければtrueを返す
+    public boolean isAccountNonLocked() { return true; }
 
-    @Override
-    public boolean isAccountNonLocked() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isAccountNonLocked'");
-    }
+    @Override // ユーザーのパスワードが期限切れでなければtrueを返す
+    public boolean isCredentialsNonExpired() { return true; }
 
-    @Override
-    public boolean isCredentialsNonExpired() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isCredentialsNonExpired'");
-    }
-
-    @Override
-    public boolean isEnabled() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isEnabled'");
-    }
+    @Override // ユーザーが有効であればtrueを返す
+    public boolean isEnabled() { return true; }
 
 }

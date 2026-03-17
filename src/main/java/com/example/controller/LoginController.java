@@ -50,7 +50,7 @@ public class LoginController {
 			return toLogin();// RequestMappingのアドレスを指定
 		}
 
-		session.setAttribute("user", user);
+		// session.setAttribute("user", user);
 
 		String returnUrl = (String) session.getAttribute("returnUrl");
 		if (returnUrl != null) {

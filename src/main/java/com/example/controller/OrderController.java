@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.domain.LoginUserDetails;
 import com.example.domain.Order;
 import com.example.domain.User;
 import com.example.form.OrderForm;
@@ -51,10 +53,10 @@ public class OrderController {
 	}
 
 	@RequestMapping("/toOrder")
-	public String toOrder(Model model) { // Modelを追加
+	public String toOrder(@AuthenticationPrincipal LoginUserDetails loginUserDetails,Model model) { // Modelを追加
 
 		// 1. セッションからユーザー情報を取得
-		User user = (User) session.getAttribute("user");
+		User user = loginUserDetails.getUser();
 
 		// 2. ログインチェック
 		if (user == null) {
@@ -91,7 +93,7 @@ public class OrderController {
 	 * @return 完了画面
 	 */
 	@RequestMapping("/order")
-	public String orderCompletion(@Validated OrderForm form, BindingResult result, Model model) {
+	public String orderCompletion(@AuthenticationPrincipal LoginUserDetails loginUserDetails,@Validated OrderForm form, BindingResult result, Model model) {
 		// 昨日の日付を取得し配達日と比較
 		Date date = new Date();
 		Calendar yesterday = Calendar.getInstance();
@@ -143,8 +145,10 @@ public class OrderController {
 			return "/order/order_confirm";
 		}
 
-		User user = (User) session.getAttribute("user");
+		User user = loginUserDetails.getUser();
+		
 		Order order = cartService.getCartByUserId(user.getId());
+		
 
 		if (order == null) {
 			return "redirect:/toOrder"; // 万が一カートが取れなかった場合
@@ -156,6 +160,7 @@ public class OrderController {
 		order.setDestinationZipcode(form.getDestinationZipcode().replace("-", ""));
 
 		order.setDeliveryTime(form.getTimestamp());
+		order.setId(user.getId());
 		service.order(order);
 		// 完了メールを送信
 
@@ -180,10 +185,10 @@ public class OrderController {
 	 * @return 注文履歴
 	 */
 	@RequestMapping("/orderHistory")
-	public String orderHistory(Model model) {
+	public String orderHistory(@AuthenticationPrincipal LoginUserDetails loginUserDetails,Model model) {
 
 		// ユーザーの情報を拾ってくる
-		User user = (User) session.getAttribute("user");
+		User user = loginUserDetails.getUser();
 		// もしログインしていなければログインに戻す
 		if (user == null) {
 			return "forward:/toLogin";

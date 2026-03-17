@@ -11,11 +11,13 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
 
 import com.example.domain.CartItem;
+import com.example.domain.LoginUserDetails;
 import com.example.domain.Order;
 import com.example.domain.OrderItem;
 import com.example.domain.OrderTopping;
@@ -85,7 +87,7 @@ public class OrderService {
 	 */
 	public void order(Order order) {
 		order.setStatus(paymentMethodJudge(order));
-		order.setUserId(getUserId());
+		// order.setUserId(getUserId());
 		orderRepository.update(order);
 		
 
@@ -115,10 +117,10 @@ public class OrderService {
 	 * 
 	 * @return userId
 	 */
-	public Integer getUserId() {
-		User user = (User) session.getAttribute("user");
-		return user.getId();
-	}
+	// public Integer getUserId(@AuthenticationPrincipal LoginUserDetails loginUserDetails) {
+	// 	User user = loginUserDetails.getUser();
+	// 	return user.getId();
+	// }
 
 	/**
 	 * order_itemsテーブルにINSERTするメゾット
