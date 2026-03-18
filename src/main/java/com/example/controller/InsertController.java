@@ -62,6 +62,7 @@ public class InsertController {
 	 */
 	@RequestMapping("/insertUser")
 	public String insert(@Validated InsertForm form, BindingResult result, Model model) {
+		//セッションからメールアドレスを取り込む
 		if(session.getAttribute("email") == null) {
 			return "redirect:/mailInsert";
 		}
@@ -80,6 +81,9 @@ public class InsertController {
 		//フォームの値をドメインにコピー
 		User user = new User();
 		BeanUtils.copyProperties(form, user);
+		//メールアドレスの値を挿入
+		String email = (String) session.getAttribute("email");
+		user.setEmail(email);
 		//郵便番号のハイフンを消してドメインにセット
 		user.setZipcode(form.getZipcode().replace("-", ""));
 		

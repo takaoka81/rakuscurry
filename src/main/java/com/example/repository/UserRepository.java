@@ -1,6 +1,10 @@
 package com.example.repository;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -13,7 +17,9 @@ import com.example.domain.User;
 @Repository
 public class UserRepository {
 
-	private static final RowMapper<User> USER_ROW_MAPPER = (rs, i) -> {
+	private static final Logger logger = LoggerFactory.getLogger(UserRepository.class);
+	
+	private static final RowMapper<User> USER_ROW_MAPPER =(rs,i)->{
 		User user = new User();
 		user.setId(rs.getInt("id"));
 		user.setName(rs.getString("name"));
@@ -28,23 +34,30 @@ public class UserRepository {
 	@Autowired
 	private NamedParameterJdbcTemplate template;
 
-	public User findByMailAddress(String email) {
-		String sql = "SELECT * FROM users WHERE email=:email AND status = 0";
-
+	public boolean existsByMailAddress(String email){
+		String sql = "SELECT COUNT(*) FROM users WHERE email=:email";
 		SqlParameterSource param = new MapSqlParameterSource().addValue("email", email);
-
+		Integer count = template.queryForObject(sql, param, Integer.class);
+		return count > 0;
+	}
+	
+	public User findByMailAddress(String email) {
+		String sql ="SELECT * FROM users WHERE email=:email statu = 0";
+		
+		SqlParameterSource param = new MapSqlParameterSource().addValue("email",email);
+		
 		try {
-			User user = template.queryForObject(sql, param, USER_ROW_MAPPER);
-			System.out.println(user);
+			User user= template.queryForObject(sql, param, USER_ROW_MAPPER);
+			logger.info("user={}", user);
 			return user;
-		} catch (Exception e) {
+		}catch(DataAccessException e) {
 			return null;
 		}
 
 	}
 
 	public void insert(User user) {
-		System.out.println(user);
+		logger.info("user={}", user);
 		SqlParameterSource param = new BeanPropertySqlParameterSource(user);
 		String sql = "INSERT INTO users (name, email, password, zipcode, address, telephone) "
 				+ "VALUES (:name, :email, :password, :zipcode, :address, :telephone);";

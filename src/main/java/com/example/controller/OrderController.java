@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.example.domain.Order;
 import com.example.domain.User;
 import com.example.form.OrderForm;
+import com.example.service.CartService;
 import com.example.service.OrderService;
 
 import jakarta.servlet.http.HttpSession;
@@ -31,6 +34,8 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("")
 public class OrderController {
 
+	private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
+	
 	@ModelAttribute
 	public OrderForm setOrderForm() {
 		return new OrderForm();
@@ -40,6 +45,9 @@ public class OrderController {
 	private OrderService service;
 
 	@Autowired
+	private CartService cartService;
+
+	@Autowired
 	private HttpSession session;
 
 	public OrderForm setUpOrderForm() {
@@ -47,16 +55,32 @@ public class OrderController {
 	}
 
 	@RequestMapping("/toOrder")
-	public String toOrder() {
+	public String toOrder(Model model) { // Modelを追加
 
-		// セッションにログイン情報があれば確認画面に遷移
-		// ログイン情報がなければログイン画面に遷移
-		if (session.getAttribute("user") == null) {
+		// 1. セッションからユーザー情報を取得
+		User user = (User) session.getAttribute("user");
+
+		// 2. ログインチェック
+		if (user == null) {
 			return "redirect:/toLogin";
-		} else {
-			return "order/order_confirm";
 		}
 
+		// 3. ★重要：DBからログインユーザーの「未注文(status=0)」の注文情報を取得
+		// これにより、さっき保存した商品やトッピング、合計金額がすべて手に入ります
+		Order order = cartService.getCartByUserId(user.getId());
+
+		if (order == null || order.getOrderItemList().isEmpty()) {
+			// カートが空の場合は、エラーにならないよう適切に処理（またはカート画面へ戻す）
+			return "redirect:/cart/showCart";
+		}
+
+		// 4. HTML側で計算に使うためのデータをModelにセット
+		model.addAttribute("order", order);
+
+		// もしHTML側が ${session.totalPrice} を直接参照している場合は、同期をとるためにセット
+		session.setAttribute("totalPrice", order.getTotalPrice());
+
+		return "order/order_confirm";
 	}
 
 	@RequestMapping("/orderCo")
@@ -123,7 +147,13 @@ public class OrderController {
 			return "/order/order_confirm";
 		}
 
-		Order order = new Order();
+		User user = (User) session.getAttribute("user");
+		Order order = cartService.getCartByUserId(user.getId());
+
+		if (order == null) {
+			return "redirect:/toOrder"; // 万が一カートが取れなかった場合
+		}
+
 		BeanUtils.copyProperties(form, order);
 
 		// 郵便番号のハイフンを消してドメインにセット
@@ -132,10 +162,12 @@ public class OrderController {
 		order.setDeliveryTime(form.getTimestamp());
 		service.order(order);
 		// 完了メールを送信
-		User user = (User)session.getAttribute("user");
-		service.sendMail(order,user.getEmail());
+
+		service.sendMail(order, user.getEmail());
 
 		session.removeAttribute("cartItemList");
+
+		session.removeAttribute("totalPrice");
 
 		return "redirect:/orderCompletion";
 	}
@@ -167,17 +199,17 @@ public class OrderController {
 		} else {
 			model.addAttribute("orderList", orderList);
 		}
-		System.out.println(orderList);
-
+		logger.info("orderList={}", orderList);	
+	
 		return "order/order_history";
 	}
 
 	@RequestMapping("orderdetail")
 	public String orderDetail(Integer id, Model model) {
-		System.out.println(id);
+		logger.info("id={}", id);
 		List<Order> orderList = service.orderLoad(id);
-		model.addAttribute("orderList", orderList);
-		System.out.println(orderList);
+		model.addAttribute("orderList",orderList);
+		logger.info("orderList={}", orderList);
 		return "/order/order_detail";
 	}
 }

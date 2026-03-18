@@ -86,11 +86,11 @@ public class OrderService {
 	public void order(Order order) {
 		order.setStatus(paymentMethodJudge(order));
 		order.setUserId(getUserId());
-		Integer orderId = orderRepository.insert(order);
-		insertOrderItem(orderId);
+		orderRepository.update(order);
+		
 
 		// orderオブジェクトに商品情報をセットしておく（メール送信などで必要）
-		List<Order> loaded = orderRepository.orderLoad(orderId);
+		List<Order> loaded = orderRepository.orderLoad(order.getId());
 		if (loaded != null && !loaded.isEmpty()) {
 			order.setOrderItemList(loaded.get(0).getOrderItemList());
 		}
@@ -162,6 +162,8 @@ public class OrderService {
 			orderToppingRepository.insert(orderTopping);
 		}
 	}
+
+	
 
 	/**
 	 * 引数で受け取ったemailに完了メールを送付
