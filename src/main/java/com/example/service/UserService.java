@@ -1,5 +1,6 @@
 package com.example.service;
 
+
 import java.util.Random;
 
 import org.slf4j.Logger;
@@ -27,13 +28,13 @@ public class UserService {
 
 	@Autowired
 	private UserRepository repository;
-	
+
 	@Autowired
 	private MailSender sender;
-	
+
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-	
+
 	public User login(String password, String email) {
 		User user = repository.findByMailAddress(email);
 		if (user == null) {
@@ -45,13 +46,14 @@ public class UserService {
 		}
 		return user;
 	}
-	
+
 	/**
 	 * ユーザー登録を行う。
+	 * 
 	 * @param user
 	 */
 	public void insert(User user) {
-		
+
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		repository.insert(user);
 	}
@@ -86,47 +88,49 @@ public class UserService {
 	 * @param checkPass
 	 */
 	public void sendMail(String email, String checkPass) {
-        SimpleMailMessage msg = new SimpleMailMessage();
-        session.setAttribute("checkPass", checkPass);
-        session.setAttribute("emailcheck", email);
+		SimpleMailMessage msg = new SimpleMailMessage();
+		session.setAttribute("checkPass", checkPass);
+		session.setAttribute("emailcheck", email);
 
-        msg.setFrom("curry-admin@example.com");
-        msg.setTo(email);
-        msg.setSubject("２段階認証パスワード発行");//タイトルの設定
-        msg.setText(checkPass + " こちらを画面に入力してください"); //本文の設定
+		msg.setFrom("curry-admin@example.com");
+		msg.setTo(email);
+		msg.setSubject("２段階認証パスワード発行");// タイトルの設定
+		msg.setText(checkPass + " こちらを画面に入力してください"); // 本文の設定
 
-        this.sender.send(msg);
-    }
-	
+		this.sender.send(msg);
+	}
+
 	/**
 	 * ランダムの数字を発行
+	 * 
 	 * @return 生成された４桁の数字
 	 */
 	public String randomPass() {
 		Random rand = new Random();
 		String randomStr = "";
-		for(int i = 0; i < 4; i++) {
+		for (int i = 0; i < 4; i++) {
 			int num = rand.nextInt(10);
 			randomStr += Integer.toString(num);
 		}
 		logger.info("randomStr={}", randomStr);
 		return randomStr;
 	}
-	
+
 	/**
 	 * 数字の確認
-	 * @param numPass　入力された数字
+	 * 
+	 * @param numPass 入力された数字
 	 * @return
 	 */
 	public String checkpass(String numPass) {
-		String checkPass =(String) session.getAttribute("checkPass");
-		
-		if(checkPass.equals(numPass)) {
+		String checkPass = (String) session.getAttribute("checkPass");
+
+		if (checkPass.equals(numPass)) {
 			session.removeAttribute("checkPass");
 			return "OK";
 		} else {
 			return "NO";
 		}
 	}
-	
+
 }

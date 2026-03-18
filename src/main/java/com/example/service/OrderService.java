@@ -17,7 +17,6 @@ import org.springframework.util.StreamUtils;
 import com.example.domain.Order;
 import com.example.domain.OrderItem;
 import com.example.domain.OrderTopping;
-import com.example.domain.User;
 import com.example.repository.OrderRepository;
 
 import jakarta.servlet.http.HttpSession;
@@ -74,7 +73,7 @@ public class OrderService {
 	 */
 	public void order(Order order) {
 		order.setStatus(paymentMethodJudge(order));
-		order.setUserId(getUserId());
+		// order.setUserId(getUserId());
 		orderRepository.update(order);
 		
 
@@ -99,15 +98,6 @@ public class OrderService {
 		}
 	}
 
-	/**
-	 * ユーザーのIdを返すメゾット
-	 * 
-	 * @return userId
-	 */
-	public Integer getUserId() {
-		User user = (User) session.getAttribute("user");
-		return user.getId();
-	}
 
 	/**
 	 * 引数で受け取ったemailに完了メールを送付
@@ -144,7 +134,7 @@ public class OrderService {
 				for (OrderItem item : items) {
 					orderItems.append(item.getItem().getName())
 							.append(" (").append(item.getSize()).append(") x").append(item.getQuantity())
-							.append(" - 小計: ").append(String.format("%,d", item.getSubTotal())).append("円\n");
+							.append(" - 小計: ").append(String.format("%,d", item.getSubTotal())).append("円\n\n");
 					// トッピング情報
 					if (item.getOrderTopping() != null && !item.getOrderTopping().isEmpty()) {
 						orderItems.append("  トッピング: ");
