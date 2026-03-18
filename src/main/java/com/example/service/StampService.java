@@ -21,6 +21,8 @@ public class StampService {
      */
     private static final Integer FREE_STAMP_COUNT = 25;
 
+    private static final String SIZE_M = "M";
+
     /**
      * 現在のスタンプ量から何杯無料で頼めるかを求める
      * 
@@ -28,12 +30,7 @@ public class StampService {
      * @return 無料で頼めるカレーの数
      */
     public Integer getFreeCurryCount(Integer stampCount) {
-        Integer freeCount = 0;
-        while (stampCount > FREE_STAMP_COUNT) {
-            stampCount -= FREE_STAMP_COUNT;
-            freeCount++;
-        }
-        return freeCount;
+        return stampCount / FREE_STAMP_COUNT;
     }
 
     /**
@@ -43,10 +40,7 @@ public class StampService {
      * @return スタンプカードに表示する分のスタンプ数
      */
     public Integer getStampOnCardCount(Integer stampCount) {
-        while (stampCount > FREE_STAMP_COUNT) {
-            stampCount -= FREE_STAMP_COUNT;
-        }
-        return stampCount;
+        return stampCount % FREE_STAMP_COUNT;
     }
 
     /**
@@ -58,7 +52,7 @@ public class StampService {
     public Integer getStampCountByOrder(List<OrderItem> orderItemList) {
         Integer stampCount = 0;
         for (OrderItem orderItem : orderItemList) {
-            if (orderItem.getSize().equals("M")) {
+            if (orderItem.getSize().equals(SIZE_M)) {
                 stampCount++;
             } else {
                 stampCount = stampCount + 2;
