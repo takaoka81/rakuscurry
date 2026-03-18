@@ -53,7 +53,7 @@ public class StampService {
         Integer stampCount = 0;
         for (OrderItem orderItem : orderItemList) {
             if (orderItem.getOrderPrice() == 0) {
-                stampCount -= 25;
+                stampCount -= FREE_STAMP_COUNT;
             } else if (orderItem.getSize().equals(SIZE_M)) {
                 stampCount = stampCount + (1 * orderItem.getQuantity());
             } else {

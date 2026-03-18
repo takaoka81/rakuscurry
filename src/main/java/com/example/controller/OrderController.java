@@ -170,10 +170,15 @@ public class OrderController {
 
 		order.setDeliveryTime(form.getTimestamp());
 
-		Integer addStamps = stampService.getStampCountByOrder(order.getOrderItemList());
-		user.setStampNowCount(user.getStampNowCount() + addStamps);
-		user.setStampAllCount(user.getStampAllCount() + user.getStampNowCount());
-		StampHistory stampHistory = new StampHistory(user.getId(), order.getId(), addStamps);
+		Integer chengesStamps = stampService.getStampCountByOrder(order.getOrderItemList());
+		Integer addStamps = chengesStamps;
+		// 無料適用している場合にプラス分だけを取得する
+		if (addStamps < 0) {
+			addStamps += 25;
+		}
+		user.setStampNowCount(user.getStampNowCount() + chengesStamps);
+		user.setStampAllCount(user.getStampAllCount() + addStamps);
+		StampHistory stampHistory = new StampHistory(user.getId(), order.getId(), chengesStamps);
 		service.order(order, user, stampHistory);
 
 		// 完了メールを送信
