@@ -3,6 +3,8 @@ package com.example.controller;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,6 +25,8 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("")
 public class CartController {
 
+	private static final Logger logger = LoggerFactory.getLogger(CartController.class);
+	
 	@Autowired
 	private CartService service;
 
@@ -100,42 +104,11 @@ public class CartController {
 	}
 
 	@RequestMapping("/delete")
-	public String delete(Integer index, Integer orderItemId) {
-		User user = (User) session.getAttribute("user");
-
-		if (user != null) {
-			if (orderItemId != null) {
-				// 1. DBから削除 & DB上の合計金額を更新
-				service.deleteOrderItem(orderItemId, user.getId());
-
-				// 2. ★追加：最新の注文情報をDBから取得し直す
-				Order order = service.getCartByUserId(user.getId());
-
-				// 3. ★重要：セッションの totalPrice を最新の注文合計で上書きする
-				if (order != null) {
-					session.setAttribute("totalPrice", order.getTotalPrice());
-				} else {
-					session.setAttribute("totalPrice", 0);
-				}
-			}
-		} else {
-			// --- 未ログインの場合（Sessionから削除） ---
-			@SuppressWarnings("unchecked")
-			List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
-
-			if (cartItemList != null && index != null && index < cartItemList.size()) {
-				cartItemList.remove(index.intValue());
-
-				int total = 0;
-				for (CartItem item : cartItemList) {
-					total += item.getSubTotal();
-				}
-				// 未ログイン時はここでセッションを更新しているため、反映されます
-				session.setAttribute("totalPrice", total);
-				session.setAttribute("cartItemList", cartItemList);
-			}
-		}
-
-		return "redirect:/showCart";
+	public String delete(String index, Model model) {
+		logger.info(index);
+		@SuppressWarnings("unchecked")
+		List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
+		cartItemList.remove(Integer.parseInt(index));
+		return showCart(model);
 	}
 }

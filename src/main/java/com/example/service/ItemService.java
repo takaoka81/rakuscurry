@@ -3,6 +3,8 @@ package com.example.service;
 import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,6 +21,8 @@ import com.example.repository.ToppingRepository;
 @Transactional
 public class ItemService {
 
+	private static final Logger logger = LoggerFactory.getLogger(ItemService.class);
+
 	@Autowired
 	private ItemRepository repository;
 	
@@ -31,7 +35,8 @@ public class ItemService {
 	
 	public List<Item> findByName(String name){
 		if(name == null || "".equals(name)) {
-			System.out.println("here!!");
+			//System.out.println("here!!");
+			logger.warn("find NULL or empty string");
 			return repository.findAll();
 		} else {
 			return repository.findByName(name);
@@ -86,7 +91,8 @@ public class ItemService {
 	 	        list = itemList.subList(startItemCount, toIndex);
 	 	    }
 	    
-	    System.out.println(itemList + "！");
+	    //System.out.println(itemList + "！");
+		logger.warn("itemList={}", itemList);
 	    // 上記で作成した該当ページに表示させる従業員一覧をページングできる形に変換して返す
 	    Page<Item> employeePage
 	      = new PageImpl<Item>(list, PageRequest.of(page, size), itemList.size());
