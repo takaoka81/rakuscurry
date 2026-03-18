@@ -50,6 +50,7 @@
                 </div>
                 <div class="form-group">
                   <label for="inputEmail">メールアドレス:</label>
+                  <input type="hidden" name="email" th:value="${session.email}">
                   <label th:text="${emailRegistedError}" style="color: red" for="inputError">
                   そのメールアドレスはすでに使われています</label>
                   <!-- <label th:errors="*{email}"
