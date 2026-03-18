@@ -1,8 +1,8 @@
 package com.example.dto;
 
-import com.example.domain.Item;
+import com.example.domain.Topping;
 
-public class ItemsResponse {
+public class ToppingResponse {
     /**id */
     private Integer id;
     /**商品名 */
@@ -11,8 +11,7 @@ public class ItemsResponse {
     private Integer priceM;
     /**Lサイズの値段 */
     private Integer priceL;
-    /**商品画像*/
-    private String imagePath;
+    
     public Integer getId() {
         return id;
     }
@@ -37,33 +36,23 @@ public class ItemsResponse {
     public void setPriceL(Integer priceL) {
         this.priceL = priceL;
     }
-    public String getImagePath() {
-        return imagePath;
+    public ToppingResponse() {
     }
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }
-    @Override
-    public String toString() {
-        return "ItemResponse [id=" + id + ", name=" + name + ", priceM=" + priceM + ", priceL=" + priceL
-                + ", imagePath=" + imagePath + "]";
-    }
-    public ItemsResponse() {
-    }
-    public ItemsResponse(Integer id, String name, Integer priceM, Integer priceL, String imagePath) {
+    public ToppingResponse(Integer id, String name, Integer priceM, Integer priceL) {
         this.id = id;
         this.name = name;
         this.priceM = priceM;
         this.priceL = priceL;
-        this.imagePath = imagePath;
     }
-
-    public ItemsResponse(Item item){
-        this.id=item.getId();
-        this.name=item.getName();
-        this.priceM=item.getPriceM();
-        this.priceL=item.getPriceL();
-        this.imagePath=item.getImagePath();
+    @Override
+    public String toString() {
+        return "ToppingResponse [id=" + id + ", name=" + name + ", priceM=" + priceM + ", priceL=" + priceL + "]";
+    }
+    public ToppingResponse(Topping topping) {
+        this.id = topping.getId();
+        this.name = topping.getName();
+        this.priceM = topping.getPriceM();
+        this.priceL=topping.getPriceL();
     }
 
 }

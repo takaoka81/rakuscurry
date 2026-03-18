@@ -26,6 +26,7 @@ public class UserRepository {
 		user.setEmail(rs.getString("email"));
 		user.setPassword(rs.getString("password"));
 		user.setZipcode(rs.getString("zipcode"));
+		user.setAddress(rs.getString("address"));
 		user.setTelephone(rs.getString("telephone"));
 		return user;
 	};
@@ -41,7 +42,7 @@ public class UserRepository {
 	}
 	
 	public User findByMailAddress(String email) {
-		String sql ="SELECT * FROM users WHERE email=:email";
+		String sql ="SELECT * FROM users WHERE email=:email AND status = 0";
 		
 		SqlParameterSource param = new MapSqlParameterSource().addValue("email",email);
 		
@@ -52,15 +53,37 @@ public class UserRepository {
 		}catch(DataAccessException e) {
 			return null;
 		}
-		
+
 	}
-	
+
 	public void insert(User user) {
 		logger.info("user={}", user);
 		SqlParameterSource param = new BeanPropertySqlParameterSource(user);
-		String sql = "INSERT INTO users (name, email, password, zipcode, address, telephone) "
-				+ "VALUES (:name, :email, :password, :zipcode, :address, :telephone);";	
-		template.update(sql, param);		
+		String sql = "INSERT INTO users (name, email, password, zipcode, address, telephone, status) "
+				+ "VALUES (:name, :email, :password, :zipcode, :address, :telephone , 0);";
+		template.update(sql, param);
 	}
-	
+
+	/**
+	 * ユーザー情報の更新
+	 * @param user
+	 */
+	public void update(User user){
+		SqlParameterSource param = new BeanPropertySqlParameterSource(user);
+		String sql = "UPDATE users SET name = :name, email = :email, zipcode = :zipcode, address = :address, telephone = :telephone WHERE id = :id";
+		template.update(sql, param);
+	}
+
+	/**
+	 * 論理削除
+	 * @param id
+	 */
+	public void delete(Integer id) {
+		SqlParameterSource param = new MapSqlParameterSource()
+				.addValue("id", id)
+				.addValue("status", 1);
+		String sql = "UPDATE users SET status = :status WHERE id = :id";
+		template.update(sql, param);
+	}
+
 }

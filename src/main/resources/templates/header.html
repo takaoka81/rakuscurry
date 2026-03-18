@@ -54,6 +54,10 @@
 	              >&nbsp;&nbsp;
 	              <a sec:authorize="isAnonymous()" th:href="@{/toLogin}" class="navbar-link">ログイン</a>&nbsp;&nbsp;
 	              <a sec:authorize="isAuthenticated()" th:href="@{/logout}" class="navbar-link">ログアウト</a>
+	              <a sec:authorize="isAuthenticated()" th:href="@{/toUpdateUser}" class="navbar-link">会員情報更新・退会</a>&nbsp;&nbsp;
+
+	              
+	             
 	            </p>
 	          </div>
 	          <!-- /.navbar-collapse -->

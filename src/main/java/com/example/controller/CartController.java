@@ -28,7 +28,7 @@ import jakarta.servlet.http.HttpSession;
 public class CartController {
 
 	private static final Logger logger = LoggerFactory.getLogger(CartController.class);
-	
+
 	@Autowired
 	private CartService service;
 
@@ -147,4 +147,5 @@ public class CartController {
 
 		return "redirect:/showCart";
 	}
+
 }

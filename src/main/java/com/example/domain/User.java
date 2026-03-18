@@ -1,33 +1,36 @@
 package com.example.domain;
+
 /**
  * 
  * @author satakemisako
- * ユーザー情報のドメインクラス
+ *         ユーザー情報のドメインクラス
  *
  */
 public class User {
 
-	//ID
+	// ID
 	private Integer id;
-	//ユーザー氏名
+	// 状態
+	private Integer status;
+	// ユーザー氏名
 	private String name;
-	//パスワード
+	// パスワード
 	private String password;
-	//メールアドレス
+	// メールアドレス
 	private String email;
-	//郵便番号
+	// 郵便番号
 	private String zipcode;
-	//住所
+	// 住所
 	private String address;
-	//電話番号
+	// 電話番号
 	private String telephone;
-	
-	
-	//引数ありコンストラクタ
-	public User(Integer id, String name, String password, String email, String zipcode, String address,
+
+	// 引数ありコンストラクタ
+	public User(Integer id, Integer status, String name, String password, String email, String zipcode, String address,
 			String telephone) {
 		super();
 		this.id = id;
+		this.status = status;
 		this.name = name;
 		this.password = password;
 		this.email = email;
@@ -35,59 +38,80 @@ public class User {
 		this.address = address;
 		this.telephone = telephone;
 	}
-	//引数なしコンストラクタ
-	public User() {}
-	
-	//以下getter及びsetter
-	public String getEmail() {
-		return email;
+
+	// 引数なしコンストラクタ
+	public User() {
 	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
+
+	// 以下getter及びsetter
 	public Integer getId() {
 		return id;
 	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getPassword() {
 		return password;
 	}
+
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 	public String getZipcode() {
 		return zipcode;
 	}
+
 	public void setZipcode(String zipcode) {
 		this.zipcode = zipcode;
 	}
+
 	public String getAddress() {
 		return address;
 	}
+
 	public void setAddress(String address) {
 		this.address = address;
 	}
+
 	public String getTelephone() {
 		return telephone;
 	}
+
 	public void setTelephone(String telephone) {
 		this.telephone = telephone;
 	}
-	//toStringメソッド
+
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", name=" + name + ", password=" + password + ", email=" + email + ", zipcode="
-				+ zipcode + ", address=" + address + ", telephone=" + telephone + "]";
+		return "User [id=" + id + ", status=" + status + ", name=" + name + ", password=" + password + ", email="
+				+ email + ", zipcode=" + zipcode + ", address=" + address + ", telephone=" + telephone + "]";
 	}
-	
-	
-	
+
 }
