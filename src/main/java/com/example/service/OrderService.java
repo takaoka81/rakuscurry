@@ -4,28 +4,20 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
 
-import com.example.domain.CartItem;
-import com.example.domain.LoginUserDetails;
 import com.example.domain.Order;
 import com.example.domain.OrderItem;
 import com.example.domain.OrderTopping;
-import com.example.domain.Topping;
-import com.example.domain.User;
-import com.example.repository.OrderItemRepository;
 import com.example.repository.OrderRepository;
-import com.example.repository.OrderToppingRepository;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -41,12 +33,6 @@ public class OrderService {
 
 	@Autowired
 	private OrderRepository orderRepository;
-
-	@Autowired
-	private OrderItemRepository orderItemRepository;
-
-	@Autowired
-	private OrderToppingRepository orderToppingRepository;
 
 	@Autowired
 	private HttpSession session;
@@ -112,60 +98,6 @@ public class OrderService {
 		}
 	}
 
-	/**
-	 * ユーザーのIdを返すメゾット
-	 * 
-	 * @return userId
-	 */
-	// public Integer getUserId(@AuthenticationPrincipal LoginUserDetails loginUserDetails) {
-	// 	User user = loginUserDetails.getUser();
-	// 	return user.getId();
-	// }
-
-	/**
-	 * order_itemsテーブルにINSERTするメゾット
-	 * 
-	 * @param orderId
-	 */
-	private void insertOrderItem(Integer orderId) {
-		@SuppressWarnings("unchecked")
-		List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
-
-		for (CartItem cartItem : cartItemList) {
-			OrderItem orderItem = new OrderItem();
-			// カートの時点で保持している商品金額をそのまま記録
-			BeanUtils.copyProperties(cartItem, orderItem);
-
-			orderItem.setOrderId(orderId);
-			Integer orderItemid = orderItemRepository.order(orderItem);
-
-			// サイズ情報も渡してトッピング価格を決定
-			InsertOrdertopping(orderItemid, cartItem.getToppingList(), cartItem.getSize());
-		}
-	}
-
-	/**
-	 * order_toppingsテーブルにセット
-	 * 
-	 * @param orderItemId 注文商品の主キー
-	 * @param toppingList 注文商品が持っているtoppingList
-	 */
-	private void InsertOrdertopping(Integer orderItemId, List<Topping> toppingList, String size) {
-		for (Topping topping : toppingList) {
-			OrderTopping orderTopping = new OrderTopping();
-			orderTopping.setOrderItemId(orderItemId);
-			orderTopping.setToppingId(topping.getId());
-			// サイズに応じた価格を記録
-			if ("M".equals(size)) {
-				orderTopping.setOrderPrice(topping.getPriceM());
-			} else {
-				orderTopping.setOrderPrice(topping.getPriceL());
-			}
-			orderToppingRepository.insert(orderTopping);
-		}
-	}
-
-	
 
 	/**
 	 * 引数で受け取ったemailに完了メールを送付

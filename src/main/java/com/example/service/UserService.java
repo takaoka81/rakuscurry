@@ -1,7 +1,6 @@
 package com.example.service;
 
 
-import java.util.Optional;
 import java.util.Random;
 
 import org.slf4j.Logger;
@@ -9,13 +8,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.domain.LoginUser;
-import com.example.domain.LoginUserDetails;
 import com.example.domain.User;
 import com.example.repository.UserRepository;
 

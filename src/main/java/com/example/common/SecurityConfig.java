@@ -11,6 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.savedrequest.RequestCache;
+import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.example.domain.CartItem;
@@ -48,9 +50,6 @@ public class SecurityConfig {
                                 .formLogin(login -> login
                                                 .loginPage("/toLogin") // ログイン画面
                                                 .loginProcessingUrl("/login") // ログイン処理
-                                                // .successForwardUrl("/showList")
-                                                // .defaultSuccessUrl("/showList", false) // 戻るべきページの記録がない場合 商品一覧画面へ
-                                                // ログインを求められた画面に
                                                 // 1. 失敗時の遷移（メッセージ表示用）
                                                 .failureUrl("/toLogin?error")
                                                 // 2. 成功時のカスタム処理（カート登録 & 遷移先決定）
@@ -89,8 +88,8 @@ public class SecurityConfig {
 
                         // --- 遷移先決定処理 ---
                         // ログインを求められた元の画面（SavedRequest）があるか確認
-                        var requestCache = new org.springframework.security.web.savedrequest.HttpSessionRequestCache();
-                        var savedRequest = requestCache.getRequest(request, response);
+                        RequestCache requestCache = new org.springframework.security.web.savedrequest.HttpSessionRequestCache();
+                        SavedRequest savedRequest = requestCache.getRequest(request, response);
 
                         if (savedRequest != null) {
                                 // カート画面など、ログインを求められた元のページへ戻す
