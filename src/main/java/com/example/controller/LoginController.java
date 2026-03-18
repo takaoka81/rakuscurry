@@ -40,43 +40,43 @@ public class LoginController {
 		return "login/login";
 	}
 
-	@RequestMapping("/login")
-	public String login(LoginForm form, Model model) {
-		System.out.println(form);
-		User user = service.login(form.getPassword(), form.getEmail());
-		System.out.println(user + "です");
-		if (user == null) {
-			model.addAttribute("loginError", "メールアドレス、またはパスワードが間違っています");
-			return toLogin();// RequestMappingのアドレスを指定
-		}
+	// @RequestMapping("/login")
+	// public String login(LoginForm form, Model model) {
+	// 	System.out.println(form);
+	// 	User user = service.login(form.getPassword(), form.getEmail());
+	// 	System.out.println(user + "です");
+	// 	if (user == null) {
+	// 		model.addAttribute("loginError", "メールアドレス、またはパスワードが間違っています");
+	// 		return toLogin();// RequestMappingのアドレスを指定
+	// 	}
 
-		// session.setAttribute("user", user);
+	// 	// session.setAttribute("user", user);
 
-		String returnUrl = (String) session.getAttribute("returnUrl");
-		if (returnUrl != null) {
-			session.removeAttribute("returnUrl");
-			return "redirect:" + returnUrl;
-		}
-		@SuppressWarnings("unchecked")
-		List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
+	// 	String returnUrl = (String) session.getAttribute("returnUrl");
+	// 	if (returnUrl != null) {
+	// 		session.removeAttribute("returnUrl");
+	// 		return "redirect:" + returnUrl;
+	// 	}
+	// 	@SuppressWarnings("unchecked")
+	// 	List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
 
-		if (cartItemList != null && !cartItemList.isEmpty()) {
-			for (CartItem item : cartItemList) {
-				cartService.addItemToCart(item, user.getId());
-			}
+	// 	if (cartItemList != null && !cartItemList.isEmpty()) {
+	// 		for (CartItem item : cartItemList) {
+	// 			cartService.addItemToCart(item, user.getId());
+	// 		}
 
-			session.removeAttribute("cartItemList");
-			session.removeAttribute("totalPrice");
-			return "forward:/showList";
-		} else {
-			return "redirect:/orderCo";
-		}
-	}
+	// 		session.removeAttribute("cartItemList");
+	// 		session.removeAttribute("totalPrice");
+	// 		return "forward:/showList";
+	// 	} else {
+	// 		return "redirect:/orderCo";
+	// 	}
+	// }
 
-	@RequestMapping("/logout")
-	public String logout() {
-		session.invalidate();
-		return "forward:/showList";
-	}
+	// @RequestMapping("/logout")
+	// public String logout() {
+	// 	session.invalidate();
+	// 	return "forward:/showList";
+	// }
 
 }

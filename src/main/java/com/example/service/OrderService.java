@@ -202,7 +202,7 @@ public class OrderService {
 				for (OrderItem item : items) {
 					orderItems.append(item.getItem().getName())
 							.append(" (").append(item.getSize()).append(") x").append(item.getQuantity())
-							.append(" - 小計: ").append(String.format("%,d", item.getSubTotal())).append("円\n");
+							.append(" - 小計: ").append(String.format("%,d", item.getSubTotal())).append("円\n\n");
 					// トッピング情報
 					if (item.getOrderTopping() != null && !item.getOrderTopping().isEmpty()) {
 						orderItems.append("  トッピング: ");

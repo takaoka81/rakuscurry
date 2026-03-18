@@ -31,7 +31,7 @@
             <form method="post" action="item_list_curry.html" th:action="@{/login}" th:object="${loginForm}">
               <fieldset>
                 <legend>ログイン</legend>
-                <label th:text="${loginError}" style="color: red" for="inputError"
+                <label th:if="${param.error}" style="color: red" for="inputError"
                   >メールアドレス、またはパスワードが間違っています</label
                 >
                 <div class="form-group" >
@@ -72,7 +72,7 @@
     </div>
     <!-- end container -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="../static/js/bootstrap.min.js"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
 
     <!--ハンバーガー機能追加-->
   <script th:src="@{/js/bootstrap.min.js}"></script>
