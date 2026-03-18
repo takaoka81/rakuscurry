@@ -42,7 +42,7 @@ public class UserRepository {
 	}
 	
 	public User findByMailAddress(String email) {
-		String sql ="SELECT * FROM users WHERE email=:email statu = 0";
+		String sql ="SELECT * FROM users WHERE email=:email AND status = 0";
 		
 		SqlParameterSource param = new MapSqlParameterSource().addValue("email",email);
 		
@@ -59,8 +59,8 @@ public class UserRepository {
 	public void insert(User user) {
 		logger.info("user={}", user);
 		SqlParameterSource param = new BeanPropertySqlParameterSource(user);
-		String sql = "INSERT INTO users (name, email, password, zipcode, address, telephone) "
-				+ "VALUES (:name, :email, :password, :zipcode, :address, :telephone);";
+		String sql = "INSERT INTO users (name, email, password, zipcode, address, telephone, status) "
+				+ "VALUES (:name, :email, :password, :zipcode, :address, :telephone , 0);";
 		template.update(sql, param);
 	}
 
