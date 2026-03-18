@@ -56,6 +56,19 @@ public class UserService {
 		repository.insert(user);
 	}
 
+	/**ユーザー情報を更新
+	 * @param user
+	 */
+	public void update(User user) {
+		repository.update(user);
+	}
+
+	/**ユーザー情報を削除
+	 * @param id
+	 */
+	public void delete(Integer id) {
+		repository.delete(id);
+	}
 	/**
 	 * メールアドレスが既に登録されているか確認する
 	 * 

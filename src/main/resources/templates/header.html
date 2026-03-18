@@ -53,7 +53,10 @@
 	              <a th:href="@{/orderHistory}" class="navbar-link">注文履歴</a
 	              >&nbsp;&nbsp;
 	              <a th:if="${session.user == null}" th:href="@{/toLogin}" class="navbar-link">ログイン</a>&nbsp;&nbsp;
-	              <a th:unless="${session.user == null}" th:href="@{/logout}" class="navbar-link">ログアウト</a>
+	              <a th:unless="${session.user == null}" th:href="@{/toUpdateUser}" class="navbar-link">会員情報更新・退会</a>&nbsp;&nbsp;
+				   <a th:unless="${session.user == null}" th:href="@{/logout}" class="navbar-link">ログアウト</a>
+	              
+	             
 	            </p>
 	          </div>
 	          <!-- /.navbar-collapse -->
