@@ -17,11 +17,8 @@ import org.springframework.util.StreamUtils;
 import com.example.domain.Order;
 import com.example.domain.OrderItem;
 import com.example.domain.OrderTopping;
-import com.example.domain.Topping;
 import com.example.domain.User;
-import com.example.repository.OrderItemRepository;
 import com.example.repository.OrderRepository;
-import com.example.repository.OrderToppingRepository;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -37,12 +34,6 @@ public class OrderService {
 
 	@Autowired
 	private OrderRepository orderRepository;
-
-	@Autowired
-	private OrderItemRepository orderItemRepository;
-
-	@Autowired
-	private OrderToppingRepository orderToppingRepository;
 
 	@Autowired
 	private HttpSession session;
@@ -116,27 +107,6 @@ public class OrderService {
 	public Integer getUserId() {
 		User user = (User) session.getAttribute("user");
 		return user.getId();
-	}
-
-	/**
-	 * order_toppingsテーブルにセット
-	 * 
-	 * @param orderItemId 注文商品の主キー
-	 * @param toppingList 注文商品が持っているtoppingList
-	 */
-	private void InsertOrdertopping(Integer orderItemId, List<Topping> toppingList, String size) {
-		for (Topping topping : toppingList) {
-			OrderTopping orderTopping = new OrderTopping();
-			orderTopping.setOrderItemId(orderItemId);
-			orderTopping.setToppingId(topping.getId());
-			// サイズに応じた価格を記録
-			if ("M".equals(size)) {
-				orderTopping.setOrderPrice(topping.getPriceM());
-			} else {
-				orderTopping.setOrderPrice(topping.getPriceL());
-			}
-			orderToppingRepository.insert(orderTopping);
-		}
 	}
 
 	/**
