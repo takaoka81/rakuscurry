@@ -42,7 +42,7 @@
 						<a th:href="@{/showList}" class="navbar-link">商品一覧</a>&nbsp;&nbsp;
 						<a th:href="@{/showCart}" class="navbar-link">ショッピングカート</a>&nbsp;&nbsp;
 						<a th:href="@{/orderHistory}" class="navbar-link">注文履歴</a>&nbsp;&nbsp;
-						<a th:if="${session.user != null}" th:href="@{/stamp/showStampCard}"
+						<a sec:authorize="isAuthenticated()" th:href="@{/stamp/showStampCard}"
 							class="navbar-link">スタンプカード</a>&nbsp;&nbsp;
 						<a sec:authorize="isAnonymous()" th:href="@{/toLogin}" class="navbar-link">ログイン</a>&nbsp;&nbsp;
 						<a sec:authorize="isAuthenticated()" th:href="@{/logout}" class="navbar-link">ログアウト</a>

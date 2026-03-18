@@ -42,8 +42,9 @@ public class SecurityConfig {
                                                                 "/insert", "/insert/insertUser", // 会員登録画面
                                                                 "/mailInsert", "/mailsend", "/passCheck", "/check", // メール２段階認証
                                                                 "/showList", "/detail", // 商品一覧画面・商品詳細画面
-                                                                "/inCart", "/showCart",  // ショッピングカート関連
+                                                                "/inCart", "/showCart", // ショッピングカート関連
                                                                 "/searchItem" // API
+                                                                , "/stamp"// スタンプカード
                                                 ).permitAll() // 全員許可
                                                 .anyRequest().authenticated() // それ以外はログインが必要
                                 )

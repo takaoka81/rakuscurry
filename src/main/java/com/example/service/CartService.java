@@ -1,5 +1,6 @@
 package com.example.service;
 
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,10 +14,12 @@ import com.example.domain.Order;
 import com.example.domain.OrderItem;
 import com.example.domain.OrderTopping;
 import com.example.domain.Topping;
+import com.example.domain.User;
 import com.example.form.ItemCartInForm;
 import com.example.repository.OrderItemRepository;
 import com.example.repository.OrderRepository;
 import com.example.repository.OrderToppingRepository;
+import com.example.repository.UserRepository;
 
 /**
  * カート内に商品を入れる際に使うservice
@@ -36,6 +39,12 @@ public class CartService {
 
 	@Autowired
 	private OrderToppingRepository orderToppingRepository;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private StampService stampService;
 
 	public ItemCartInForm setupForm() {
 		return new ItemCartInForm();
@@ -121,7 +130,38 @@ public class CartService {
 	 */
 	public Order getCartByUserId(Integer userId) {
 		// status=0 (カート内) のものを探す
-		return orderRepository.findByUserIdAndStatus(userId, 0);
+		Order order = orderRepository.findByUserIdAndStatus(userId, 0);
+		// adaptFreeCurry(order, userId);
+		// return order;
+		return adaptFreeCurry(order, userId);
+	}
+
+	private Order adaptFreeCurry(Order order, Integer userId) {
+		User user = userRepository.findByUserId(userId);
+		Integer freeCount = stampService.getFreeCurryCount(user.getStampNowCount());
+		List<OrderItem> orderItems = order.getOrderItemList();
+
+		// 金額が高い順に並べ替え変える
+		orderItems.sort((first, second) -> Integer.compare(second.getOrderPrice(), first.getOrderPrice()));
+
+		// 値段が高い順に無料適用数に応じて0円にする
+		for (int i = 0; i < orderItems.size() && i < freeCount; i++) {
+			orderItems.get(i).setOrderPrice(0);
+		}
+
+		// id順に並べ替える
+		orderItems.sort(Comparator.comparing(OrderItem::getId));
+
+		// 0円適用後に合計金額を反映させる
+		Integer totalPrice = 0;
+		for (OrderItem orderItem : orderItems) {
+			totalPrice += orderItem.getOrderPrice();
+		}
+
+		order.setOrderItemList(orderItems);
+		order.setTotalPrice(totalPrice);
+
+		return order;
 	}
 
 	/**

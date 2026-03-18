@@ -17,7 +17,6 @@ import com.example.domain.Topping;
 import com.example.domain.User;
 import com.example.form.ItemCartInForm;
 import com.example.service.CartService;
-import com.example.service.StampService;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
@@ -33,9 +32,6 @@ public class CartController {
 	private HttpSession session;
 	@Autowired
 	private ServletContext application;
-
-	@Autowired
-	private StampService stampService;
 
 	public ItemCartInForm setupForm() {
 		return new ItemCartInForm();
@@ -55,15 +51,6 @@ public class CartController {
 
 		if (loginUserDetails != null) {
 			User user = loginUserDetails.getUser();
-			if (user != null) {
-				// TODO
-				if (user.getStampNowCount() >= 25) {
-					Integer freeCurryCount = stampService.getFreeCurryCount(user.getStampNowCount());
-					for (int i = 0; i <= freeCurryCount; i++) {
-
-					}
-				}
-			}
 			service.addItemToCart(cartItem, user.getId());
 		} else {
 			saveToSessionCart(cartItem);

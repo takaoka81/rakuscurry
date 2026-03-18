@@ -53,73 +53,75 @@
               </th>
             </tr>
             <th:block th:if="${cartNothing == null}">
-            <tr  th:each="cart,status:${session.cartItemList}">
-              <td>
-                <div class="center">
+              <tr th:each="cart,status:${session.cartItemList}">
+                <td>
+                  <div class="center">
 
-                  <img th:src="@{/img_curry/}+${cart.imagePath}" class="img-responsive img-rounded item-img-center"
-                    width="100" height="300" /><br />
-                  <span th:text="${cart.name}"></span>
-                </div>
-              </td>
-              <td>
-                <span th:text="${cart.size}" class="price">&nbsp;Ｌ</span>
+                    <img th:src="@{/img_curry/}+${cart.imagePath}" class="img-responsive img-rounded item-img-center"
+                      width="100" height="300" /><br />
+                    <span th:text="${cart.name}"></span>
+                  </div>
+                </td>
+                <td>
+                  <span th:text="${cart.size}" class="price">&nbsp;Ｌ</span>
 
-                &nbsp;&nbsp;<span th:text="${#numbers.formatInteger(cart.itemPrice,1,'COMMA')}+'円'"></span>
-                &nbsp;&nbsp;<span th:text="${cart.quantity}+'個'"></span>
-              </td>
-              <td>
-                <ul th:if="${toppingList==null}" th:each="topping:${cart.toppingList}">
-                  <li th:if="${cart.size=='M'}" th:text="${topping.name}+${topping.priceM}+'円'">ピーマン300円</li>
-                  <li th:if="${cart.size=='L'}" th:text="${topping.name}+${topping.priceL}+'円'">ピーマン300円</li>
-                </ul>
-              </td>
-              <td>
-                <div class="text-center" th:text="${#numbers.formatInteger(cart.subTotal,1,'COMMA')}+'円'"></div>
-              </td>
-              <td>
-                <div class="text-center">
-                  <form th:action="@{/delete}">
-                    <input type="hidden" name="index" th:value="${status.index}">
-                    <button type="submit" class="btn btn-primary">削除</button>
-                  </form>
-                </div>
-              </td>
-            </tr>
+                  &nbsp;&nbsp;<span th:text="${#numbers.formatInteger(cart.itemPrice,1,'COMMA')}+'円'"></span>
+                  &nbsp;&nbsp;<span th:text="${cart.quantity}+'個'"></span>
+                </td>
+                <td>
+                  <ul th:if="${toppingList==null}" th:each="topping:${cart.toppingList}">
+                    <li th:if="${cart.size=='M'}" th:text="${topping.name}+${topping.priceM}+'円'">ピーマン300円</li>
+                    <li th:if="${cart.size=='L'}" th:text="${topping.name}+${topping.priceL}+'円'">ピーマン300円</li>
+                  </ul>
+                </td>
+                <td>
+                  <div class="text-center" th:text="${#numbers.formatInteger(cart.subTotal,1,'COMMA')}+'円'"></div>
+                </td>
+                <td>
+                  <div class="text-center">
+                    <form th:action="@{/delete}">
+                      <input type="hidden" name="index" th:value="${status.index}">
+                      <button type="submit" class="btn btn-primary">削除</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
             </th:block>
             <th:block th:if="${order != null}">
 
-            <tr th:each="orderItem:${order.orderItemList}">
-              <td>
-                <div class="center">
-                  <img th:src="@{/img_curry/}+${orderItem.item.imagePath}"
-                    class="img-responsive img-rounded item-img-center" width="100" height="300" /><br />
-                  <span th:text="${orderItem.item.name}"></span>
-                </div>
-              </td>
-              <td>
-                <span th:text="${orderItem.size}" class="price"></span>
-                &nbsp;&nbsp;<span th:text="${#numbers.formatInteger(orderItem.orderPrice ?: 0,1,'COMMA')}+'円'"></span>
-                &nbsp;&nbsp;<span th:text="${orderItem.quantity}+'個'"></span>
-              </td>
-              <td>
-                <ul th:each="ot:${orderItem.orderTopping}">
-                  <li th:text="${ot.topping.name}+${ot.orderPrice ?: 0}+'円'"></li>
-                </ul>
-              </td>
-              <td>
-                <div class="text-center" th:text="${#numbers.formatInteger(orderItem.getSubTotal() ?: 0,1,'COMMA')}+'円'">
-                </div>
-              </td>
-              <td>
-                <div class="text-center">
-                  <form th:action="@{/delete}">
-                    <input type="hidden" name="orderItemId" th:value="${orderItem.id}">
-                    <button type="submit" class="btn btn-primary">削除</button>
-                  </form>
-                </div>
-              </td>
-            </tr>
+              <tr th:each="orderItem:${order.orderItemList}">
+                <td>
+                  <div class="center">
+                    <img th:src="@{/img_curry/}+${orderItem.item.imagePath}"
+                      class="img-responsive img-rounded item-img-center" width="100" height="300" /><br />
+                    <span th:text="${orderItem.item.name}"></span>
+                  </div>
+                </td>
+                <td>
+                  <span th:text="${orderItem.size}" class="price"></span>
+                  &nbsp;&nbsp;<span th:text="${#numbers.formatInteger(orderItem.orderPrice ?: 0,1,'COMMA')}+'円'"></span>
+                  &nbsp;&nbsp;<span th:text="${orderItem.quantity}+'個'"></span><br>
+                  <span th:text="無料適用商品" th:if="${orderItem.orderPrice == 0}"></span>
+                </td>
+                <td>
+                  <ul th:each="ot:${orderItem.orderTopping}">
+                    <li th:text="${ot.topping.name}+${ot.orderPrice ?: 0}+'円'"></li>
+                  </ul>
+                </td>
+                <td>
+                  <div class="text-center"
+                    th:text="${#numbers.formatInteger(orderItem.getSubTotal() ?: 0,1,'COMMA')}+'円'">
+                  </div>
+                </td>
+                <td>
+                  <div class="text-center">
+                    <form th:action="@{/delete}">
+                      <input type="hidden" name="orderItemId" th:value="${orderItem.id}">
+                      <button type="submit" class="btn btn-primary">削除</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
             </th:block>
           </tbody>
         </table>
@@ -137,33 +139,29 @@
                 <span th:text="${#numbers.formatInteger(total,1,'COMMA')}"></span>円 (税込み)</span>
             </th:block>
           </div>
-      <div class="row">
-        <div class="col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
-	        <div th:if="${cartNothing == null}">
-	          <div class="form-group">
-	            <form th:action="@{/toOrder}">
-	              <input
-	                class="btn btn-warning btn-block order-btn"
-	                type="submit"
-	                value="注文に進む"
-	              />
-	            </form>
-	          </div>
-	       </div>
+          <div class="row">
+            <div class="col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
+              <div th:if="${cartNothing == null}">
+                <div class="form-group">
+                  <form th:action="@{/toOrder}">
+                    <input class="btn btn-warning btn-block order-btn" type="submit" value="注文に進む" />
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
         </div>
       </div>
     </div>
+    <!-- end container -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script th:src="@{/js/auto_complete.js}"></script>
 
-    <div class="row">
-      </div>
-    </div>
-  </div>
-  <!-- end container -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-  <script th:src="@{/js/auto_complete.js}"></script>
-
-  <!--ハンバーガー機能追加-->
-  <script th:src="@{/js/bootstrap.min.js}"></script>
+    <!--ハンバーガー機能追加-->
+    <script th:src="@{/js/bootstrap.min.js}"></script>
 
 </body>
 
