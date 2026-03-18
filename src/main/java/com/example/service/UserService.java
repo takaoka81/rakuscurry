@@ -4,6 +4,8 @@ package com.example.service;
 import java.util.Optional;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -23,6 +25,8 @@ import jakarta.servlet.http.HttpSession;
 @Transactional
 public class UserService {
 
+	private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+	
 	@Autowired
 	private HttpSession session;
 
@@ -59,6 +63,16 @@ public class UserService {
 	}
 
 	/**
+	 * メールアドレスが既に登録されているか確認する
+	 * 
+	 * @param email 二段階認証のためのメールアドレス
+	 */
+	public boolean existsByMailAddress(String email){
+		boolean exitsMailAddress = repository.existsByMailAddress(email);
+		return exitsMailAddress;
+	}
+	
+	/**
 	 * ２段階認証のパスワードを入力されたメールアドレスに送信
 	 * 
 	 * @param email
@@ -89,7 +103,7 @@ public class UserService {
 			int num = rand.nextInt(10);
 			randomStr += Integer.toString(num);
 		}
-		System.out.println(randomStr);
+		logger.info("randomStr={}", randomStr);
 		return randomStr;
 	}
 

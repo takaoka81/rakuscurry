@@ -33,17 +33,20 @@
               <fieldset>
                 <legend>２段階認証確認</legend>
                
+                <p th:if="${errorMessage}" th:text="${errorMessage}" style="color: red;"></p>
                 <div class="form-group" >
                   <label for="inputEmail">メールアドレス:</label>
-                  <label th:errors="*{mail}"
+                  <label 
+                    th:errors="*{mail}"
                     class="control-label"
                     style="color: red"
-                    for="inputError"
-                    >住所を入力してください</label
-                  >
+                    for="inputError">
+                  </label>
+
                   <input
                     type="text"
                     name="mail"
+                    th:filed="*{mail}"
                     id="mail"
                     class="form-control"
                     placeholder="xxx@xxxで入力してください"
