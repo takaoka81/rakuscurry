@@ -3,6 +3,8 @@ package com.example.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -18,6 +20,8 @@ import jakarta.servlet.ServletContext;
 @Controller
 @RequestMapping("")
 public class ItemController {
+
+	private static final Logger logger = LoggerFactory.getLogger(CartController.class);
 	
 	@Autowired
 	private ServletContext application;
@@ -77,7 +81,7 @@ public class ItemController {
 		 */
 		private List<Integer> calcPageNumbers(Model model, Page<Item> itemPage) {
 			int totalPages = itemPage.getTotalPages();
-			System.out.println(totalPages);
+			logger.info("totalPages={}", totalPages);
 			List<Integer> pageNumbers = null;
 			if (totalPages > 0) {
 				pageNumbers = new ArrayList<Integer>();
@@ -85,7 +89,7 @@ public class ItemController {
 					pageNumbers.add(i);
 				}
 			}
-			System.out.println(itemPage);
+			logger.info("totalPages={}", totalPages);
 			model.addAttribute("itemPage", itemPage);
 			return pageNumbers;
 		}
