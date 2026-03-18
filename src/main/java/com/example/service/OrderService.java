@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
 
-import com.example.domain.CartItem;
 import com.example.domain.Order;
 import com.example.domain.OrderItem;
 import com.example.domain.OrderTopping;
@@ -121,28 +119,6 @@ public class OrderService {
 	}
 
 	/**
-	 * order_itemsテーブルにINSERTするメゾット
-	 * 
-	 * @param orderId
-	 */
-	private void insertOrderItem(Integer orderId) {
-		@SuppressWarnings("unchecked")
-		List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
-
-		for (CartItem cartItem : cartItemList) {
-			OrderItem orderItem = new OrderItem();
-			// カートの時点で保持している商品金額をそのまま記録
-			BeanUtils.copyProperties(cartItem, orderItem);
-
-			orderItem.setOrderId(orderId);
-			Integer orderItemid = orderItemRepository.order(orderItem);
-
-			// サイズ情報も渡してトッピング価格を決定
-			InsertOrdertopping(orderItemid, cartItem.getToppingList(), cartItem.getSize());
-		}
-	}
-
-	/**
 	 * order_toppingsテーブルにセット
 	 * 
 	 * @param orderItemId 注文商品の主キー
@@ -162,8 +138,6 @@ public class OrderService {
 			orderToppingRepository.insert(orderTopping);
 		}
 	}
-
-	
 
 	/**
 	 * 引数で受け取ったemailに完了メールを送付
