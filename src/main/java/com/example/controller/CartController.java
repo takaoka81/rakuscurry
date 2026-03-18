@@ -7,11 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.domain.CartItem;
+import com.example.domain.LoginUserDetails;
 import com.example.domain.Order;
 import com.example.domain.Topping;
 import com.example.domain.User;
@@ -44,7 +46,7 @@ public class CartController {
 	}
 
 	@RequestMapping("/inCart")
-	public String inCart(ItemCartInForm form) {
+	public String inCart(@AuthenticationPrincipal LoginUserDetails loginUserDetails, ItemCartInForm form) {
 		CartItem cartItem = new CartItem();
 		BeanUtils.copyProperties(form, cartItem);
 		cartItem.setItemId(form.getId());
@@ -55,13 +57,15 @@ public class CartController {
 		List<Topping> selectedToppings = service.getToppingIndex(toppingList, form.getToppingIndex());
 		cartItem.setToppingList(selectedToppings);
 
-		User user = (User) session.getAttribute("user");
-		if (user != null) {
-			// TODO
-			if (user.getStampNowCount() >= 25) {
-				Integer freeCurryCount = stampService.getFreeCurryCount(user.getStampNowCount());
-				for (int i = 0; i <= freeCurryCount; i++) {
+		if (loginUserDetails != null) {
+			User user = loginUserDetails.getUser();
+			if (user != null) {
+				// TODO
+				if (user.getStampNowCount() >= 25) {
+					Integer freeCurryCount = stampService.getFreeCurryCount(user.getStampNowCount());
+					for (int i = 0; i <= freeCurryCount; i++) {
 
+					}
 				}
 			}
 			service.addItemToCart(cartItem, user.getId());
@@ -83,11 +87,11 @@ public class CartController {
 	}
 
 	@RequestMapping("/showCart")
-	public String showCart(Model model) {
-		User user = (User) session.getAttribute("user");
+	public String showCart(@AuthenticationPrincipal LoginUserDetails loginUserDetails, Model model) {
 
-		if (user != null) {
+		if (loginUserDetails != null) {
 			// --- ログイン時の処理 ---
+			User user = loginUserDetails.getUser();
 			Order order = service.getCartByUserId(user.getId());
 			if (order == null || order.getOrderItemList().isEmpty()) {
 				model.addAttribute("cartNothing", "カートに商品がありません");
@@ -115,11 +119,44 @@ public class CartController {
 	}
 
 	@RequestMapping("/delete")
-	public String delete(String index, Model model) {
-		logger.info(index);
-		@SuppressWarnings("unchecked")
-		List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
-		cartItemList.remove(Integer.parseInt(index));
-		return showCart(model);
+	public String delete(@AuthenticationPrincipal LoginUserDetails loginUserDetails, Integer index,
+			Integer orderItemId) {
+
+		if (loginUserDetails != null) {
+			User user = loginUserDetails.getUser();
+			if (orderItemId != null) {
+				// 1. DBから削除 & DB上の合計金額を更新
+				service.deleteOrderItem(orderItemId, user.getId());
+
+				// 2. ★追加：最新の注文情報をDBから取得し直す
+				Order order = service.getCartByUserId(user.getId());
+
+				// 3. ★重要：セッションの totalPrice を最新の注文合計で上書きする
+				if (order != null) {
+					session.setAttribute("totalPrice", order.getTotalPrice());
+				} else {
+					session.setAttribute("totalPrice", 0);
+				}
+			}
+		} else {
+			// --- 未ログインの場合（Sessionから削除） ---
+			@SuppressWarnings("unchecked")
+			List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
+
+			if (cartItemList != null && index != null && index < cartItemList.size()) {
+				cartItemList.remove(index.intValue());
+
+				int total = 0;
+				for (CartItem item : cartItemList) {
+					total += item.getSubTotal();
+				}
+				// 未ログイン時はここでセッションを更新しているため、反映されます
+				session.setAttribute("totalPrice", total);
+				session.setAttribute("cartItemList", cartItemList);
+			}
+		}
+
+		return "redirect:/showCart";
 	}
+
 }

@@ -92,7 +92,7 @@ public class OrderService {
 	 */
 	public void order(Order order, User user, StampHistory stampHistory) {
 		order.setStatus(paymentMethodJudge(order));
-		order.setUserId(getUserId());
+		// order.setUserId(getUserId());
 		orderRepository.update(order);
 		userService.updateStampCounts(user);
 		stampHistoryService.insert(stampHistory);
@@ -126,49 +126,6 @@ public class OrderService {
 	public Integer getUserId() {
 		User user = (User) session.getAttribute("user");
 		return user.getId();
-	}
-
-	/**
-	 * order_itemsテーブルにINSERTするメゾット
-	 * 
-	 * @param orderId
-	 */
-	private void insertOrderItem(Integer orderId) {
-		@SuppressWarnings("unchecked")
-		List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
-
-		for (CartItem cartItem : cartItemList) {
-			OrderItem orderItem = new OrderItem();
-			// カートの時点で保持している商品金額をそのまま記録
-			BeanUtils.copyProperties(cartItem, orderItem);
-
-			orderItem.setOrderId(orderId);
-			Integer orderItemid = orderItemRepository.order(orderItem);
-
-			// サイズ情報も渡してトッピング価格を決定
-			InsertOrdertopping(orderItemid, cartItem.getToppingList(), cartItem.getSize());
-		}
-	}
-
-	/**
-	 * order_toppingsテーブルにセット
-	 * 
-	 * @param orderItemId 注文商品の主キー
-	 * @param toppingList 注文商品が持っているtoppingList
-	 */
-	private void InsertOrdertopping(Integer orderItemId, List<Topping> toppingList, String size) {
-		for (Topping topping : toppingList) {
-			OrderTopping orderTopping = new OrderTopping();
-			orderTopping.setOrderItemId(orderItemId);
-			orderTopping.setToppingId(topping.getId());
-			// サイズに応じた価格を記録
-			if ("M".equals(size)) {
-				orderTopping.setOrderPrice(topping.getPriceM());
-			} else {
-				orderTopping.setOrderPrice(topping.getPriceL());
-			}
-			orderToppingRepository.insert(orderTopping);
-		}
 	}
 
 	/**
@@ -206,7 +163,7 @@ public class OrderService {
 				for (OrderItem item : items) {
 					orderItems.append(item.getItem().getName())
 							.append(" (").append(item.getSize()).append(") x").append(item.getQuantity())
-							.append(" - 小計: ").append(String.format("%,d", item.getSubTotal())).append("円\n");
+							.append(" - 小計: ").append(String.format("%,d", item.getSubTotal())).append("円\n\n");
 					// トッピング情報
 					if (item.getOrderTopping() != null && !item.getOrderTopping().isEmpty()) {
 						orderItems.append("  トッピング: ");

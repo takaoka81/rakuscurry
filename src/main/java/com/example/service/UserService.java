@@ -20,7 +20,7 @@ import jakarta.servlet.http.HttpSession;
 @Transactional
 public class UserService {
 	private static final Logger logger = LoggerFactory.getLogger(UserService.class);
-	
+
 	@Autowired
 	private HttpSession session;
 
@@ -58,6 +58,24 @@ public class UserService {
 
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		repository.insert(user);
+	}
+
+	/**
+	 * ユーザー情報を更新
+	 * 
+	 * @param user
+	 */
+	public void update(User user) {
+		repository.update(user);
+	}
+
+	/**
+	 * ユーザー情報を削除
+	 * 
+	 * @param id
+	 */
+	public void delete(Integer id) {
+		repository.delete(id);
 	}
 
 	/**
@@ -122,6 +140,8 @@ public class UserService {
 		}
 	}
 
+	<<<<<<<HEAD
+
 	/**
 	 * usersテーブルのスタンプカウントを更新する
 	 * 
@@ -131,4 +151,5 @@ public class UserService {
 		repository.updateStampCounts(user);
 	}
 
+	=======>>>>>>>develop
 }
