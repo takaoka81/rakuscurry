@@ -1,10 +1,11 @@
 package com.example.controller;
 
+import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +90,10 @@ public class OrderController {
 		// もしHTML側が ${session.totalPrice} を直接参照している場合は、同期をとるためにセット
 		session.setAttribute("totalPrice", order.getTotalPrice());
 
-		String token = UUID.randomUUID().toString();
+		SecureRandom random = new SecureRandom();
+		byte[] bytes = new byte[32];
+		random.nextBytes(bytes);
+		String token = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
 		session.setAttribute("token", token);
 		model.addAttribute("token", token);
 		return "order/order_confirm";
