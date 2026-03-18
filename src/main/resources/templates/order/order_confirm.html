@@ -90,6 +90,7 @@
 
     <!-- table -->
     <form action="order_finished.html" th:action="@{/order}" th:object="${orderForm}" method="post">
+      <input type="hidden" name="token" th:value="${token}">
       <input type="hidden" name="totalPrice" th:value="${session.totalPrice}">
       <div class="row">
         <div class="

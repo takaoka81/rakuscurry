@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.domain.LoginUserDetails;
 import com.example.domain.Order;
@@ -87,6 +89,9 @@ public class OrderController {
 		// もしHTML側が ${session.totalPrice} を直接参照している場合は、同期をとるためにセット
 		session.setAttribute("totalPrice", order.getTotalPrice());
 
+		String token = UUID.randomUUID().toString();
+		session.setAttribute("token", token);
+		model.addAttribute("token", token);
 		return "order/order_confirm";
 	}
 
@@ -103,7 +108,13 @@ public class OrderController {
 	 */
 	@RequestMapping("/order")
 	public String orderCompletion(@AuthenticationPrincipal LoginUserDetails loginUserDetails, @Validated OrderForm form,
-			BindingResult result, Model model) {
+			BindingResult result, Model model, @RequestParam("token") String token) {
+		// トークンが正しいか
+		if (!token.equals((String) session.getAttribute("token"))) {
+			return "redirect:/showList";
+		}
+		session.removeAttribute("token");
+
 		// 昨日の日付を取得し配達日と比較
 		Date date = new Date();
 		Calendar yesterday = Calendar.getInstance();
