@@ -140,8 +140,6 @@ public class UserService {
 		}
 	}
 
-	<<<<<<<HEAD
-
 	/**
 	 * usersテーブルのスタンプカウントを更新する
 	 * 
@@ -151,5 +149,4 @@ public class UserService {
 		repository.updateStampCounts(user);
 	}
 
-	=======>>>>>>>develop
 }

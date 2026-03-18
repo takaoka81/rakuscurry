@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -15,16 +14,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
 
-import com.example.domain.CartItem;
 import com.example.domain.Order;
 import com.example.domain.OrderItem;
 import com.example.domain.OrderTopping;
 import com.example.domain.StampHistory;
-import com.example.domain.Topping;
 import com.example.domain.User;
-import com.example.repository.OrderItemRepository;
 import com.example.repository.OrderRepository;
-import com.example.repository.OrderToppingRepository;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -40,12 +35,6 @@ public class OrderService {
 
 	@Autowired
 	private OrderRepository orderRepository;
-
-	@Autowired
-	private OrderItemRepository orderItemRepository;
-
-	@Autowired
-	private OrderToppingRepository orderToppingRepository;
 
 	@Autowired
 	private UserService userService;
