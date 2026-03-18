@@ -193,7 +193,15 @@ public class OrderController {
 	}
 
 	@RequestMapping("orderCompletion")
-	public String orderCompletion() {
+	public String orderCompletion(@AuthenticationPrincipal LoginUserDetails loginUserDetails, Model model) {
+		if (loginUserDetails != null) {
+			User user = loginUserDetails.getUser();
+			if (user.getStampNowCount() >= 25) {
+				Integer freeCurryCount = stampService.getFreeCurryCount(user.getStampNowCount());
+				model.addAttribute("freeCurryCount", freeCurryCount);
+			}
+		}
+
 		return "/order/order_finished";
 	}
 
