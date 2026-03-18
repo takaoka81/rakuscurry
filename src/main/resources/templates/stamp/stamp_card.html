@@ -40,7 +40,7 @@
         <div class="rank-side">
             <div class="rank-status">
                 あなたのランク<br>
-                <strong>ホット</strong>
+                <span th:text="${rankLabel}"></span>
             </div>
 
             <div class="rank-detail">
@@ -60,7 +60,7 @@
                     <li><img class="picture" th:src="@{/img_rank/rank4.png}"> ランク4 スパイシー</li>
                     <li><img class="picture" th:src="@{/img_rank/rank5.png}"> ランク5 マグマ</li>
                 </ul>
-                <div class="current-badge">現在のランク: ホット</div>
+                <div class="current-badge">現在のランク: <span th:text="${rankLabel}"></span></div>
             </div>
             <form method="dialog">
                 <button class="close-btn">OK</button>
