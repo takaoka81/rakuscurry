@@ -172,9 +172,8 @@ public class OrderController {
 
 		Integer addStamps = stampService.getStampCountByOrder(order.getOrderItemList());
 		user.setStampNowCount(user.getStampNowCount() + addStamps);
-		user.setStampAllCount(user.getStampAllCount() + addStamps);
+		user.setStampAllCount(user.getStampAllCount() + user.getStampNowCount());
 		StampHistory stampHistory = new StampHistory(user.getId(), order.getId(), addStamps);
-		order.setId(user.getId());
 		service.order(order, user, stampHistory);
 
 		// 完了メールを送信

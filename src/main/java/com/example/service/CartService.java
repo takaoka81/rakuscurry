@@ -139,27 +139,34 @@ public class CartService {
 	private Order adaptFreeCurry(Order order, Integer userId) {
 		User user = userRepository.findByUserId(userId);
 		Integer freeCount = stampService.getFreeCurryCount(user.getStampNowCount());
-		List<OrderItem> orderItems = order.getOrderItemList();
-
-		// 金額が高い順に並べ替え変える
-		orderItems.sort((first, second) -> Integer.compare(second.getOrderPrice(), first.getOrderPrice()));
-
-		// 値段が高い順に無料適用数に応じて0円にする
-		for (int i = 0; i < orderItems.size() && i < freeCount; i++) {
-			orderItems.get(i).setOrderPrice(0);
+		if (order == null) {
+			return null;
 		}
 
-		// id順に並べ替える
-		orderItems.sort(Comparator.comparing(OrderItem::getId));
+		if (freeCount >= 1) {
+			List<OrderItem> orderItems = order.getOrderItemList();
 
-		// 0円適用後に合計金額を反映させる
-		Integer totalPrice = 0;
-		for (OrderItem orderItem : orderItems) {
-			totalPrice += orderItem.getOrderPrice();
+			// 金額が高い順に並べ替え変える
+			orderItems.sort((first, second) -> Integer.compare(second.getOrderPrice(), first.getOrderPrice()));
+
+			// TODO
+			// 値段が高い順に無料適用数に応じて0円にする
+			for (int i = 0; i < orderItems.size() && i < freeCount; i++) {
+				orderItems.get(i).setOrderPrice(0);
+			}
+
+			// id順に並べ替える
+			orderItems.sort(Comparator.comparing(OrderItem::getId));
+
+			// 0円適用後に合計金額を反映させる
+			Integer totalPrice = 0;
+			for (OrderItem orderItem : orderItems) {
+				totalPrice += orderItem.getOrderPrice();
+			}
+
+			order.setOrderItemList(orderItems);
+			order.setTotalPrice(totalPrice);
 		}
-
-		order.setOrderItemList(orderItems);
-		order.setTotalPrice(totalPrice);
 
 		return order;
 	}

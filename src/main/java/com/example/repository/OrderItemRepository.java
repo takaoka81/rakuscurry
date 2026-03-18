@@ -14,35 +14,59 @@ import com.example.domain.OrderItem;
 
 /**
  * order_itemsとやりとりする
+ * 
  * @author naramasato
  *
  */
 @Repository
 public class OrderItemRepository {
-	
+
 	@Autowired
 	private NamedParameterJdbcTemplate template;
-	
-//	private static final RowMapper<OrderItemRepository> ORDER_ITEM_ROW_MAPPER
-//		 = new BeanPropertyRowMapper<>(OrderItemRepository.class);
-	
+
+	// private static final RowMapper<OrderItemRepository> ORDER_ITEM_ROW_MAPPER
+	// = new BeanPropertyRowMapper<>(OrderItemRepository.class);
+
 	/**
 	 * order_itemsにINSERTする
+	 * 
 	 * @param orderItem
-	 * @return　自動採番されたid
+	 * @return 自動採番されたid
 	 */
 	public Integer order(OrderItem orderItem) {
 		SqlParameterSource param = new BeanPropertySqlParameterSource(orderItem);
-		
+
 		String sql = "INSERT INTO order_items(item_id, order_id, quantity, size, order_price) "
 				+ "VALUES(:itemId, :orderId, :quantity, :size, :orderPrice)";
-		
+
 		KeyHolder keyHolder = new GeneratedKeyHolder();
-		String[] keyColumnNames = {"id"};
+		String[] keyColumnNames = { "id" };
 		template.update(sql, param, keyHolder, keyColumnNames);
-		
+
 		orderItem.setId(keyHolder.getKey().intValue());
-		
+
 		return orderItem.getId();
+	}
+
+	/**
+	 * order_itemsにUPDATEする(0円適用時用)
+	 * 
+	 * @param orderItem
+	 */
+	public void updateOrder(OrderItem orderItem) {
+		SqlParameterSource param = new BeanPropertySqlParameterSource(orderItem);
+
+		String sql = """
+				UPDATE
+					order_items
+				SET
+					order_price=:orderPrice
+				WHERE
+					id=:id
+				""";
+		;
+
+		template.update(sql, param);
+
 	}
 }

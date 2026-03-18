@@ -19,6 +19,7 @@ import com.example.domain.OrderItem;
 import com.example.domain.OrderTopping;
 import com.example.domain.StampHistory;
 import com.example.domain.User;
+import com.example.repository.OrderItemRepository;
 import com.example.repository.OrderRepository;
 
 import jakarta.servlet.http.HttpSession;
@@ -41,6 +42,9 @@ public class OrderService {
 
 	@Autowired
 	private StampHistoryService stampHistoryService;
+
+	@Autowired
+	private OrderItemRepository orderItemRepository;
 
 	@Autowired
 	private HttpSession session;
@@ -81,10 +85,15 @@ public class OrderService {
 	 */
 	public void order(Order order, User user, StampHistory stampHistory) {
 		order.setStatus(paymentMethodJudge(order));
-		// order.setUserId(getUserId());
 		orderRepository.update(order);
 		userService.updateStampCounts(user);
 		stampHistoryService.insert(stampHistory);
+		for (OrderItem orderItem : order.getOrderItemList()) {
+			if (orderItem.getOrderPrice() == 0) {
+				orderItem.setOrderId(order.getId());
+				orderItemRepository.updateOrder(orderItem);
+			}
+		}
 
 		// orderオブジェクトに商品情報をセットしておく（メール送信などで必要）
 		List<Order> loaded = orderRepository.orderLoad(order.getId());

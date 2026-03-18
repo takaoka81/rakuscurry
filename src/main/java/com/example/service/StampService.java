@@ -52,10 +52,12 @@ public class StampService {
     public Integer getStampCountByOrder(List<OrderItem> orderItemList) {
         Integer stampCount = 0;
         for (OrderItem orderItem : orderItemList) {
-            if (orderItem.getSize().equals(SIZE_M)) {
-                stampCount++;
+            if (orderItem.getOrderPrice() == 0) {
+                stampCount -= 25;
+            } else if (orderItem.getSize().equals(SIZE_M)) {
+                stampCount = stampCount + (1 * orderItem.getQuantity());
             } else {
-                stampCount = stampCount + 2;
+                stampCount = stampCount + (2 * orderItem.getQuantity());
             }
         }
         return stampCount;
