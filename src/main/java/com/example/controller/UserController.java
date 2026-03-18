@@ -45,7 +45,7 @@ public class UserController {
             session.invalidate();
         }
         redirectAttributes.addFlashAttribute("deleteMessage", "退会手続きが完了しました。ご利用ありがとうございました。");
-        return "redirect:/toLogin";
+        return "redirect:/showList";
     }
 
     /**
