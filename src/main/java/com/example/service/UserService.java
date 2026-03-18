@@ -89,8 +89,6 @@ public class UserService {
 	 */
 	public void sendMail(String email, String checkPass) {
 		SimpleMailMessage msg = new SimpleMailMessage();
-		session.setAttribute("checkPass", checkPass);
-		session.setAttribute("emailcheck", email);
 
 		msg.setFrom("curry-admin@example.com");
 		msg.setTo(email);
@@ -122,11 +120,8 @@ public class UserService {
 	 * @param numPass 入力された数字
 	 * @return
 	 */
-	public String checkpass(String numPass) {
-		String checkPass = (String) session.getAttribute("checkPass");
-
-		if (checkPass.equals(numPass)) {
-			session.removeAttribute("checkPass");
+	public String checkpass(String numPass, String checkPass) {
+		if (checkPass.equals(numPass)) {	
 			return "OK";
 		} else {
 			return "NO";

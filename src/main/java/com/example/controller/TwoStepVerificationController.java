@@ -65,6 +65,10 @@ public class TwoStepVerificationController {
 		}
 		//ランダム生成された整数を受けとる
 		String checkPass = userService.randomPass();
+
+		session.setAttribute("checkPass", checkPass);
+		session.setAttribute("emailcheck", form.getMail());
+
 		//入力されたメールアドレスに送信
 		userService.sendMail(form.getMail(),checkPass);
 		
@@ -93,13 +97,16 @@ public class TwoStepVerificationController {
 		if(session.getAttribute("emailcheck") == null) {
 			return "redirect:/mailInsert";
 		}
+
+		String checkPass = (String) session.getAttribute("checkPass");
 		
-		String message =  userService.checkpass(form.getPassCheck());
+		String message =  userService.checkpass(form.getPassCheck(), checkPass);
 		
 		String email = (String) session.getAttribute("emailcheck");
 		
 		if(message.equals("OK")) {
 			session.setAttribute("email", email);
+			session.removeAttribute("checkPass");
 			return "redirect:/insert";
 		} else {
 			model.addAttribute("error","入力された値が違います");
