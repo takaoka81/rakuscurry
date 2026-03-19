@@ -50,6 +50,8 @@ public class OrderService {
 
 	@Autowired
 	private HttpSession session;
+
+	@Autowired
 	private OrderRepository orderRepository;
 
 	@Value("${spring.mail.from}")
