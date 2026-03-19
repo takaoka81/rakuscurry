@@ -23,6 +23,9 @@ public class OrderItem {
 	// 注文したトッピングのList
 	private List<OrderTopping> orderTopping;
 
+	// 割引額
+	private Integer discount;
+
 	private Integer freeCount;
 
 	private boolean isFree;
@@ -121,6 +124,10 @@ public class OrderItem {
 		if (freeCount != null) {
 			return (itemPrice + toppingTotalPrice) * count - (itemPrice * freeCount);
 		}
+
+		if (discount > 0) {
+			return (itemPrice * quantity) - discount;
+		}
 		// 4. 計算結果を返す
 		return (itemPrice + toppingTotalPrice) * count;
 	}
@@ -139,6 +146,14 @@ public class OrderItem {
 
 	public void setFree(boolean isFree) {
 		this.isFree = isFree;
+	}
+
+	public Integer getDiscount() {
+		return discount;
+	}
+
+	public void setDiscount(Integer discount) {
+		this.discount = discount;
 	}
 
 }

@@ -144,6 +144,7 @@ public class CartService {
 			return null;
 		}
 
+		// TODO
 		if (freeCount >= 1) {
 			List<OrderItem> orderItems = order.getOrderItemList();
 
@@ -168,9 +169,11 @@ public class CartService {
 			// 0円適用後に合計金額を反映させる
 			Integer totalPrice = 0;
 			Integer subPrice = 0;
-			for (OrderItem orderItem : orderItems) {
-				totalPrice += orderItem.getOrderPrice() * orderItem.getQuantity();
-				subPrice = subPrice + orderItem.getOrderPrice() * orderItem.getFreeCount();
+			for (int i = 0; i < orderItems.size(); i++) {
+				totalPrice += orderItems.get(i).getOrderPrice() * orderItems.get(i).getQuantity();
+				subPrice = subPrice + orderItems.get(i).getOrderPrice() * orderItems.get(0).getFreeCount();
+				orderItems.get(i).setDiscount(subPrice);
+				orderItemRepository.update(orderItems.get(i));
 			}
 			order.setOrderItemList(orderItems);
 			order.setTotalPrice(totalPrice - subPrice);
@@ -183,6 +186,7 @@ public class CartService {
 		List<OrderItem> orderItemsQuantitySingle = new ArrayList<>();
 		for (OrderItem orderItem : orderItems) {
 			if (orderItem.getQuantity() >= 2) {
+				// orderItem.setDiscount(orderItem.getOrderPrice() * orderItem.getQuantity());
 				for (int i = 1; i <= orderItem.getQuantity(); i++) {
 					OrderItem item = new OrderItem();
 					item.setId(orderItem.getId());

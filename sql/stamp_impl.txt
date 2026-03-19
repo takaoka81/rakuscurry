@@ -1,5 +1,6 @@
 ALTER TABLE users ADD stamp_now_count integer;
 ALTER TABLE users ADD stamp_all_count integer;
+ALTER TABLE order_items ADD discount integer;
 
 CREATE TABLE stamp_history(
     id serial PRIMARY KEY,
