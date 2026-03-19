@@ -11,6 +11,7 @@ body {
     display: flex;
     gap: 20px;
     align-items: flex-start;
+    margin-top: 20px;
 }
 
 /* 左側（スタンプカード）を広めに */
@@ -20,8 +21,11 @@ body {
 
 /* 右側（ランク情報） */
 .rank-side {
+    display: flex;
     flex: 1;
-    text-align: left;
+    justify-content: center;
+    align-items: center;
+    gap: 200px;
 }
 
 /* スマホでは縦並びに変更 */
@@ -41,15 +45,18 @@ body {
     width: 100%;
     max-width: 400px;
     text-align: center;
+    margin: 0 auto;
 }
 
 /* ① タイトル */
 .card-header h1 {
-    font-size: 1.2rem;
-    margin-bottom: 5px;
+    font-size: 3.6rem;
+    font-weight: bold;
+    margin-bottom: 20px;
 }
 
 .card-header p {
+    font-size: 2.4rem;
     font-weight: bold;
     margin-bottom: 20px;
 }
@@ -62,7 +69,7 @@ body {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 10px;
-    margin-bottom: 20px;
+    margin: 0 auto 40px;
 }
 
 .stamp {
@@ -84,26 +91,35 @@ body {
 .stamp.active::after {
     content: '✓';
     color: white;
-    font-size: 1.2rem;
+    font-size: 1.8rem;
 }
 
 /* ③ 特典情報 */
 .reward-info {
-    font-size: 1.1rem;
+    font-size: 2.4rem;
     font-weight: bold;
-    margin-bottom: 20px;
+    margin: 0 auto 20px;
 }
 
 /* ④ ランク表示 */
 .rank-status {
     text-align: right;
     margin-right: 10px;
-    font-size: 0.9rem;
+    font-size: 1.8rem;
 }
 
 .rank-status strong {
-    font-size: 1.2rem;
-    display: block;
+    display: inline-block;
+    margin-right: 5px;
+    font-size: 2.4rem;
+}
+.rank-color {
+    color: var(--label-color);
+}
+@media (max-width: 768px) {
+    .rank-side {
+        gap: 40px;
+    }
 }
 
 /* ⑤ ランク詳細リンク */
@@ -117,7 +133,7 @@ body {
     border: none;
     color: #333;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 1.8rem;
     text-decoration: underline;
 }
 

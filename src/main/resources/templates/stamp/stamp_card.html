@@ -19,7 +19,7 @@
                 <div class="card-container">
                     <header class="card-header">
                         <h1>スタンプカード</h1>
-                        <p>25個溜まるとカレー1杯無料!</p>
+                        <p>25個溜まるとカレー1杯無料！</p>
                     </header>
 
                     <div class="stamp-board" th:style="'border-color:' + ${labelColor}">
@@ -29,18 +29,19 @@
                         </div>
                     </div>
 
+                    <div class="reward-info">
+                        <p><span id="free-count" th:text="${freeCurryCount}"></span>杯無料注文可能！</p>
+                    </div>
                 </div>
 
-                <div class="reward-info">
-                    <p><span id="free-count" th:text="${freeCurryCount}"></span>杯無料注文可能！</p>
-                </div>
             </div>
         </div>
 
         <div class="rank-side">
             <div class="rank-status">
                 あなたのランク<br>
-                <span th:text="${rankLabel}"></span>
+                <strong class="rank-color" th:style="'--label-color:' + ${labelColor}"> <span
+                        th:text="${rankLabel}"></span></strong>
             </div>
 
             <div class="rank-detail">

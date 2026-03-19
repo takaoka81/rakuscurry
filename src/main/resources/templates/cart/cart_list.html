@@ -101,7 +101,7 @@
                   <span th:text="${orderItem.size}" class="price"></span>
                   &nbsp;&nbsp;<span th:text="${#numbers.formatInteger(orderItem.orderPrice ?: 0,1,'COMMA')}+'円'"></span>
                   &nbsp;&nbsp;<span th:text="${orderItem.quantity}+'個'"></span><br>
-                  <span th:text="無料適用商品" th:if="${orderItem.orderPrice == 0}"></span>
+                  <span th:text="'無料' + ${orderItem.freeCount} + '品適用'" th:if="${orderItem.isFree}"></span>
                 </td>
                 <td>
                   <ul th:each="ot:${orderItem.orderTopping}">
