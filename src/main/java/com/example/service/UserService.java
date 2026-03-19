@@ -15,16 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.domain.User;
 import com.example.repository.UserRepository;
 
-import jakarta.servlet.http.HttpSession;
-
 @Service
 @Transactional
 public class UserService {
 
 	private static final Logger logger = LoggerFactory.getLogger(UserService.class);
-	
-	@Autowired
-	private HttpSession session;
 
 	@Autowired
 	private UserRepository repository;
@@ -89,8 +84,6 @@ public class UserService {
 	 */
 	public void sendMail(String email, String checkPass) {
 		SimpleMailMessage msg = new SimpleMailMessage();
-		session.setAttribute("checkPass", checkPass);
-		session.setAttribute("emailcheck", email);
 
 		msg.setFrom("curry-admin@example.com");
 		msg.setTo(email);
@@ -122,15 +115,8 @@ public class UserService {
 	 * @param numPass 入力された数字
 	 * @return
 	 */
-	public String checkpass(String numPass) {
-		String checkPass = (String) session.getAttribute("checkPass");
-
-		if (checkPass.equals(numPass)) {
-			session.removeAttribute("checkPass");
-			return "OK";
-		} else {
-			return "NO";
-		}
+	public boolean  checkpass(String numPass, String checkPass) {
+            return checkPass.equals(numPass);
 	}
 
 }
