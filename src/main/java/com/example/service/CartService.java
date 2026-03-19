@@ -144,7 +144,6 @@ public class CartService {
 			return null;
 		}
 
-		// TODO
 		if (freeCount >= 1) {
 			List<OrderItem> orderItems = order.getOrderItemList();
 
