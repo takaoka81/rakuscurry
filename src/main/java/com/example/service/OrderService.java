@@ -22,8 +22,6 @@ import com.example.domain.OrderItem;
 import com.example.domain.OrderTopping;
 import com.example.repository.OrderRepository;
 
-import jakarta.servlet.http.HttpSession;
-
 /**
  * orderに関わる内容を行う
  * 
@@ -38,9 +36,6 @@ public class OrderService {
 
 	@Autowired
 	private OrderRepository orderRepository;
-
-	@Autowired
-	private HttpSession session;
 
 	@Value("${spring.mail.from}")
 	private String mailFrom;
