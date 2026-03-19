@@ -43,7 +43,7 @@ public class SecurityConfig {
                                                                 "/mailInsert", "/mailsend", "/passCheck", "/check", // メール２段階認証
                                                                 "/showList", "/detail", // 商品一覧画面・商品詳細画面
                                                                 "/inCart", "/showCart",  // ショッピングカート関連
-                                                                "/searchItem" // API
+                                                                "/searchItem","/items","/item/**" // API
                                                 ).permitAll() // 全員許可
                                                 .anyRequest().authenticated() // それ以外はログインが必要
                                 )
