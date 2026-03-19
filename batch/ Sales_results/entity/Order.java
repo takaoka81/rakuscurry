@@ -14,6 +14,7 @@ public class Order {
     private Integer id;
     @JsonProperty("user_id")
     private Integer userId;
+    @JsonProperty("status")
     private Integer status;
     @JsonProperty("total_price")
     private Integer totalPrice;

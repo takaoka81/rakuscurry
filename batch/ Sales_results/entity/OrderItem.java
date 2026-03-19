@@ -24,7 +24,11 @@ public class OrderItem {
     @JsonProperty("toppings")
     public List<OrderTopping> toppings;
 
-    public OrderItem(){}
+    private static final Logger logger = LoggerFactory.getLogger(OrderItem.class);
+
+    public OrderItem(){
+        logger.debug("OrderItem initialized (empty constructor)");
+    }
 
     public OrderItem(int id, int itemId, int quantity, String size, List<OrderTopping> toppings) {
         this.id = id;
@@ -32,6 +36,7 @@ public class OrderItem {
         this.quantity = quantity;
         this.size = size;
         this.toppings = toppings;
+        logger.info("OrderItem initialized with ID: {}, ItemID: {}", id, itemId);
     }
 
     public int getId() {

@@ -11,6 +11,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling // BatchScheduler の @Scheduled が有効になる。
 public class BatchApplication implements CommandLineRunner {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(BatchApplication.class);
+
     @Autowired
     private DataExportService dataExportService;
 
@@ -27,15 +29,18 @@ public class BatchApplication implements CommandLineRunner {
     public void run(String... args) throws Exception {
         if (args.length > 0) {
             String targetDate = args[0]; // 引数から日付（例：2026-11-28）を取得
+            logger.info("手動実行モードで開始します。引数: {}", targetDate);
             System.out.println("--- 実行を開始します。日付: " + targetDate + " ---");
             
             try {
                 dataExportService.execute(targetDate);
                 System.out.println("--- 実行が正常に終了しました。 ---");
             } catch (Exception e) {
+                logger.error("実行中にエラーが発生しました: {}", e.getMessage(), e);
                 System.err.println("--- 実行中にエラーが発生しました: " + e.getMessage() + " ---");
             }
         } else {
+            logger.info("引数なしで起動中");
             System.out.println("--- バッチアプリケーション起動完了 ---");
         }
     }

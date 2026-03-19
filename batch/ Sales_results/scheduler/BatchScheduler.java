@@ -14,6 +14,8 @@ public class BatchScheduler {
     @Autowired
     private DataExportService dataExportService;
 
+    private static final Logger logger = LoggerFactory.getLogger(BatchScheduler.class);
+
     /**
      * 定期実行（Cron）用メソッド
      * 毎日深夜 02:00 に前日分のデータを集計・送信する設定例
@@ -22,11 +24,13 @@ public class BatchScheduler {
     public void scheduleDailyTask() {
         String targetDate = LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE);
         
+        logger.info("スケジュールタスクを開始します。実行対象日: {}", targetDate);
         System.out.println("定期タスクの開始。日付: " + targetDate);
         
         // 共通のサービスメソッドを呼び出し
         dataExportService.execute(targetDate);
         
         System.out.println("定期タスクが正常に完了しました。");
+        logger.info("スケジュールタスクの呼び出しを終了しました。");
     }
 }

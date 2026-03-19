@@ -15,15 +15,18 @@ public class OrderTopping {
     @JsonProperty("order_item_id")
     private Integer orderItemId;
 
-    
-    public OrderTopping(){}
+    private static final Logger logger = LoggerFactory.getLogger(OrderTopping.class);
 
     
+    public OrderTopping(){
+        logger.debug("OrderTopping initialized (empty constructor)");
+    }
 
     public OrderTopping(int id, int toppingId, Integer orderItemId) {
         this.id = id;
         this.toppingId = toppingId;
         this.orderItemId = orderItemId;
+        logger.info("OrderTopping initialized with ID: {}, ToppingID: {}", id, toppingId);
     }
 
 
