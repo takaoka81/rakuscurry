@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -14,12 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
 
+import com.example.controller.LoginController;
 import com.example.domain.Order;
 import com.example.domain.OrderItem;
 import com.example.domain.OrderTopping;
 import com.example.repository.OrderRepository;
-
-import jakarta.servlet.http.HttpSession;
 
 /**
  * orderに関わる内容を行う
@@ -31,11 +32,10 @@ import jakarta.servlet.http.HttpSession;
 @Transactional
 public class OrderService {
 
-	@Autowired
-	private OrderRepository orderRepository;
+	private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
 	@Autowired
-	private HttpSession session;
+	private OrderRepository orderRepository;
 
 	@Value("${spring.mail.from}")
 	private String mailFrom;
@@ -168,7 +168,7 @@ public class OrderService {
 			this.sender.send(msg);
 		} catch (IOException e) {
 			// ログ出力やエラーハンドリング
-			e.printStackTrace();
+			logger.error("処理中にエラーが発生しました", e);
 		}
 	}
 }
