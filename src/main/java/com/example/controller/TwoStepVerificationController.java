@@ -100,11 +100,11 @@ public class TwoStepVerificationController {
 
 		String checkPass = (String) session.getAttribute("checkPass");
 		
-		String message =  userService.checkpass(form.getPassCheck(), checkPass);
+		boolean message =  userService.checkpass(form.getPassCheck(), checkPass);
 		
 		String email = (String) session.getAttribute("emailcheck");
 		
-		if(message.equals("OK")) {
+		if(message) {
 			session.setAttribute("email", email);
 			session.removeAttribute("checkPass");
 			return "redirect:/insert";
