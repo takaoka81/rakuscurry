@@ -173,7 +173,6 @@ public class OrderService {
 			this.sender.send(msg);
 		} catch (IOException e) {
 			// ログ出力やエラーハンドリング
-			e.printStackTrace();
 			logger.error("処理中にエラーが発生しました", e);
 		}
 	}
