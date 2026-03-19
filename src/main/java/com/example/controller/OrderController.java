@@ -86,7 +86,22 @@ public class OrderController {
 	}
 
 	@RequestMapping("/orderCo")
-	public String orderCo() {
+	public String orderCo(OrderForm form , Model model) {
+		/**
+		 * ログインユーザー情報を注文のお届け先情報にコピーする
+		 * 
+		 * @param order 注文情報
+		 */
+		User user = (User)session.getAttribute("user");
+		form.setDestinationName(user.getName());
+		form.setDestinationEmail(user.getEmail());
+		form.setDestinationZipcode(user.getZipcode());
+		form.setDestinationAddress(user.getAddress());
+		form.setDestinationTel(user.getTelephone());
+		
+		Order order = new Order();
+		BeanUtils.copyProperties(form, order);
+
 		return "/order/order_confirm";
 	}
 
