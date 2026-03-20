@@ -48,7 +48,7 @@ public class StampHistoryRepository {
                 WHERE
                     order_id=:orderId
                 """;
-        SqlParameterSource param = new MapSqlParameterSource().addValue("order_id", orderId);
+        SqlParameterSource param = new MapSqlParameterSource().addValue("orderId", orderId);
 
         StampHistory stampHistory = template.queryForObject(sql, param, STAMP_HISTORY_ROW_MAPPER);
         return stampHistory;
