@@ -126,7 +126,7 @@ public class OrderItem {
 		}
 
 		if (discount > 0) {
-			return (itemPrice * quantity) - discount;
+			return (itemPrice + toppingTotalPrice) * count - discount;
 		}
 		// 4. 計算結果を返す
 		return (itemPrice + toppingTotalPrice) * count;

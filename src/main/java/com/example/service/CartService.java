@@ -167,15 +167,28 @@ public class CartService {
 
 			// 0円適用後に合計金額を反映させる
 			Integer totalPrice = 0;
-			Integer subPrice = 0;
-			for (int i = 0; i < orderItems.size(); i++) {
-				totalPrice += orderItems.get(i).getOrderPrice() * orderItems.get(i).getQuantity();
-				subPrice = subPrice + orderItems.get(i).getOrderPrice() * orderItems.get(0).getFreeCount();
-				orderItems.get(i).setDiscount(subPrice);
-				orderItemRepository.update(orderItems.get(i));
+			Integer totalSubPrice = 0;
+			for (OrderItem orderItem : orderItems) {
+				Integer subPrice = 0;
+				totalPrice += orderItem.getOrderPrice() * orderItem.getQuantity();
+				subPrice = orderItem.getOrderPrice() * orderItem.getFreeCount();
+				orderItem.setDiscount(subPrice);
+				totalSubPrice += subPrice;
+				orderItemRepository.update(orderItem);
 			}
+
+			Integer totalToppingPrice = 0;
+			for (OrderItem orderItem : orderItems) {
+				Integer toppingPrice = 0;
+				for (OrderTopping orderTopping : orderItem.getOrderTopping()) {
+					toppingPrice += orderTopping.getOrderPrice();
+				}
+				totalToppingPrice += toppingPrice * orderItem.getQuantity();
+			}
+
 			order.setOrderItemList(orderItems);
-			order.setTotalPrice(totalPrice - subPrice);
+			order.setTotalPrice(totalPrice - totalSubPrice + totalToppingPrice);
+			orderRepository.updateTotalPrice(userId, order.getTotalPrice());
 		}
 
 		return order;
@@ -195,6 +208,7 @@ public class CartService {
 					item.setSize(orderItem.getSize());
 					item.setOrderPrice(orderItem.getOrderPrice());
 					item.setItem(orderItem.getItem());
+					item.setOrderTopping(orderItem.getOrderTopping());
 					orderItemsQuantitySingle.add(item);
 				}
 			} else {
