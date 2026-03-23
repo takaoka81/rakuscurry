@@ -38,7 +38,7 @@ public class CartController {
 	}
 
 	@RequestMapping("/inCart")
-	public String inCart(@AuthenticationPrincipal LoginUserDetails loginUserDetails,ItemCartInForm form) {
+	public String inCart(@AuthenticationPrincipal LoginUserDetails loginUserDetails, ItemCartInForm form) {
 		CartItem cartItem = new CartItem();
 		BeanUtils.copyProperties(form, cartItem);
 		cartItem.setItemId(form.getId());
@@ -49,7 +49,6 @@ public class CartController {
 		List<Topping> selectedToppings = service.getToppingIndex(toppingList, form.getToppingIndex());
 		cartItem.setToppingList(selectedToppings);
 
-		
 		if (loginUserDetails != null) {
 			User user = loginUserDetails.getUser();
 			service.addItemToCart(cartItem, user.getId());
@@ -71,8 +70,7 @@ public class CartController {
 	}
 
 	@RequestMapping("/showCart")
-	public String showCart(@AuthenticationPrincipal LoginUserDetails loginUserDetails,Model model) {
-		
+	public String showCart(@AuthenticationPrincipal LoginUserDetails loginUserDetails, Model model) {
 
 		if (loginUserDetails != null) {
 			// --- ログイン時の処理 ---
@@ -104,8 +102,8 @@ public class CartController {
 	}
 
 	@RequestMapping("/delete")
-	public String delete(@AuthenticationPrincipal LoginUserDetails loginUserDetails,Integer index, Integer orderItemId) {
-		
+	public String delete(@AuthenticationPrincipal LoginUserDetails loginUserDetails, Integer index,
+			Integer orderItemId) {
 
 		if (loginUserDetails != null) {
 			User user = loginUserDetails.getUser();

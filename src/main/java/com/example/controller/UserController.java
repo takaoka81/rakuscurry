@@ -1,7 +1,5 @@
 package com.example.controller;
 
-import java.lang.ProcessBuilder.Redirect;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -80,7 +78,8 @@ public class UserController {
      * @return 商品一覧画面
      */
     @PostMapping("/updateUser")
-    public String updateUser(@Validated InsertForm form, BindingResult result,RedirectAttributes redirectAttributes, Model model) {
+    public String updateUser(@Validated InsertForm form, BindingResult result, RedirectAttributes redirectAttributes,
+            Model model) {
         // セッションから現在のパスワードを補完してバリデーションを通す（暫定対応）
         User loginuser = (User) session.getAttribute("user");
         if (form.getPassword() == null || form.getPassword().isEmpty()) {

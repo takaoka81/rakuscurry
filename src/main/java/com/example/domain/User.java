@@ -25,9 +25,19 @@ public class User {
 	// 電話番号
 	private String telephone;
 
+	/**
+	 * 現在のスタンプ数
+	 */
+	private Integer stampNowCount;
+
+	/**
+	 * 今まで貯めたスタンプの総数
+	 */
+	private Integer stampAllCount;
+
 	// 引数ありコンストラクタ
 	public User(Integer id, Integer status, String name, String password, String email, String zipcode, String address,
-			String telephone) {
+			String telephone, Integer stampNowCount, Integer stampAllCount) {
 		super();
 		this.id = id;
 		this.status = status;
@@ -37,6 +47,8 @@ public class User {
 		this.zipcode = zipcode;
 		this.address = address;
 		this.telephone = telephone;
+		this.stampNowCount = stampNowCount;
+		this.stampAllCount = stampAllCount;
 	}
 
 	// 引数なしコンストラクタ
@@ -108,10 +120,20 @@ public class User {
 		this.telephone = telephone;
 	}
 
-	@Override
-	public String toString() {
-		return "User [id=" + id + ", status=" + status + ", name=" + name + ", password=" + password + ", email="
-				+ email + ", zipcode=" + zipcode + ", address=" + address + ", telephone=" + telephone + "]";
+	public Integer getStampNowCount() {
+		return stampNowCount;
+	}
+
+	public void setStampNowCount(Integer stampNowCount) {
+		this.stampNowCount = stampNowCount;
+	}
+
+	public Integer getStampAllCount() {
+		return stampAllCount;
+	}
+
+	public void setStampAllCount(Integer stampAllCount) {
+		this.stampAllCount = stampAllCount;
 	}
 
 }

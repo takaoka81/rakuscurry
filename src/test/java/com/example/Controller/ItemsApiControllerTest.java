@@ -1,7 +1,5 @@
 package com.example.Controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -14,10 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.client.HttpServerErrorException.InternalServerError;
 
 import com.example.controller.ItemsApiController;
 import com.example.exception.handle.GlobalExceptionHandler;
@@ -42,17 +38,17 @@ public class ItemsApiControllerTest {
                 .build();
     }
 
-/**
- * Handlerがステータスコード500のエラーを取得できているかのテスト
- */
-    
-@Test
-    void test500Error_ShouldReturnCustomJson() throws Exception {
-    // 予期せぬエラー（500相当）を発生させる
-    when(itemService.findByName(anyString())).thenThrow(new RuntimeException("DB error"));
+    /**
+     * Handlerがステータスコード500のエラーを取得できているかのテスト
+     */
 
-    mockMvc.perform(get("/items").param("name", "test"))
-        .andExpect(status().isInternalServerError()) // 500
-        .andExpect(jsonPath("$.message").value("Internal Server Error")); 
-  }
+    @Test
+    void test500Error_ShouldReturnCustomJson() throws Exception {
+        // 予期せぬエラー（500相当）を発生させる
+        when(itemService.findByName(anyString())).thenThrow(new RuntimeException("DB error"));
+
+        mockMvc.perform(get("/items").param("name", "test"))
+                .andExpect(status().isInternalServerError()) // 500
+                .andExpect(jsonPath("$.message").value("Internal Server Error"));
+    }
 }

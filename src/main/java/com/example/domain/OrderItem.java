@@ -23,6 +23,13 @@ public class OrderItem {
 	// 注文したトッピングのList
 	private List<OrderTopping> orderTopping;
 
+	// 割引額
+	private Integer discount;
+
+	private Integer freeCount;
+
+	private boolean isFree;
+
 	// ゲッターとセッター
 	public Integer getId() {
 		return id;
@@ -95,26 +102,58 @@ public class OrderItem {
 				+ "]";
 	}
 
-public Integer getSubTotal() {
+	public Integer getSubTotal() {
 
-    // 1. 商品自体の単価を決める（nullなら0円）
-    int itemPrice = (this.orderPrice != null) ? this.orderPrice : 0;
+		// 1. 商品自体の単価を決める（nullなら0円）
+		int itemPrice = (this.orderPrice != null) ? this.orderPrice : 0;
 
-    // 2. トッピングの合計金額を計算する
-    int toppingTotalPrice = 0;
-    // ★ここを orderToppingList に修正
-    if (this.orderTopping != null) { 
-        for (OrderTopping topping : this.orderTopping) {
-            if (topping.getOrderPrice() != null) {
-                toppingTotalPrice += topping.getOrderPrice();
-            }
-        }
-    }
+		// 2. トッピングの合計金額を計算する
+		int toppingTotalPrice = 0;
+		// ★ここを orderToppingList に修正
+		if (this.orderTopping != null) {
+			for (OrderTopping topping : this.orderTopping) {
+				if (topping.getOrderPrice() != null) {
+					toppingTotalPrice += topping.getOrderPrice();
+				}
+			}
+		}
 
-    // 3. 数量を確認する（nullなら0個）
-    int count = (this.quantity != null) ? this.quantity : 0;
+		// 3. 数量を確認する（nullなら0個）
+		int count = (this.quantity != null) ? this.quantity : 0;
 
-    // 4. 計算結果を返す
-    return (itemPrice + toppingTotalPrice) * count;
-}
+		if (freeCount != null) {
+			return (itemPrice + toppingTotalPrice) * count - (itemPrice * freeCount);
+		}
+
+		if (discount > 0) {
+			return (itemPrice + toppingTotalPrice) * count - discount;
+		}
+		// 4. 計算結果を返す
+		return (itemPrice + toppingTotalPrice) * count;
+	}
+
+	public Integer getFreeCount() {
+		return freeCount;
+	}
+
+	public void setFreeCount(Integer freeCount) {
+		this.freeCount = freeCount;
+	}
+
+	public boolean isFree() {
+		return isFree;
+	}
+
+	public void setFree(boolean isFree) {
+		this.isFree = isFree;
+	}
+
+	public Integer getDiscount() {
+		return discount;
+	}
+
+	public void setDiscount(Integer discount) {
+		this.discount = discount;
+	}
+
 }

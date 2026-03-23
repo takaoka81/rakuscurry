@@ -1,6 +1,8 @@
 package com.example.controller;
 
+import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -16,13 +18,16 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.domain.LoginUserDetails;
 import com.example.domain.Order;
+import com.example.domain.StampHistory;
 import com.example.domain.User;
 import com.example.form.OrderForm;
 import com.example.service.CartService;
 import com.example.service.OrderService;
+import com.example.service.StampService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -37,7 +42,7 @@ import jakarta.servlet.http.HttpSession;
 public class OrderController {
 
 	private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
-	
+
 	@ModelAttribute
 	public OrderForm setOrderForm() {
 		return new OrderForm();
@@ -50,6 +55,9 @@ public class OrderController {
 	private CartService cartService;
 
 	@Autowired
+	private StampService stampService;
+
+	@Autowired
 	private HttpSession session;
 
 	public OrderForm setUpOrderForm() {
@@ -57,7 +65,7 @@ public class OrderController {
 	}
 
 	@RequestMapping("/toOrder")
-	public String toOrder(@AuthenticationPrincipal LoginUserDetails loginUserDetails,Model model) { // Modelを追加
+	public String toOrder(@AuthenticationPrincipal LoginUserDetails loginUserDetails, Model model) { // Modelを追加
 
 		// 1. セッションからユーザー情報を取得
 		User user = loginUserDetails.getUser();
@@ -82,6 +90,12 @@ public class OrderController {
 		// もしHTML側が ${session.totalPrice} を直接参照している場合は、同期をとるためにセット
 		session.setAttribute("totalPrice", order.getTotalPrice());
 
+		SecureRandom random = new SecureRandom();
+		byte[] bytes = new byte[32];
+		random.nextBytes(bytes);
+		String token = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+		session.setAttribute("token", token);
+		model.addAttribute("token", token);
 		return "order/order_confirm";
 	}
 
@@ -112,7 +126,14 @@ public class OrderController {
 	 * @return 完了画面
 	 */
 	@RequestMapping("/order")
-	public String orderCompletion(@AuthenticationPrincipal LoginUserDetails loginUserDetails,@Validated OrderForm form, BindingResult result, Model model) {
+	public String orderCompletion(@AuthenticationPrincipal LoginUserDetails loginUserDetails, @Validated OrderForm form,
+			BindingResult result, Model model, @RequestParam("token") String token) {
+		// トークンが正しいか
+		if (!token.equals((String) session.getAttribute("token"))) {
+			return "redirect:/showList";
+		}
+		session.removeAttribute("token");
+
 		// 昨日の日付を取得し配達日と比較
 		Date date = new Date();
 		Calendar yesterday = Calendar.getInstance();
@@ -165,9 +186,8 @@ public class OrderController {
 		}
 
 		User user = loginUserDetails.getUser();
-		
+
 		Order order = cartService.getCartByUserId(user.getId());
-		
 
 		if (order == null) {
 			return "redirect:/toOrder"; // 万が一カートが取れなかった場合
@@ -179,8 +199,18 @@ public class OrderController {
 		order.setDestinationZipcode(form.getDestinationZipcode().replace("-", ""));
 
 		order.setDeliveryTime(form.getTimestamp());
-		order.setId(user.getId());
-		service.order(order);
+
+		Integer chengesStamps = stampService.getStampCountByOrder(order.getOrderItemList());
+		Integer addStamps = chengesStamps;
+		// 無料適用している場合にプラス分だけを取得する
+		if (addStamps < 0) {
+			addStamps += 25;
+		}
+		user.setStampNowCount(user.getStampNowCount() + chengesStamps);
+		user.setStampAllCount(user.getStampAllCount() + addStamps);
+		StampHistory stampHistory = new StampHistory(user.getId(), order.getId(), chengesStamps);
+		service.order(order, user, stampHistory);
+
 		// 完了メールを送信
 
 		service.sendMail(order, user.getEmail());
@@ -193,7 +223,15 @@ public class OrderController {
 	}
 
 	@RequestMapping("orderCompletion")
-	public String orderCompletion() {
+	public String orderCompletion(@AuthenticationPrincipal LoginUserDetails loginUserDetails, Model model) {
+		if (loginUserDetails != null) {
+			User user = loginUserDetails.getUser();
+			if (user.getStampNowCount() >= 25) {
+				Integer freeCurryCount = stampService.getFreeCurryCount(user.getStampNowCount());
+				model.addAttribute("freeCurryCount", freeCurryCount);
+			}
+		}
+
 		return "/order/order_finished";
 	}
 
@@ -204,7 +242,7 @@ public class OrderController {
 	 * @return 注文履歴
 	 */
 	@RequestMapping("/orderHistory")
-	public String orderHistory(@AuthenticationPrincipal LoginUserDetails loginUserDetails,Model model) {
+	public String orderHistory(@AuthenticationPrincipal LoginUserDetails loginUserDetails, Model model) {
 
 		// ユーザーの情報を拾ってくる
 		User user = loginUserDetails.getUser();
@@ -219,8 +257,8 @@ public class OrderController {
 		} else {
 			model.addAttribute("orderList", orderList);
 		}
-		logger.info("orderList={}", orderList);	
-	
+		logger.info("orderList={}", orderList);
+
 		return "order/order_history";
 	}
 
@@ -228,7 +266,7 @@ public class OrderController {
 	public String orderDetail(Integer id, Model model) {
 		logger.info("id={}", id);
 		List<Order> orderList = service.orderLoad(id);
-		model.addAttribute("orderList",orderList);
+		model.addAttribute("orderList", orderList);
 		logger.info("orderList={}", orderList);
 		return "/order/order_detail";
 	}

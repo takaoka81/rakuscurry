@@ -1,0 +1,206 @@
+body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+    background-color: #f9f9f9;
+    display: flex;
+    justify-content: center;
+    color: #333;
+}
+
+/* 横並びレイアウト */
+.stamp-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    margin-top: 20px;
+}
+
+/* 左側（スタンプカード）を広めに */
+.stamp-board-wrapper {
+    flex: 2;
+}
+
+/* 右側（ランク情報） */
+.rank-side {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    gap: 200px;
+}
+
+/* スマホでは縦並びに変更 */
+@media (max-width: 768px) {
+    .stamp-layout {
+        flex-direction: column;
+    }
+
+    .rank-side {
+        text-align: right;
+        margin-top: 20px;
+    }
+}
+
+.card-container {
+    background-color: #fff;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    margin: 0 auto;
+}
+
+/* ① タイトル */
+.card-header h1 {
+    font-size: 3.6rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.card-header p {
+    font-size: 2.4rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* ② スタンプ台紙 */
+.stamp-board {
+    border: 8px solid #f2a244;
+    border-radius: 10px;
+    padding: 15px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin: 0 auto 40px;
+}
+
+.stamp {
+    aspect-ratio: 1;
+    border: 2px dashed #ccc;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.stamp.active {
+    background-color: #e69b4e;
+    border-color: #e69b4e;
+}
+
+/* チェックマークの擬似要素 */
+.stamp.active::after {
+    content: '✓';
+    color: white;
+    font-size: 1.8rem;
+}
+
+/* ③ 特典情報 */
+.reward-info {
+    font-size: 2.4rem;
+    font-weight: bold;
+    margin: 0 auto 20px;
+}
+
+/* ④ ランク表示 */
+.rank-status {
+    text-align: right;
+    margin-right: 10px;
+    font-size: 1.8rem;
+}
+
+.rank-status strong {
+    display: inline-block;
+    margin-right: 5px;
+    font-size: 2.4rem;
+}
+.rank-color {
+    color: var(--label-color);
+}
+@media (max-width: 768px) {
+    .rank-side {
+        gap: 40px;
+    }
+}
+
+/* ⑤ ランク詳細リンク */
+.rank-detail {
+    text-align: right;
+    margin-top: 10px;
+}
+
+#open-dialog {
+    background: none;
+    border: none;
+    color: #333;
+    cursor: pointer;
+    font-size: 1.8rem;
+    text-decoration: underline;
+}
+
+/* ダイアログのスタイル */
+dialog {
+    border: none;
+    border-radius: 15px;
+    padding: 0;
+    width: 50%;
+    max-width: 4000px;
+}
+
+dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.dialog-header {
+    background-color: #f26522;
+    color: white;
+    padding: 10px;
+    text-align: center;
+}
+
+.dialog-body {
+    padding: 20px;
+
+}
+
+.dialog-body ul {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+}
+
+.dialog-body li {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+}
+
+.current-rank-item {
+    color: #d32f2f;
+    font-weight: bold;
+}
+
+.current-badge {
+    background-color: #f26522;
+    color: white;
+    border-radius: 20px;
+    padding: 5px 15px;
+    display: inline-block;
+    margin-top: 15px;
+}
+
+.close-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #f2a244;
+    border: none;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.picture {
+    width: 28px;
+    height: 28px;
+    margin-right: 10px;
+}

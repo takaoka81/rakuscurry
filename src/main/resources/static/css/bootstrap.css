@@ -185,12 +185,17 @@ table {
   border-spacing: 0;
   border-collapse: collapse;
 }
-/* 文字を中央揃え */
+
 td,
 th {
   padding: 0;
   text-align: center;
 }
+
+.slct-left {
+  text-align: left;
+}
+
 /*! Source: https://github.com/h5bp/html5-boilerplate/blob/master/src/css/main.css */
 @media print {
   *,
@@ -2401,7 +2406,6 @@ table th[class*="col-"] {
   .item-img-center {
     max-width: 100%;
     height: auto;
-    width: 70px;
   }
   /* 削除ボタンのサイズ調整 */
   .btn.btn-primary {
