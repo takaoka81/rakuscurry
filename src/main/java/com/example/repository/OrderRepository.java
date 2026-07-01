@@ -217,7 +217,7 @@ public class OrderRepository {
 		List<Order> orderList = template.query(sql, param, ORDER_RESULTSET);
 
 		if (orderList.size() == 0) {
-			return null;
+			return orderList;
 		}
 		return orderList;
 	}

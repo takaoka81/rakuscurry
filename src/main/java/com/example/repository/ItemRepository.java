@@ -57,7 +57,7 @@ public class ItemRepository {
 		SqlParameterSource param = new MapSqlParameterSource().addValue("name", "%"+name+"%");
 		List<Item> itemList = template.query(findByNameSql, param, ITEM_ROW_MAPPER);
 		if(itemList.size() == 0) {
-			return null;
+			return itemList;
 		}
 		return itemList;
 	}
