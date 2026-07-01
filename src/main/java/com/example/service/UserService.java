@@ -1,6 +1,5 @@
 package com.example.service;
 
-
 import java.util.Random;
 
 import org.slf4j.Logger;
@@ -18,7 +17,6 @@ import com.example.repository.UserRepository;
 @Service
 @Transactional
 public class UserService {
-
 	private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
 	@Autowired
@@ -29,6 +27,10 @@ public class UserService {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+
+	public User findByUserId(Integer id) {
+		return repository.findByUserId(id);
+	}
 
 	public User login(String password, String email) {
 		User user = repository.findByMailAddress(email);
@@ -53,29 +55,34 @@ public class UserService {
 		repository.insert(user);
 	}
 
-	/**ユーザー情報を更新
+	/**
+	 * ユーザー情報を更新
+	 * 
 	 * @param user
 	 */
 	public void update(User user) {
 		repository.update(user);
 	}
 
-	/**ユーザー情報を削除
+	/**
+	 * ユーザー情報を削除
+	 * 
 	 * @param id
 	 */
 	public void delete(Integer id) {
 		repository.delete(id);
 	}
+
 	/**
 	 * メールアドレスが既に登録されているか確認する
 	 * 
 	 * @param email 二段階認証のためのメールアドレス
 	 */
-	public boolean existsByMailAddress(String email){
+	public boolean existsByMailAddress(String email) {
 		boolean exitsMailAddress = repository.existsByMailAddress(email);
 		return exitsMailAddress;
 	}
-	
+
 	/**
 	 * ２段階認証のパスワードを入力されたメールアドレスに送信
 	 * 
@@ -115,8 +122,17 @@ public class UserService {
 	 * @param numPass 入力された数字
 	 * @return
 	 */
-	public boolean  checkpass(String numPass, String checkPass) {
-            return checkPass.equals(numPass);
+	public boolean checkpass(String numPass, String checkPass) {
+		return checkPass.equals(numPass);
+	}
+
+	/**
+	 * usersテーブルのスタンプカウントを更新する
+	 * 
+	 * @param user
+	 */
+	public void updateStampCounts(User user) {
+		repository.updateStampCounts(user);
 	}
 
 }

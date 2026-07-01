@@ -1,0 +1,16 @@
+ALTER TABLE users ADD stamp_now_count integer;
+ALTER TABLE users ADD stamp_all_count integer;
+ALTER TABLE order_items ADD discount integer;
+
+CREATE TABLE stamp_history(
+    id serial PRIMARY KEY,
+    user_id integer NOT NULL,
+    order_id integer NOT NULL,
+    stamp_count_changes integer NOT NULL,
+
+    CONSTRAINT fk_stamp_history_user
+        FOREIGN KEY (user_id) REFERENCES users(id),
+
+    CONSTRAINT fk_stamp_history_order
+        FOREIGN KEY (order_id) REFERENCES orders(id)
+);

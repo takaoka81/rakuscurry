@@ -1,7 +1,11 @@
 package com.example.service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +17,12 @@ import com.example.domain.Order;
 import com.example.domain.OrderItem;
 import com.example.domain.OrderTopping;
 import com.example.domain.Topping;
+import com.example.domain.User;
 import com.example.form.ItemCartInForm;
 import com.example.repository.OrderItemRepository;
 import com.example.repository.OrderRepository;
 import com.example.repository.OrderToppingRepository;
+import com.example.repository.UserRepository;
 
 /**
  * カート内に商品を入れる際に使うservice
@@ -36,6 +42,12 @@ public class CartService {
 
 	@Autowired
 	private OrderToppingRepository orderToppingRepository;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private StampService stampService;
 
 	public ItemCartInForm setupForm() {
 		return new ItemCartInForm();
@@ -120,8 +132,115 @@ public class CartService {
 	 * ユーザーIDから未注文のカート情報を取得する
 	 */
 	public Order getCartByUserId(Integer userId) {
-		// status=0 (カート内) のものを探す
-		return orderRepository.findByUserIdAndStatus(userId, 0);
+		// status=0 (カート内) のもgetCartByUserIdのを探す
+		Order order = orderRepository.findByUserIdAndStatus(userId, 0);
+		return adaptFreeCurry(order, userId);
+	}
+
+	private Order adaptFreeCurry(Order order, Integer userId) {
+		User user = userRepository.findByUserId(userId);
+		Integer freeCount = stampService.getFreeCurryCount(user.getStampNowCount());
+		if (order == null) {
+			return null;
+		}
+
+		if (freeCount >= 1) {
+			List<OrderItem> orderItems = order.getOrderItemList();
+
+			// 金額が高い順に並べ替え変える
+			orderItems.sort((first, second) -> Integer.compare(second.getOrderPrice(), first.getOrderPrice()));
+
+			// 数量1に置き変えたリストを作成
+			List<OrderItem> orderItemsQuantitySingle = createOrderItemsQuantitySingle(orderItems);
+
+			// 値段が高い順に無料適用数に応じて0円にする
+			for (int i = 0; i < orderItemsQuantitySingle.size() && i < freeCount; i++) {
+				orderItemsQuantitySingle.get(i).setOrderPrice(0);
+				orderItemsQuantitySingle.get(i).setFree(true);
+			}
+
+			// 同じitemIdのものは一行で表示するために数量を元に戻す
+			orderItems = createSameOrderIdListes(orderItemsQuantitySingle);
+
+			// id順に並べ替える
+			orderItems.sort(Comparator.comparing(OrderItem::getId));
+
+			// 0円適用後に合計金額を反映させる
+			Integer totalPrice = 0;
+			Integer totalSubPrice = 0;
+			for (OrderItem orderItem : orderItems) {
+				Integer subPrice = 0;
+				totalPrice += orderItem.getOrderPrice() * orderItem.getQuantity();
+				subPrice = orderItem.getOrderPrice() * orderItem.getFreeCount();
+				orderItem.setDiscount(subPrice);
+				totalSubPrice += subPrice;
+				orderItemRepository.update(orderItem);
+			}
+
+			Integer totalToppingPrice = 0;
+			for (OrderItem orderItem : orderItems) {
+				Integer toppingPrice = 0;
+				for (OrderTopping orderTopping : orderItem.getOrderTopping()) {
+					toppingPrice += orderTopping.getOrderPrice();
+				}
+				totalToppingPrice += toppingPrice * orderItem.getQuantity();
+			}
+
+			order.setOrderItemList(orderItems);
+			order.setTotalPrice(totalPrice - totalSubPrice + totalToppingPrice);
+			orderRepository.updateTotalPrice(userId, order.getTotalPrice());
+		}
+
+		return order;
+	}
+
+	private List<OrderItem> createOrderItemsQuantitySingle(List<OrderItem> orderItems) {
+		List<OrderItem> orderItemsQuantitySingle = new ArrayList<>();
+		for (OrderItem orderItem : orderItems) {
+			if (orderItem.getQuantity() >= 2) {
+				// orderItem.setDiscount(orderItem.getOrderPrice() * orderItem.getQuantity());
+				for (int i = 1; i <= orderItem.getQuantity(); i++) {
+					OrderItem item = new OrderItem();
+					item.setId(orderItem.getId());
+					item.setItemId(orderItem.getItemId());
+					// item.setOrderId(orderItem.getOrderId());
+					item.setQuantity(1);
+					item.setSize(orderItem.getSize());
+					item.setOrderPrice(orderItem.getOrderPrice());
+					item.setItem(orderItem.getItem());
+					item.setOrderTopping(orderItem.getOrderTopping());
+					orderItemsQuantitySingle.add(item);
+				}
+			} else {
+				orderItemsQuantitySingle.add(orderItem);
+			}
+		}
+		return orderItemsQuantitySingle;
+	}
+
+	private List<OrderItem> createSameOrderIdListes(List<OrderItem> orderItems) {
+		Map<String, OrderItem> orderItemSameIds = new LinkedHashMap<>();
+		for (OrderItem item : orderItems) {
+			String key = item.getItemId() + "_" + item.getSize();
+			if (orderItemSameIds.containsKey(key)) {
+				OrderItem existing = orderItemSameIds.get(key);
+				existing.setOrderPrice(item.getOrderPrice());
+				existing.setQuantity(existing.getQuantity() + item.getQuantity());
+				// freeCount を増やす
+				if (item.isFree()) {
+					existing.setFreeCount(existing.getFreeCount() + 1);
+				}
+				// isFree の集約（1つでも true があれば true）
+				if (item.isFree()) {
+					existing.setFree(true);
+				}
+			} else {
+				orderItemSameIds.put(key, item);
+				// freeCount 初期化
+				item.setFreeCount(item.isFree() ? 1 : 0);
+			}
+		}
+		return new ArrayList<>(orderItemSameIds.values());
 	}
 
 	/**

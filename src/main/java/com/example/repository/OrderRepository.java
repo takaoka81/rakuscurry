@@ -106,6 +106,7 @@ public class OrderRepository {
 				orderItem.setQuantity(rs.getInt("oi_quantity"));
 				orderItem.setSize(rs.getString("oi_size"));
 				orderItem.setOrderPrice(rs.getInt("oi_order_price"));
+				orderItem.setDiscount(rs.getInt("oi_discount"));
 
 				// Itemをセット
 				Item item = new Item();
@@ -167,7 +168,7 @@ public class OrderRepository {
 				+ "o.delivery_time AS o_delivery_time, o.payment_method AS o_payment_method, "
 				+ "u.id AS u_id, u.name AS u_name, u.password AS u_password, u.email As u_email, u.zipcode AS u_zipcode, u.address AS u_address, u.telephone AS u_telephone, "
 				+ "oi.id AS oi_id, oi.item_id AS oi_item_id, oi.order_id AS oi_order_id, oi.quantity AS oi_quantity, "
-				+ "oi.size AS oi_size, oi.order_price AS oi_order_price, "
+				+ "oi.size AS oi_size, oi.order_price AS oi_order_price, oi.discount AS oi_discount,"
 				+ "i.id AS i_id, i.name AS i_name, i.description AS i_description, i.price_m AS i_price_m, i.price_l AS i_price_l, "
 				+ "i.image_path AS i_image_path, i.deleted AS i_deleted, "
 				+ "ot.id AS ot_id, ot.topping_id AS ot_topping_id, ot.order_item_id AS ot_order_item_id, ot.order_price AS ot_order_price, t.id AS t_id, t.name AS t_name, "
@@ -199,7 +200,7 @@ public class OrderRepository {
 				+ "o.delivery_time AS o_delivery_time, o.payment_method AS o_payment_method, "
 				+ "u.id AS u_id, u.name AS u_name, u.password AS u_password, u.email As u_email, u.zipcode AS u_zipcode, u.address AS u_address, u.telephone AS u_telephone, "
 				+ "oi.id AS oi_id, oi.item_id AS oi_item_id, oi.order_id AS oi_order_id, oi.quantity AS oi_quantity, "
-				+ "oi.size AS oi_size, oi.order_price AS oi_order_price, "
+				+ "oi.size AS oi_size, oi.order_price AS oi_order_price, oi.discount AS oi_discount,"
 				+ "i.id AS i_id, i.name AS i_name, i.description AS i_description, i.price_m AS i_price_m, i.price_l AS i_price_l, "
 				+ "i.image_path AS i_image_path, i.deleted AS i_deleted, "
 				+ "ot.id AS ot_id, ot.topping_id AS ot_topping_id, ot.order_item_id AS ot_order_item_id, ot.order_price AS ot_order_price, t.id AS t_id, t.name AS t_name, "
@@ -277,6 +278,7 @@ public class OrderRepository {
 				+ "oi.quantity AS oi_quantity, "
 				+ "oi.size AS oi_size, "
 				+ "oi.order_price AS oi_order_price, "
+				+ "oi.discount AS oi_discount,"
 				+ "i.name AS i_name, i.image_path AS i_image_path, "
 				+ "ot.id AS ot_id, ot.topping_id AS ot_topping_id, "
 				+ "ot.order_price AS ot_order_price, "
@@ -333,6 +335,7 @@ public class OrderRepository {
 					orderItem.setOrderPrice(rs.getInt("oi_order_price"));
 					orderItem.setQuantity(rs.getInt("oi_quantity"));
 					orderItem.setSize(rs.getString("oi_size"));
+					orderItem.setDiscount(rs.getInt("oi_discount"));
 					orderItem.setOrderTopping(new ArrayList<>());
 
 					Item item = new Item();

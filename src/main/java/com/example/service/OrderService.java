@@ -20,7 +20,12 @@ import com.example.controller.LoginController;
 import com.example.domain.Order;
 import com.example.domain.OrderItem;
 import com.example.domain.OrderTopping;
+import com.example.domain.StampHistory;
+import com.example.domain.User;
+import com.example.repository.OrderItemRepository;
 import com.example.repository.OrderRepository;
+
+import jakarta.servlet.http.HttpSession;
 
 /**
  * orderに関わる内容を行う
@@ -33,6 +38,18 @@ import com.example.repository.OrderRepository;
 public class OrderService {
 
 	private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+
+	@Autowired
+	private UserService userService;
+
+	@Autowired
+	private StampHistoryService stampHistoryService;
+
+	@Autowired
+	private OrderItemRepository orderItemRepository;
+
+	@Autowired
+	private HttpSession session;
 
 	@Autowired
 	private OrderRepository orderRepository;
@@ -66,18 +83,22 @@ public class OrderService {
 		return orderRepository.findByOrdertable(id);
 	}
 
-	
-
 	/**
 	 * orderドメインに足りない物をセット
 	 * 
 	 * @param order
 	 */
-	public void order(Order order) {
+	public void order(Order order, User user, StampHistory stampHistory) {
 		order.setStatus(paymentMethodJudge(order));
-		// order.setUserId(getUserId());
 		orderRepository.update(order);
-		
+		userService.updateStampCounts(user);
+		stampHistoryService.insert(stampHistory);
+		for (OrderItem orderItem : order.getOrderItemList()) {
+			if (orderItem.getOrderPrice() == 0) {
+				orderItem.setOrderId(order.getId());
+				orderItemRepository.updateOrder(orderItem);
+			}
+		}
 
 		// orderオブジェクトに商品情報をセットしておく（メール送信などで必要）
 		List<Order> loaded = orderRepository.orderLoad(order.getId());
@@ -100,6 +121,15 @@ public class OrderService {
 		}
 	}
 
+	/**
+	 * ユーザーのIdを返すメゾット
+	 * 
+	 * @return userId
+	 */
+	public Integer getUserId() {
+		User user = (User) session.getAttribute("user");
+		return user.getId();
+	}
 
 	/**
 	 * 引数で受け取ったemailに完了メールを送付
