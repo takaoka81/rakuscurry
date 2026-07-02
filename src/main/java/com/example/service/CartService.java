@@ -138,11 +138,14 @@ public class CartService {
 	}
 
 	private Order adaptFreeCurry(Order order, Integer userId) {
-		User user = userRepository.findByUserId(userId);
-		Integer freeCount = stampService.getFreeCurryCount(user.getStampNowCount());
 		if (order == null) {
 			return null;
 		}
+
+		Integer stampNowCount = userRepository.findByUserId(userId)
+				.map(User::getStampNowCount)
+				.orElse(0);
+		Integer freeCount = stampService.getFreeCurryCount(stampNowCount);
 
 		if (freeCount >= 1) {
 			List<OrderItem> orderItems = order.getOrderItemList();

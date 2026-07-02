@@ -1,5 +1,6 @@
 package com.example.service;
 
+import java.util.Optional;
 import java.util.Random;
 
 import org.slf4j.Logger;
@@ -28,20 +29,14 @@ public class UserService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	public User findByUserId(Integer id) {
+	public Optional<User> findByUserId(Integer id) {
 		return repository.findByUserId(id);
 	}
 
-	public User login(String password, String email) {
-		User user = repository.findByMailAddress(email);
-		if (user == null) {
-			return null;
-		}
-		// パスワードが不一致だった場合はnullを返す
-		if (!passwordEncoder.matches(password, user.getPassword())) {
-			return null;
-		}
-		return user;
+	public Optional<User> login(String password, String email) {
+		// ユーザーが見つからない、またはパスワードが不一致の場合は空のOptionalを返す
+		return repository.findByMailAddress(email)
+				.filter(user -> passwordEncoder.matches(password, user.getPassword()));
 	}
 
 	/**

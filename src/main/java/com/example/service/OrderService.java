@@ -94,7 +94,7 @@ public class OrderService {
 		userService.updateStampCounts(user);
 		stampHistoryService.insert(stampHistory);
 		for (OrderItem orderItem : order.getOrderItemList()) {
-			if (orderItem.getOrderPrice() == 0) {
+			if (orderItem.getOrderPrice().equals(0)) {
 				orderItem.setOrderId(order.getId());
 				orderItemRepository.updateOrder(orderItem);
 			}
@@ -114,7 +114,7 @@ public class OrderService {
 	 * @return statusを整数で返す
 	 */
 	public Integer paymentMethodJudge(Order order) {
-		if (order.getPaymentMethod() == 1) {
+		if (order.getPaymentMethod().equals(1)) {
 			return 1;
 		} else {
 			return 2;

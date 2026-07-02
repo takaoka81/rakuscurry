@@ -1,8 +1,10 @@
 package com.example.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -68,11 +70,16 @@ public class ItemRepository {
 	 * @param id 商品ID
 	 * @return Item情報１件
 	 */
-	public Item showItemDetail(Integer id) {
+	public Optional<Item> showItemDetail(Integer id) {
 		String showItemDetailSql = "SELECT * FROM items WHERE id = :id;";
+
 		SqlParameterSource param = new MapSqlParameterSource().addValue("id", id);
-		Item item = template.queryForObject(showItemDetailSql, param, ITEM_ROW_MAPPER);
+		try{
+		Optional<Item> item = Optional.ofNullable(template.queryForObject(showItemDetailSql, param, ITEM_ROW_MAPPER));
 		return item;
+		}catch(EmptyResultDataAccessException e){
+			return Optional.empty();
+		}
 	}
 	
 	public void insert(Item item) {
@@ -92,15 +99,15 @@ public class ItemRepository {
 		return allNames;
 	}
 
-	public Item ApiShowItemDetail(Integer id){
+	public Optional<Item> ApiShowItemDetail(Integer id){
 		String sql="SELECT * FROM items WHERE id = :id;";
 		SqlParameterSource param=new MapSqlParameterSource("id",id);
 		List<Item> items =template.query(sql,param,ITEM_ROW_MAPPER);
 
 		if(items.isEmpty()){
-			return null;
+			return Optional.empty();
 		}else{
-			return items.get(0);
+			return Optional.of(items.get(0));
 		}
 	}
 }

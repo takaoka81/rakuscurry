@@ -1,9 +1,12 @@
 package com.example.repository;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -34,7 +37,7 @@ public class UserRepository {
 	@Autowired
 	private NamedParameterJdbcTemplate template;
 
-	public User findByUserId(Integer id) {
+	public Optional<User> findByUserId(Integer id) {
 		String sql = """
 				SELECT
 					id,
@@ -54,8 +57,12 @@ public class UserRepository {
 
 		SqlParameterSource param = new MapSqlParameterSource().addValue("id", id);
 
-		User user = template.queryForObject(sql, param, USER_ROW_MAPPER);
-		return user;
+		try {
+			User user = template.queryForObject(sql, param, USER_ROW_MAPPER);
+			return Optional.ofNullable(user);
+		} catch (EmptyResultDataAccessException e) {
+			return Optional.empty();
+		}
 	}
 
 	public boolean existsByMailAddress(String email) {
@@ -65,7 +72,7 @@ public class UserRepository {
 		return count > 0;
 	}
 
-	public User findByMailAddress(String email) {
+	public Optional<User> findByMailAddress(String email) {
 
 		String sql = "SELECT * FROM users WHERE email=:email AND status = 0";
 
@@ -74,9 +81,12 @@ public class UserRepository {
 		try {
 			User user = template.queryForObject(sql, param, USER_ROW_MAPPER);
 			logger.info("user={}", user);
-			return user;
+			return Optional.ofNullable(user);
+		} catch (EmptyResultDataAccessException e) {
+			return Optional.empty();
 		} catch (DataAccessException e) {
-			return null;
+			logger.error("DBにアクセスできませんでした。", e);
+			throw e;
 		}
 
 	}

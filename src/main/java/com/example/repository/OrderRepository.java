@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -271,7 +273,7 @@ public class OrderRepository {
 	/**
 	 * カート情報（注文前データ）を1件取得する
 	 */
-	public Order findByUserIdAndStatus(Integer userId, Integer status) {
+	public Optional<Order> findByUserIdAndStatus(Integer userId, Integer status) {
 
 		String sql = "SELECT o.id AS o_id, o.user_id AS user_id, o.status AS status, o.total_price AS o_total_price, "
 				+ "oi.id AS oi_id, oi.item_id, "
@@ -294,7 +296,12 @@ public class OrderRepository {
 				.addValue("userId", userId)
 				.addValue("status", status);
 
-		return template.query(sql, param, orderResultSetExtractor);
+		try{
+			 Optional<Order> order = Optional.ofNullable(template.query(sql, param, orderResultSetExtractor));
+			 return order;
+		}catch(EmptyResultDataAccessException e){
+			return Optional.empty();
+		}
 	}
 
 	/**

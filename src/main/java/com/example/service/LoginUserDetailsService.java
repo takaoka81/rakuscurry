@@ -20,7 +20,7 @@ public class LoginUserDetailsService implements UserDetailsService {
 	public LoginUserDetails loadUserByUsername(String email) throws UsernameNotFoundException{
 		System.out.println(email);
 
-		Optional<User> userOp = Optional.ofNullable(repository.findByMailAddress(email));
+		Optional<User> userOp = repository.findByMailAddress(email);
 		return userOp.map(user -> new LoginUserDetails(user))
                      .orElseThrow(() -> new UsernameNotFoundException("ユーザーが見つかりません"));
 	}
