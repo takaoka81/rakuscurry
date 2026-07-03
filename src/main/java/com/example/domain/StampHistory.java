@@ -10,22 +10,22 @@ public class StampHistory {
     /**
      * id
      */
-    private Integer id;
+    private int id;
 
     /**
      * ユーザid
      */
-    private Integer userId;
+    private int userId;
 
     /**
      * 注文id
      */
-    private Integer orderId;
+    private int orderId;
 
     /**
      * 注文idのなかのスタンプ増減数
      */
-    private Integer stampCountChanges;
+    private int stampCountChanges;
 
     public StampHistory() {
     }
@@ -36,35 +36,35 @@ public class StampHistory {
         this.stampCountChanges = stampCountChanges;
     }
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public Integer getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 
-    public Integer getOrderId() {
+    public int getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Integer orderId) {
+    public void setOrderId(int orderId) {
         this.orderId = orderId;
     }
 
-    public Integer getStampCountChanges() {
+    public int getStampCountChanges() {
         return stampCountChanges;
     }
 
-    public void setStampCountChanges(Integer stampCountChanges) {
+    public void setStampCountChanges(int stampCountChanges) {
         this.stampCountChanges = stampCountChanges;
     }
 

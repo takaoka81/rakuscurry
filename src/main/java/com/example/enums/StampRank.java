@@ -1,4 +1,4 @@
-package com.example.domain;
+package com.example.enums;
 
 public enum StampRank {
     MILD(1, "マイルド", "#4CAF50"),

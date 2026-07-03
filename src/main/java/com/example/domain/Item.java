@@ -8,15 +8,15 @@ public class Item {
 	 */
 
 	/** id */
-	private Integer id;
+	private int id;
 	/** 商品名 */
 	private String name;
 	/** 商品説明 */
 	private String description;
 	/** Mサイズの値段 */
-	private Integer priceM;
+	private int priceM;
 	/** Lサイズの値段 */
-	private Integer priceL;
+	private int priceL;
 	/** 商品画像 */
 	private String imagePath;
 	/** 削除フラグ */
@@ -43,11 +43,11 @@ public class Item {
 		this.toppingList = toppingList;
 	}
 
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
@@ -67,19 +67,19 @@ public class Item {
 		this.description = description;
 	}
 
-	public Integer getPriceM() {
+	public int getPriceM() {
 		return priceM;
 	}
 
-	public void setPriceM(Integer priceM) {
+	public void setPriceM(int priceM) {
 		this.priceM = priceM;
 	}
 
-	public Integer getPriceL() {
+	public int getPriceL() {
 		return priceL;
 	}
 
-	public void setPriceL(Integer priceL) {
+	public void setPriceL(int priceL) {
 		this.priceL = priceL;
 	}
 

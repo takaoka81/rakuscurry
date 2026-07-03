@@ -5,13 +5,13 @@ import java.util.List;
 public class OrderItem {
 
 	// id
-	private Integer id;
+	private int id;
 	// 商品id
-	private Integer itemId;
+	private int itemId;
 	// orderのid
-	private Integer orderId;
+	private int orderId;
 	// 数量
-	private Integer quantity;
+	private int quantity;
 	// サイズ
 	private String size;
 	// 注文時金額
@@ -31,35 +31,35 @@ public class OrderItem {
 	private boolean isFree;
 
 	// ゲッターとセッター
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	public Integer getItemId() {
+	public int getItemId() {
 		return itemId;
 	}
 
-	public void setItemId(Integer itemId) {
+	public void setItemId(int itemId) {
 		this.itemId = itemId;
 	}
 
-	public Integer getOrderId() {
+	public int getOrderId() {
 		return orderId;
 	}
 
-	public void setOrderId(Integer orderId) {
+	public void setOrderId(int orderId) {
 		this.orderId = orderId;
 	}
 
-	public Integer getQuantity() {
+	public int getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(Integer quantity) {
+	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
 
@@ -119,13 +119,13 @@ public class OrderItem {
 		}
 
 		// 3. 数量を確認する（nullなら0個）
-		int count = (this.quantity != null) ? this.quantity : 0;
+		int count = this.quantity;
 
 		if (freeCount != null) {
 			return (itemPrice + toppingTotalPrice) * count - (itemPrice * freeCount);
 		}
 
-		if (discount > 0) {
+		if (discount > 0 && discount != null) {
 			return (itemPrice + toppingTotalPrice) * count - discount;
 		}
 		// 4. 計算結果を返す

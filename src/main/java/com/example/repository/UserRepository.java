@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import com.example.domain.User;
+import com.example.enums.UserStatus;
 
 @Repository
 public class UserRepository {
@@ -19,6 +20,7 @@ public class UserRepository {
 	private static final RowMapper<User> USER_ROW_MAPPER = (rs, i) -> {
 		User user = new User();
 		user.setId(rs.getInt("id"));
+		user.setStatus(UserStatus.fromCode(rs.getInt("status")));
 		user.setName(rs.getString("name"));
 		user.setEmail(rs.getString("email"));
 		user.setPassword(rs.getString("password"));
@@ -37,6 +39,7 @@ public class UserRepository {
 		String sql = """
 				SELECT
 					id,
+					status,
 					name,
 					email,
 					password,
@@ -70,9 +73,11 @@ public class UserRepository {
 
 	public Optional<User> findByMailAddress(String email) {
 
-		String sql = "SELECT * FROM users WHERE email=:email AND status = 0";
+		String sql = "SELECT * FROM users WHERE email=:email AND status = :status";
 
-		SqlParameterSource param = new MapSqlParameterSource().addValue("email", email);
+		SqlParameterSource param = new MapSqlParameterSource()
+				.addValue("email", email)
+				.addValue("status", UserStatus.ACTIVE.getCode());
 
 		try {
 			User user = template.queryForObject(sql, param, USER_ROW_MAPPER);
@@ -87,7 +92,8 @@ public class UserRepository {
 		SqlParameterSource param = new BeanPropertySqlParameterSource(user);
 
 		String sql = "INSERT INTO users (name, email, password, zipcode, address, telephone, status,stamp_now_count,stamp_all_count) "
-				+ "VALUES (:name, :email, :password, :zipcode, :address, :telephone , 0,:stampNowCount, :stampAllCount);";
+				+ "VALUES (:name, :email, :password, :zipcode, :address, :telephone , " + UserStatus.ACTIVE.getCode()
+				+ ",:stampNowCount, :stampAllCount);";
 		template.update(sql, param);
 	}
 
@@ -130,7 +136,7 @@ public class UserRepository {
 	public void delete(Integer id) {
 		SqlParameterSource param = new MapSqlParameterSource()
 				.addValue("id", id)
-				.addValue("status", 1);
+				.addValue("status", UserStatus.WITHDRAWN.getCode());
 		String sql = "UPDATE users SET status = :status WHERE id = :id";
 		template.update(sql, param);
 	}

@@ -81,13 +81,9 @@ public class CartItem {
 		if (this.toppingList != null) {
 			for (Topping topping : this.toppingList) {
 				if ("M".equals(this.size)) {
-					if (topping.getPriceM() != null) {
-						toppingTotalPrice += topping.getPriceM();
-					}
+					toppingTotalPrice += topping.getPriceM();
 				} else { // "L" size
-					if (topping.getPriceL() != null) {
-						toppingTotalPrice += topping.getPriceL();
-					}
+					toppingTotalPrice += topping.getPriceL();
 				}
 			}
 		}

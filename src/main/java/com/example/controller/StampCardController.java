@@ -7,8 +7,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.domain.LoginUserDetails;
-import com.example.domain.StampRank;
 import com.example.domain.User;
+import com.example.enums.StampRank;
 import com.example.service.StampService;
 
 @Controller

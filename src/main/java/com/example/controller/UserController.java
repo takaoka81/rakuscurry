@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.domain.User;
+import com.example.enums.UserStatus;
 import com.example.form.InsertForm;
 import com.example.service.UserService;
 
@@ -100,7 +101,7 @@ public class UserController {
         User user = new User();
         BeanUtils.copyProperties(form, user);
         user.setId(loginuser.getId());
-        user.setStatus(0);
+        user.setStatus(UserStatus.ACTIVE);
 
         try {
             userService.update(user);

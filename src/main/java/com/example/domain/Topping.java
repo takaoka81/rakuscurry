@@ -13,9 +13,9 @@ public class Topping {
 	//トッピング名
 	private String name;
 	//Mサイズ時の価格
-	private Integer priceM;
+	private int priceM;
 	//Lサイズ時の価格
-	private Integer priceL;
+	private int priceL;
 	
 	//コンストラクター
 	public Topping() {}
@@ -45,19 +45,19 @@ public class Topping {
 		this.name = name;
 	}
 
-	public Integer getPriceM() {
+	public int getPriceM() {
 		return priceM;
 	}
 
-	public void setPriceM(Integer priceM) {
+	public void setPriceM(int priceM) {
 		this.priceM = priceM;
 	}
 
-	public Integer getPriceL() {
+	public int getPriceL() {
 		return priceL;
 	}
 
-	public void setPriceL(Integer priceL) {
+	public void setPriceL(int priceL) {
 		this.priceL = priceL;
 	}
 

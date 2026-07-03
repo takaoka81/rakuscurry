@@ -9,9 +9,9 @@ package com.example.domain;
 public class OrderTopping {
 
 	// id
-	private Integer id;
+	private int id;
 	// トッピングid
-	private Integer toppingId;
+	private int toppingId;
 	// 注文商品id
 	private Integer orderItemId;
 	// topping情報
@@ -19,19 +19,19 @@ public class OrderTopping {
 	// 注文時金額
 	private Integer orderPrice;
 
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	public Integer getToppingId() {
+	public int getToppingId() {
 		return toppingId;
 	}
 
-	public void setToppingId(Integer toppingId) {
+	public void setToppingId(int toppingId) {
 		this.toppingId = toppingId;
 	}
 

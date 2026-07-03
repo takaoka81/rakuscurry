@@ -12,13 +12,13 @@ import java.util.List;
 public class Order {
 
 	//id
-	private Integer id;
+	private int id;
 	//ユーザーid
-	private Integer userId;
+	private int userId;
 	//状態
-	private Integer status;
+	private int status;
 	//合計金額
-	private Integer totalPrice;
+	private int totalPrice;
 	//注文日
 	private Date orderDate;
 	//宛先氏名
@@ -41,28 +41,28 @@ public class Order {
 	private List<OrderItem> orderItemList;
 	
 	//ゲッターとセッター
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
-	public Integer getUserId() {
+	public int getUserId() {
 		return userId;
 	}
-	public void setUserId(Integer userId) {
+	public void setUserId(int userId) {
 		this.userId = userId;
 	}
-	public Integer getStatus() {
+	public int getStatus() {
 		return status;
 	}
-	public void setStatus(Integer status) {
+	public void setStatus(int status) {
 		this.status = status;
 	}
-	public Integer getTotalPrice() {
+	public int getTotalPrice() {
 		return totalPrice;
 	}
-	public void setTotalPrice(Integer totalPrice) {
+	public void setTotalPrice(int totalPrice) {
 		this.totalPrice = totalPrice;
 	}
 	public Date getOrderDate() {

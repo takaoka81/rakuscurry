@@ -25,6 +25,8 @@ import com.example.domain.OrderItem;
 import com.example.domain.OrderTopping;
 import com.example.domain.StampHistory;
 import com.example.domain.User;
+import com.example.enums.PayJuduge;
+import com.example.enums.Status;
 import com.example.repository.OrderItemRepository;
 import com.example.repository.OrderRepository;
 
@@ -135,10 +137,10 @@ public class OrderService {
 	 * @return statusを整数で返す
 	 */
 	public Integer paymentMethodJudge(Order order) {
-		if (order.getPaymentMethod().equals(1)) {
-			return 1;
+		if (PayJuduge.fromCode(order.getPaymentMethod()) == PayJuduge.COD) {
+			return Status.ORDER.getCode();
 		} else {
-			return 2;
+			return Status.PAYMENT_RECEIVED.getCode();
 		}
 	}
 

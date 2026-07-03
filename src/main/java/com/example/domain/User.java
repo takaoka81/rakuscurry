@@ -1,7 +1,9 @@
 package com.example.domain;
 
+import com.example.enums.UserStatus;
+
 /**
- * 
+ *
  * @author satakemisako
  *         ユーザー情報のドメインクラス
  *
@@ -9,9 +11,9 @@ package com.example.domain;
 public class User {
 
 	// ID
-	private Integer id;
+	private int id;
 	// 状態
-	private Integer status;
+	private UserStatus status;
 	// ユーザー氏名
 	private String name;
 	// パスワード
@@ -36,7 +38,7 @@ public class User {
 	private Integer stampAllCount;
 
 	// 引数ありコンストラクタ
-	public User(Integer id, Integer status, String name, String password, String email, String zipcode, String address,
+	public User(Integer id, UserStatus status, String name, String password, String email, String zipcode, String address,
 			String telephone, Integer stampNowCount, Integer stampAllCount) {
 		super();
 		this.id = id;
@@ -56,19 +58,19 @@ public class User {
 	}
 
 	// 以下getter及びsetter
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	public Integer getStatus() {
+	public UserStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(Integer status) {
+	public void setStatus(UserStatus status) {
 		this.status = status;
 	}
 

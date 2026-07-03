@@ -84,8 +84,7 @@
                <tr>
                	<th><label>支払方法</label></th>
                 <th>
-                  <span th:if="${orders.paymentMethod == 1}">代金引換</span>
-                  <span th:if="${orders.paymentMethod == 2}">クレジットカード支払い</span>
+                  <span th:text="${T(com.example.enums.PayJuduge).fromCode(orders.paymentMethod).label}"></span>
                 </th>
                </tr>
                <tr>
@@ -97,8 +96,7 @@
                <tr>
                	<th><label>支払い状況</label></th>
                 <th>
-                  <span th:if="${orders.status == 1}">未入金</span>
-                  <span th:if="${orders.status == 2}">入金済</span>
+                  <span th:text="${T(com.example.enums.Status).fromCode(orders.status).label}"></span>
                 </th>
                </tr>
             </tbody>
