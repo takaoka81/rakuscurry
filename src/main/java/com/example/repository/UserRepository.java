@@ -2,10 +2,7 @@ package com.example.repository;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -18,7 +15,6 @@ import com.example.domain.User;
 
 @Repository
 public class UserRepository {
-	private static final Logger logger = LoggerFactory.getLogger(UserRepository.class);
 
 	private static final RowMapper<User> USER_ROW_MAPPER = (rs, i) -> {
 		User user = new User();
@@ -80,19 +76,14 @@ public class UserRepository {
 
 		try {
 			User user = template.queryForObject(sql, param, USER_ROW_MAPPER);
-			logger.info("user={}", user);
 			return Optional.ofNullable(user);
 		} catch (EmptyResultDataAccessException e) {
 			return Optional.empty();
-		} catch (DataAccessException e) {
-			logger.error("DBにアクセスできませんでした。", e);
-			throw e;
 		}
 
 	}
 
 	public void insert(User user) {
-		logger.info("user={}", user);
 		SqlParameterSource param = new BeanPropertySqlParameterSource(user);
 
 		String sql = "INSERT INTO users (name, email, password, zipcode, address, telephone, status,stamp_now_count,stamp_all_count) "

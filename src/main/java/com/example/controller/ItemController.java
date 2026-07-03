@@ -25,7 +25,7 @@ import jakarta.servlet.ServletContext;
 @RequestMapping("")
 public class ItemController {
 
-	private static final Logger logger = LoggerFactory.getLogger(CartController.class);
+	private static final Logger logger = LoggerFactory.getLogger(ItemController.class);
 
 	@Autowired
 	private ServletContext application;
@@ -121,6 +121,9 @@ public class ItemController {
 
 		// 商品詳細を表示させる
 		Item item = itemService.showItemDetail(Integer.parseInt(id));
+		if (item == null) {
+			return "redirect:/showList";
+		}
 		model.addAttribute("item", item);
 
 		// トッピング一覧を表示

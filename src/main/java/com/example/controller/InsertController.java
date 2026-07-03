@@ -2,6 +2,8 @@ package com.example.controller;
 
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,6 +30,7 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/insert")
 public class InsertController {
 	
+	private static final Logger logger = LoggerFactory.getLogger(InsertController.class);
 
 	@ModelAttribute
 	public InsertForm setUpForm() {

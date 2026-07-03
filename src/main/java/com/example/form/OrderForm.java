@@ -1,9 +1,6 @@
 package com.example.form;
 
 import java.sql.Date;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -42,20 +39,6 @@ public class OrderForm {
 	//支払い方法
 	@NotNull(message="支払い方法を入力してください")
 	private Integer paymentMethod;
-	
-	public Timestamp getTimestamp() {
-		SimpleDateFormat sdf = new SimpleDateFormat("HH");
-	    java.util.Date date;
-			try {
-				date = sdf.parse(deliveryTime);
-				Timestamp ts = new Timestamp(date.getTime());
-				System.out.println(ts);
-				return ts;
-			} catch (ParseException e) {
-				e.printStackTrace();
-				return null;
-			}
-	}
 	
 	public Integer getIntegerDeliveryTime() {
 		return Integer.parseInt(deliveryTime);

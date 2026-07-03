@@ -198,7 +198,7 @@ public class OrderController {
 		// 郵便番号のハイフンを消してドメインにセット
 		order.setDestinationZipcode(form.getDestinationZipcode().replace("-", ""));
 
-		order.setDeliveryTime(form.getTimestamp());
+		order.setDeliveryTime(service.parseDeliveryTime(form.getDeliveryTime()));
 
 		Integer chengesStamps = stampService.getStampCountByOrder(order.getOrderItemList());
 		Integer addStamps = chengesStamps;

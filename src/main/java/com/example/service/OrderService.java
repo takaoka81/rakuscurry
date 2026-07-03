@@ -2,6 +2,9 @@ package com.example.service;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -34,10 +37,9 @@ import jakarta.servlet.http.HttpSession;
  *
  */
 @Service
-@Transactional
 public class OrderService {
 
-	private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+	private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
 	@Autowired
 	private UserService userService;
@@ -88,6 +90,7 @@ public class OrderService {
 	 * 
 	 * @param order
 	 */
+	@Transactional
 	public void order(Order order, User user, StampHistory stampHistory) {
 		order.setStatus(paymentMethodJudge(order));
 		orderRepository.update(order);
@@ -108,8 +111,26 @@ public class OrderService {
 	}
 
 	/**
+	 * フォームから受け取った配達時間（時のみの文字列）をTimestampに変換する
+	 *
+	 * @param deliveryTime "HH"形式の時刻文字列
+	 * @return 変換後のTimestamp
+	 */
+	public Timestamp parseDeliveryTime(String deliveryTime) {
+		SimpleDateFormat sdf = new SimpleDateFormat("HH");
+		try {
+			java.util.Date date = sdf.parse(deliveryTime);
+			logger.info(deliveryTime);
+			return new Timestamp(date.getTime());
+		} catch (ParseException e) {
+			logger.error("日付変換に失敗しました。deliverytime={}", deliveryTime, e);
+			throw new IllegalArgumentException("配達時間の形式が不正です: " + deliveryTime, e);
+		}
+	}
+
+	/**
 	 * statusを判別するメゾット
-	 * 
+	 *
 	 * @param order
 	 * @return statusを整数で返す
 	 */

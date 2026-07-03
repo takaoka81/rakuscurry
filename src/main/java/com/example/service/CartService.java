@@ -6,7 +6,10 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,8 +34,9 @@ import com.example.repository.UserRepository;
  *
  */
 @Service
-@Transactional
 public class CartService {
+
+	private static final Logger logger = LoggerFactory.getLogger(CartService.class);
 
 	@Autowired
 	private OrderRepository orderRepository;
@@ -67,22 +71,14 @@ public class CartService {
 	public void addItemToCart(CartItem cartItem, Integer userId) {
 
 		// 1. カート(Order)があるか確認
-		Order order = orderRepository.findByUserIdAndStatus(userId, 0);
-		Integer orderId;
-
-		if (order == null) {
-			// カートがなければ新規作成
-			order = new Order();
-			order.setUserId(userId);
-			order.setStatus(0);
-			order.setTotalPrice(0);
-			orderId = orderRepository.insert(order); // ここで1回だけinsert
-		} else {
-			// 既存のカートがあればそのIDを使う
-			orderId = order.getId();
-		}
-
-		// ★修正ポイント：ここの余分な orderRepository.insert(order) は削除してください
+		Optional<Order> order = orderRepository.findByUserIdAndStatus(userId, 0);
+		Integer orderId = order.map(Order::getId)
+				.orElseGet(() -> {
+					Order newOrder = new Order();
+					newOrder.setUserId(userId);
+					newOrder.setStatus(0);
+					return orderRepository.insert(newOrder);
+				});
 
 		// 2. 子(OrderItem)の登録
 		OrderItem orderItem = new OrderItem();
@@ -112,36 +108,35 @@ public class CartService {
 
 		// 4. 合計金額の再計算と更新
 		// これを行うことで、DBの total_price が null や 0 でなくなるため、HTMLでの掛け算エラーが消えます
-		Order updatedOrder = orderRepository.findByUserIdAndStatus(userId, 0);
+		Optional<Order> updatedOrder = orderRepository.findByUserIdAndStatus(userId, 0);
 
-		// 取得したデータ（updatedOrder）がnullでないこと、商品リストがあることを確認
-		if (updatedOrder != null && updatedOrder.getOrderItemList() != null) {
+		// 取得したデータ（updatedOrder）が存在すること、商品リストがあることを確認
+		if (updatedOrder.isPresent() && updatedOrder.get().getOrderItemList() != null) {
 			int newTotal = 0;
-			for (OrderItem item : updatedOrder.getOrderItemList()) {
+			for (OrderItem item : updatedOrder.get().getOrderItemList()) {
 				// 商品ごとの(価格+トッピング価格) * 数量 を加算
 				newTotal += item.getSubTotal();
 			}
 			// ここでDBの orders テーブルの total_price カラムを書き換える
 			orderRepository.updateTotalPrice(orderId, newTotal);
 
-			System.out.println("DBの合計金額を更新しました: " + newTotal + "円");
+			logger.info("DBの合計金額を更新しました: " + newTotal + "円");
 		}
 	}
 
 	/**
 	 * ユーザーIDから未注文のカート情報を取得する
 	 */
+	@Transactional
 	public Order getCartByUserId(Integer userId) {
 		// status=0 (カート内) のもgetCartByUserIdのを探す
-		Order order = orderRepository.findByUserIdAndStatus(userId, 0);
-		return adaptFreeCurry(order, userId);
+		return orderRepository.findByUserIdAndStatus(userId, 0)
+				.map(order -> adaptFreeCurry(order, userId))
+				.orElse(null);
+
 	}
 
 	private Order adaptFreeCurry(Order order, Integer userId) {
-		if (order == null) {
-			return null;
-		}
-
 		Integer stampNowCount = userRepository.findByUserId(userId)
 				.map(User::getStampNowCount)
 				.orElse(0);
@@ -300,23 +295,16 @@ public class CartService {
 		orderRepository.deleteOrderItem(orderItemId);
 
 		// 2. orderRepository に既にある「最新のOrderを取得するメソッド」を呼びます
-		Order order = orderRepository.findByUserIdAndStatus(userId, 0);
-
-		if (order != null) {
-			// 3. ★ここで「再計算」を強制的に行う
+		orderRepository.findByUserIdAndStatus(userId, 0).ifPresent(order -> {
 			int latestTotal = 0;
 			if (order.getOrderItemList() != null) {
 				for (OrderItem item : order.getOrderItemList()) {
-					// 各商品の小計を足し合わせる
 					latestTotal += item.getSubTotal();
 				}
 			}
-
-			// 4. ★計算した「最新の金額」でDBを更新する
 			orderRepository.updateTotalPrice(order.getId(), latestTotal);
-
-			// 5. Controllerで使うために、オブジェクト内の金額も更新しておく
 			order.setTotalPrice(latestTotal);
-		}
+		});
+
 	}
 }

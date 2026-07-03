@@ -1,5 +1,7 @@
 package com.example.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,6 +23,8 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("")
 public class UserController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private UserService userService;
@@ -104,7 +108,7 @@ public class UserController {
             redirectAttributes.addFlashAttribute("updateMessage", "会員情報を更新しました。再度ログインしてください。");
             return "redirect:/toLogin";
         } catch (DataIntegrityViolationException e) {
-            e.printStackTrace();
+            logger.error("すでに使われているメールアドレスです", e);
             model.addAttribute("emailRegistedError", "そのメールアドレスはすでに使われています");
             return "user/user_update";
         }

@@ -35,7 +35,6 @@ public class ItemService {
 	
 	public List<Item> findByName(String name){
 		if(name == null || "".equals(name)) {
-			//System.out.println("here!!");
 			logger.warn("find NULL or empty string");
 			return repository.findAll();
 		} else {
@@ -50,7 +49,7 @@ public class ItemService {
 	 * @return　商品情報を１件
 	 */
 	public Item showItemDetail(Integer id) {
-		return repository.showItemDetail(id);
+		return repository.showItemDetail(id).orElse(null);
 	}
 	
 	/**
@@ -90,8 +89,6 @@ public class ItemService {
 	 	        int toIndex = Math.min(startItemCount + size, itemList.size());
 	 	        list = itemList.subList(startItemCount, toIndex);
 	 	    }
-	    
-	    //System.out.println(itemList + "！");
 		logger.warn("itemList={}", itemList);
 	    // 上記で作成した該当ページに表示させる従業員一覧をページングできる形に変換して返す
 	    Page<Item> employeePage
@@ -100,6 +97,6 @@ public class ItemService {
 	}
 
 	public Item ApiShowItemDetail(Integer id){
-		return repository.ApiShowItemDetail(id);
+		return repository.ApiShowItemDetail(id).orElse(null);
 	}
 }
