@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -296,12 +295,7 @@ public class OrderRepository {
 				.addValue("userId", userId)
 				.addValue("status", status);
 
-		try{
-			 Optional<Order> order = Optional.ofNullable(template.query(sql, param, orderResultSetExtractor));
-			 return order;
-		}catch(EmptyResultDataAccessException e){
-			return Optional.empty();
-		}
+		return Optional.ofNullable(template.query(sql, param, orderResultSetExtractor));
 	}
 
 	/**
