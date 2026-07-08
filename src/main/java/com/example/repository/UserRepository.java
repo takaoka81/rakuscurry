@@ -40,12 +40,6 @@ public class UserRepository {
 				SELECT
 					id,
 					status,
-					name,
-					email,
-					password,
-					zipcode,
-					address,
-					telephone,
 					stamp_now_count,
 					stamp_all_count
 				FROM
@@ -57,7 +51,14 @@ public class UserRepository {
 		SqlParameterSource param = new MapSqlParameterSource().addValue("id", id);
 
 		try {
-			User user = template.queryForObject(sql, param, USER_ROW_MAPPER);
+			User user = template.queryForObject(sql, param, (rs, rowNum) -> {
+				User u = new User();
+				u.setId(rs.getInt("id"));
+				u.setStatus(UserStatus.fromCode(rs.getInt("status")));
+				u.setStampNowCount(rs.getInt("stamp_now_count"));
+				u.setStampAllCount(rs.getInt("stamp_all_count"));
+				return u;
+			});
 			return Optional.ofNullable(user);
 		} catch (EmptyResultDataAccessException e) {
 			return Optional.empty();

@@ -82,7 +82,6 @@ public class ItemService {
 	    List<Item> list;
 	    
 	    	 if (itemList.size() < startItemCount) {
-	 	    	// (ありえないが)もし表示させたい従業員カウントがサイズよりも大きい場合は空のリストを返す
 	 	        list = Collections.emptyList();
 	 	    } else {
 	 	    	// 該当ページに表示させる従業員一覧を作成

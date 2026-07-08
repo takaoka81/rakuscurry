@@ -3,10 +3,11 @@ package com.example.domain;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class LoginUserDetails implements UserDetails {
+public class LoginUserDetails implements UserDetails, CredentialsContainer {
     private final User user;
 
     public LoginUserDetails(User user) {
@@ -44,5 +45,10 @@ public class LoginUserDetails implements UserDetails {
 
     @Override // ユーザーが有効であればtrueを返す
     public boolean isEnabled() { return true; }
+
+    @Override // 認証完了後にSpring Securityから呼ばれ、保持しているパスワードハッシュを消去する
+    public void eraseCredentials() {
+        user.setPassword(null);
+    }
 
 }

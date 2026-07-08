@@ -100,13 +100,13 @@ public class OrderController {
 	}
 
 	@RequestMapping("/orderCo")
-	public String orderCo(OrderForm form , Model model) {
+	public String orderCo(@AuthenticationPrincipal LoginUserDetails loginUserDetails, OrderForm form , Model model) {
 		/**
 		 * ログインユーザー情報を注文のお届け先情報にコピーする
-		 * 
+		 *
 		 * @param order 注文情報
 		 */
-		User user = (User)session.getAttribute("user");
+		User user = loginUserDetails.getUser();
 		form.setDestinationName(user.getName());
 		form.setDestinationEmail(user.getEmail());
 		form.setDestinationZipcode(user.getZipcode());

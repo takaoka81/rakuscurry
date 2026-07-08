@@ -78,12 +78,6 @@ public class OrderRepository {
 				// Userをセット
 				User user = new User();
 				user.setId(rs.getInt("u_id"));
-				user.setName(rs.getString("u_name"));
-				user.setPassword(rs.getString("u_password"));
-				user.setEmail(rs.getString("u_email"));
-				user.setZipcode(rs.getString("u_zipcode"));
-				user.setAddress(rs.getString("u_address"));
-				user.setTelephone(rs.getString("u_telephone"));
 
 				// Orderドメインが持っているuserフィールドに外部キーで紐づいているUserをセット
 				order.setUser(user);
@@ -167,7 +161,7 @@ public class OrderRepository {
 				+ "o.order_date AS o_order_date, o.destination_name AS o_destination_name, o.destination_email AS o_destination_email, "
 				+ "o.destination_zipcode AS o_destination_zipcode, o.destination_address AS o_destination_address, o.destination_tel AS o_destination_tel, "
 				+ "o.delivery_time AS o_delivery_time, o.payment_method AS o_payment_method, "
-				+ "u.id AS u_id, u.name AS u_name, u.password AS u_password, u.email As u_email, u.zipcode AS u_zipcode, u.address AS u_address, u.telephone AS u_telephone, "
+				+ "u.id AS u_id,"
 				+ "oi.id AS oi_id, oi.item_id AS oi_item_id, oi.order_id AS oi_order_id, oi.quantity AS oi_quantity, "
 				+ "oi.size AS oi_size, oi.order_price AS oi_order_price, oi.discount AS oi_discount,"
 				+ "i.id AS i_id, i.name AS i_name, i.description AS i_description, i.price_m AS i_price_m, i.price_l AS i_price_l, "
@@ -199,7 +193,7 @@ public class OrderRepository {
 				+ "o.order_date AS o_order_date, o.destination_name AS o_destination_name, o.destination_email AS o_destination_email, "
 				+ "o.destination_zipcode AS o_destination_zipcode, o.destination_address AS o_destination_address, o.destination_tel AS o_destination_tel, "
 				+ "o.delivery_time AS o_delivery_time, o.payment_method AS o_payment_method, "
-				+ "u.id AS u_id, u.name AS u_name, u.password AS u_password, u.email As u_email, u.zipcode AS u_zipcode, u.address AS u_address, u.telephone AS u_telephone, "
+				+ "u.id AS u_id,"
 				+ "oi.id AS oi_id, oi.item_id AS oi_item_id, oi.order_id AS oi_order_id, oi.quantity AS oi_quantity, "
 				+ "oi.size AS oi_size, oi.order_price AS oi_order_price, oi.discount AS oi_discount,"
 				+ "i.id AS i_id, i.name AS i_name, i.description AS i_description, i.price_m AS i_price_m, i.price_l AS i_price_l, "
