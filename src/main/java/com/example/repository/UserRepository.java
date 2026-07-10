@@ -17,20 +17,18 @@ import com.example.enums.UserStatus;
 @Repository
 public class UserRepository {
 
-	private static final RowMapper<User> USER_ROW_MAPPER = (rs, i) -> {
-		User user = new User();
-		user.setId(rs.getInt("id"));
-		user.setStatus(UserStatus.fromCode(rs.getInt("status")));
-		user.setName(rs.getString("name"));
-		user.setEmail(rs.getString("email"));
-		user.setPassword(rs.getString("password"));
-		user.setZipcode(rs.getString("zipcode"));
-		user.setAddress(rs.getString("address"));
-		user.setTelephone(rs.getString("telephone"));
-		user.setStampNowCount(rs.getInt("stamp_now_count"));
-		user.setStampAllCount(rs.getInt("stamp_all_count"));
-		return user;
-	};
+	private static final RowMapper<User> USER_ROW_MAPPER = (rs, i) -> new User.Builder()
+			.id(rs.getInt("id"))
+			.status(UserStatus.fromCode(rs.getInt("status")))
+			.name(rs.getString("name"))
+			.email(rs.getString("email"))
+			.password(rs.getString("password"))
+			.zipcode(rs.getString("zipcode"))
+			.address(rs.getString("address"))
+			.telephone(rs.getString("telephone"))
+			.stampNowCount(rs.getInt("stamp_now_count"))
+			.stampAllCount(rs.getInt("stamp_all_count"))
+			.build();
 
 	@Autowired
 	private NamedParameterJdbcTemplate template;
@@ -51,14 +49,12 @@ public class UserRepository {
 		SqlParameterSource param = new MapSqlParameterSource().addValue("id", id);
 
 		try {
-			User user = template.queryForObject(sql, param, (rs, rowNum) -> {
-				User u = new User();
-				u.setId(rs.getInt("id"));
-				u.setStatus(UserStatus.fromCode(rs.getInt("status")));
-				u.setStampNowCount(rs.getInt("stamp_now_count"));
-				u.setStampAllCount(rs.getInt("stamp_all_count"));
-				return u;
-			});
+			User user = template.queryForObject(sql, param, (rs, rowNum) -> new User.Builder()
+					.id(rs.getInt("id"))
+					.status(UserStatus.fromCode(rs.getInt("status")))
+					.stampNowCount(rs.getInt("stamp_now_count"))
+					.stampAllCount(rs.getInt("stamp_all_count"))
+					.build());
 			return Optional.ofNullable(user);
 		} catch (EmptyResultDataAccessException e) {
 			return Optional.empty();

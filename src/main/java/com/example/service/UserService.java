@@ -46,8 +46,10 @@ public class UserService {
 	 */
 	public void insert(User user) {
 
-		user.setPassword(passwordEncoder.encode(user.getPassword()));
-		repository.insert(user);
+		User encodedUser = user.toBuilder()
+			.password(passwordEncoder.encode(user.getPassword()))
+			.build();
+		repository.insert(encodedUser);
 	}
 
 	/**

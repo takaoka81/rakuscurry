@@ -4,7 +4,6 @@ package com.example.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
@@ -80,16 +79,18 @@ public class InsertController {
 			model.addAttribute("passwordNotMatchError", "パスワードと確認用パスワードが不一致です");
 			return "register_user";
 		}
-		
-		//フォームの値をドメインにコピー
-		User user = new User();
-		BeanUtils.copyProperties(form, user);
+				
 		//メールアドレスの値を挿入
 		String email = (String) session.getAttribute("email");
-		user.setEmail(email);
-		//郵便番号のハイフンを消してドメインにセット
-		user.setZipcode(form.getZipcode().replace("-", ""));
-		
+		User user = new User.Builder()
+				.email(email)
+				.name(form.getName())
+				.password(form.getPassword())
+				.zipcode(form.getZipcode().replace("-", ""))
+				.address(form.getAddress())
+				.telephone(form.getTelephone())
+				.build();
+
 		//emailが既に登録の場合はSQLで例外が発生するのでtry-catchを行う。
 		//例外の際はエラー文をリクエストスコープに格納してユーザー登録画面に遷移
 		try {

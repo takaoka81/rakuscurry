@@ -2,7 +2,6 @@ package com.example.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -90,10 +89,14 @@ public class UserController {
             return "user/user_update";
         }
 
-        User user = new User();
-        BeanUtils.copyProperties(form, user);
-        user.setId(loginUserDetails.getUser().getId());
-        user.setStatus(UserStatus.ACTIVE);
+        User user = loginUserDetails.getUser().toBuilder()
+                .name(form.getName())
+                .email(form.getEmail())
+                .zipcode(form.getZipcode())
+                .address(form.getAddress())
+                .telephone(form.getTelephone())
+                .status(UserStatus.ACTIVE)
+                .build();
 
         try {
             userService.update(user);

@@ -206,8 +206,10 @@ public class OrderController {
 		if (addStamps < 0) {
 			addStamps += 25;
 		}
-		user.setStampNowCount(user.getStampNowCount() + chengesStamps);
-		user.setStampAllCount(user.getStampAllCount() + addStamps);
+		user = user.toBuilder()
+				.stampNowCount(user.getStampNowCount() + chengesStamps)
+				.stampAllCount(user.getStampAllCount() + addStamps)
+				.build();
 		StampHistory stampHistory = new StampHistory(user.getId(), order.getId(), chengesStamps);
 		service.order(order, user, stampHistory);
 

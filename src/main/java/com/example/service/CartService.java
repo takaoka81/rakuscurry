@@ -71,6 +71,25 @@ public class CartService {
 	public void addItemToCart(CartItem cartItem, Integer userId) {
 
 		// 1. カート(Order)があるか確認
+		Integer orderId = findOrCreatedId(userId);
+
+		// 2. 子(OrderItem)の登録
+		Integer orderItemId = insertOrderItem(cartItem, orderId);
+
+		// 3. 孫(OrderTopping)の登録
+		insertOrderTopping(cartItem.getToppingList(), orderItemId, cartItem.getSize());
+
+		// 4. 合計金額の再計算と更新
+		updateTotalPriceAfterAdd(orderId, userId);
+	}
+
+	/**
+	 * カート(Order)があるか確認
+	 * 
+	 * @param userId
+	 * @return カートがあればカートID無ければ新規カートを作成したIDを返す
+	 */
+	private Integer findOrCreatedId(Integer userId) {
 		Optional<Order> order = orderRepository.findByUserIdAndStatus(userId, 0);
 		Integer orderId = order.map(Order::getId)
 				.orElseGet(() -> {
@@ -79,35 +98,56 @@ public class CartService {
 					newOrder.setStatus(0);
 					return orderRepository.insert(newOrder);
 				});
+		return orderId;
+	}
 
-		// 2. 子(OrderItem)の登録
+	/**
+	 * 子(OrderItem)の登録
+	 * 
+	 * @param cartItem
+	 * @param orderId
+	 * @return OrderItemのID
+	 */
+	private Integer insertOrderItem(CartItem cartItem, Integer orderId) {
 		OrderItem orderItem = new OrderItem();
 		BeanUtils.copyProperties(cartItem, orderItem);
-		orderItem.setOrderId(orderId); // 確定したorderIdをセット
+		orderItem.setOrderId(orderId);
 		orderItem.setOrderPrice(cartItem.getItemPrice());
+		return orderItemRepository.order(orderItem);
+	}
 
-		// リポジトリのメソッド名が order() になっている場合はそのままでOK
-		Integer orderItemId = orderItemRepository.order(orderItem);
-
-		// 3. 孫(OrderTopping)の登録
-		List<Topping> toppingList = cartItem.getToppingList();
-		if (toppingList != null && !toppingList.isEmpty()) {
-			for (Topping topping : toppingList) {
-				OrderTopping ot = new OrderTopping();
-				ot.setOrderItemId(orderItemId);
-				ot.setToppingId(topping.getId());
-
-				if ("M".equals(cartItem.getSize())) {
-					ot.setOrderPrice(topping.getPriceM());
-				} else {
-					ot.setOrderPrice(topping.getPriceL());
-				}
-				orderToppingRepository.insert(ot);
-			}
+	/**
+	 * 孫(OrderTopping)の登録
+	 *
+	 * @param toppingList
+	 * @param orderItemId
+	 * @param size
+	 */
+	private void insertOrderTopping(List<Topping> toppingList, Integer orderItemId, String size) {
+		if (toppingList == null || toppingList.isEmpty()) {
+			return;
 		}
+		for (Topping topping : toppingList) {
+			OrderTopping ot = new OrderTopping();
+			ot.setOrderItemId(orderItemId);
+			ot.setToppingId(topping.getId());
 
-		// 4. 合計金額の再計算と更新
-		// これを行うことで、DBの total_price が null や 0 でなくなるため、HTMLでの掛け算エラーが消えます
+			if ("M".equals(size)) {
+				ot.setOrderPrice(topping.getPriceM());
+			} else {
+				ot.setOrderPrice(topping.getPriceL());
+			}
+			orderToppingRepository.insert(ot);
+		}
+	}
+
+	/**
+	 * 合計金額を更新する
+	 * 
+	 * @param orderId
+	 * @param userId
+	 */
+	private void updateTotalPriceAfterAdd(Integer orderId, Integer userId) {
 		Optional<Order> updatedOrder = orderRepository.findByUserIdAndStatus(userId, 0);
 
 		// 取得したデータ（updatedOrder）が存在すること、商品リストがあることを確認
@@ -136,60 +176,100 @@ public class CartService {
 
 	}
 
+	@Transactional
 	private Order adaptFreeCurry(Order order, Integer userId) {
-		Integer stampNowCount = userRepository.findByUserId(userId)
-				.map(User::getStampNowCount)
-				.orElse(0);
-		Integer freeCount = stampService.getFreeCurryCount(stampNowCount);
+		Integer freeCount = getFreeCount(userId);
 
 		if (freeCount >= 1) {
-			List<OrderItem> orderItems = order.getOrderItemList();
-
-			// 金額が高い順に並べ替え変える
-			orderItems.sort((first, second) -> Integer.compare(second.getOrderPrice(), first.getOrderPrice()));
-
-			// 数量1に置き変えたリストを作成
-			List<OrderItem> orderItemsQuantitySingle = createOrderItemsQuantitySingle(orderItems);
-
-			// 値段が高い順に無料適用数に応じて0円にする
-			for (int i = 0; i < orderItemsQuantitySingle.size() && i < freeCount; i++) {
-				orderItemsQuantitySingle.get(i).setOrderPrice(0);
-				orderItemsQuantitySingle.get(i).setFree(true);
-			}
-
-			// 同じitemIdのものは一行で表示するために数量を元に戻す
-			orderItems = createSameOrderIdListes(orderItemsQuantitySingle);
-
-			// id順に並べ替える
-			orderItems.sort(Comparator.comparing(OrderItem::getId));
+			List<OrderItem> orderItems = applyFreeDiscount(order.getOrderItemList(), freeCount);
 
 			// 0円適用後に合計金額を反映させる
-			Integer totalPrice = 0;
-			Integer totalSubPrice = 0;
-			for (OrderItem orderItem : orderItems) {
-				Integer subPrice = 0;
-				totalPrice += orderItem.getOrderPrice() * orderItem.getQuantity();
-				subPrice = orderItem.getOrderPrice() * orderItem.getFreeCount();
-				orderItem.setDiscount(subPrice);
-				totalSubPrice += subPrice;
-				orderItemRepository.update(orderItem);
-			}
-
-			Integer totalToppingPrice = 0;
-			for (OrderItem orderItem : orderItems) {
-				Integer toppingPrice = 0;
-				for (OrderTopping orderTopping : orderItem.getOrderTopping()) {
-					toppingPrice += orderTopping.getOrderPrice();
-				}
-				totalToppingPrice += toppingPrice * orderItem.getQuantity();
-			}
+			int priceResult = calcTotalWithDiscount(orderItems);
+			int totalToppingPrice = calcToppingTotal(orderItems);
+			int totalPrice = priceResult + totalToppingPrice;
 
 			order.setOrderItemList(orderItems);
-			order.setTotalPrice(totalPrice - totalSubPrice + totalToppingPrice);
+			order.setTotalPrice(totalPrice);
 			orderRepository.updateTotalPrice(userId, order.getTotalPrice());
 		}
 
 		return order;
+	}
+
+	/**
+	 * 無料枠数の取得
+	 * 
+	 * @param userId
+	 * @return 無料枠数
+	 */
+	Integer getFreeCount(Integer userId) {
+		Integer stampNowCount = userRepository.findByUserId(userId)
+				.map(User::getStampNowCount)
+				.orElse(0);
+		return stampService.getFreeCurryCount(stampNowCount);
+	}
+
+	/**
+	 * 一番高い商品を無料にする
+	 * 
+	 * @param orderItems
+	 * @param freeCount
+	 * @return
+	 *
+	 */
+	List<OrderItem> applyFreeDiscount(List<OrderItem> orderItems, Integer freeCount) {
+		orderItems.sort((first, second) -> Integer.compare(second.getOrderPrice(), first.getOrderPrice()));
+		List<OrderItem> orderItemsQuantitySingle = createOrderItemsQuantitySingle(orderItems);
+
+		for (int i = 0; i < orderItemsQuantitySingle.size() && i < freeCount; i++) {
+			orderItemsQuantitySingle.get(i).setOrderPrice(0);
+			orderItemsQuantitySingle.get(i).setFree(true);
+		}
+
+		// 同じitemIdのものは一行で表示するために数量を元に戻す
+		orderItems = createSameOrderIdListes(orderItemsQuantitySingle);
+
+		// id順に並べ替える
+		orderItems.sort(Comparator.comparing(OrderItem::getId));
+		return orderItems;
+	}
+
+	/**
+	 * 合計金額を計算する
+	 *
+	 * @param orderItems
+	 * @return
+	 */
+	Integer calcTotalWithDiscount(List<OrderItem> orderItems) {
+		Integer totalPrice = 0;
+		Integer totalSubPrice = 0;
+		for (OrderItem orderItem : orderItems) {
+			Integer subPrice = 0;
+			totalPrice += orderItem.getOrderPrice() * orderItem.getQuantity();
+			subPrice = orderItem.getOrderPrice() * orderItem.getFreeCount();
+			orderItem.setDiscount(subPrice);
+			totalSubPrice += subPrice;
+			orderItemRepository.update(orderItem);
+		}
+		return totalPrice - totalSubPrice;
+	}
+
+	/**
+	 * トッピングの合計金額を計算する
+	 * 
+	 * @param orderItems
+	 * @return
+	 */
+	Integer calcToppingTotal(List<OrderItem> orderItems) {
+		Integer totalToppingPrice = 0;
+		for (OrderItem orderItem : orderItems) {
+			Integer toppingPrice = 0;
+			for (OrderTopping orderTopping : orderItem.getOrderTopping()) {
+				toppingPrice += orderTopping.getOrderPrice();
+			}
+			totalToppingPrice += toppingPrice * orderItem.getQuantity();
+		}
+		return totalToppingPrice;
 	}
 
 	private List<OrderItem> createOrderItemsQuantitySingle(List<OrderItem> orderItems) {

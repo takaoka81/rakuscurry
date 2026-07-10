@@ -37,10 +37,13 @@ public class User {
 	 */
 	private Integer stampAllCount;
 
+	// 引数なしコンストラクタ
+	public User() {
+	}
+
 	// 引数ありコンストラクタ
-	public User(Integer id, UserStatus status, String name, String password, String email, String zipcode, String address,
+	public User(int id, UserStatus status, String name, String password, String email, String zipcode, String address,
 			String telephone, Integer stampNowCount, Integer stampAllCount) {
-		super();
 		this.id = id;
 		this.status = status;
 		this.name = name;
@@ -53,8 +56,85 @@ public class User {
 		this.stampAllCount = stampAllCount;
 	}
 
-	// 引数なしコンストラクタ
-	public User() {
+	private User(Builder builder) {
+		this.id = builder.id;
+		this.status = builder.status;
+		this.name = builder.name;
+		this.password = builder.password;
+		this.email = builder.email;
+		this.zipcode = builder.zipcode;
+		this.address = builder.address;
+		this.telephone = builder.telephone;
+		this.stampNowCount = builder.stampNowCount;
+		this.stampAllCount = builder.stampAllCount;
+	}
+
+	// Effective Java Item 2 に基づくビルダー
+	public static class Builder {
+		private int id;
+		private UserStatus status;
+		private String name;
+		private String password;
+		private String email;
+		private String zipcode;
+		private String address;
+		private String telephone;
+		private Integer stampNowCount;
+		private Integer stampAllCount;
+
+		public Builder id(int id) {
+			this.id = id;
+			return this;
+		}
+
+		public Builder status(UserStatus status) {
+			this.status = status;
+			return this;
+		}
+
+		public Builder name(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public Builder password(String password) {
+			this.password = password;
+			return this;
+		}
+
+		public Builder email(String email) {
+			this.email = email;
+			return this;
+		}
+
+		public Builder zipcode(String zipcode) {
+			this.zipcode = zipcode;
+			return this;
+		}
+
+		public Builder address(String address) {
+			this.address = address;
+			return this;
+		}
+
+		public Builder telephone(String telephone) {
+			this.telephone = telephone;
+			return this;
+		}
+
+		public Builder stampNowCount(Integer stampNowCount) {
+			this.stampNowCount = stampNowCount;
+			return this;
+		}
+
+		public Builder stampAllCount(Integer stampAllCount) {
+			this.stampAllCount = stampAllCount;
+			return this;
+		}
+
+		public User build() {
+			return new User(this);
+		}
 	}
 
 	// 以下getter及びsetter
@@ -136,6 +216,20 @@ public class User {
 
 	public void setStampAllCount(Integer stampAllCount) {
 		this.stampAllCount = stampAllCount;
+	}
+
+	public Builder toBuilder() {
+		return new Builder()
+				.id(this.id)
+				.status(this.status)
+				.name(this.name)
+				.password(this.password)
+				.email(this.email)
+				.zipcode(this.zipcode)
+				.address(this.address)
+				.telephone(this.telephone)
+				.stampNowCount(this.stampNowCount)
+				.stampAllCount(this.stampAllCount);
 	}
 
 }

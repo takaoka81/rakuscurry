@@ -76,8 +76,10 @@ public class OrderRepository {
 				order.setPaymentMethod(rs.getInt("o_payment_method"));
 
 				// Userをセット
-				User user = new User();
-				user.setId(rs.getInt("u_id"));
+				User user = new User.Builder()
+				.id(rs.getInt("u_id"))
+				.build();
+				
 
 				// Orderドメインが持っているuserフィールドに外部キーで紐づいているUserをセット
 				order.setUser(user);

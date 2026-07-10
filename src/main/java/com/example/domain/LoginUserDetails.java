@@ -8,7 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public class LoginUserDetails implements UserDetails, CredentialsContainer {
-    private final User user;
+    private User user;
 
     public LoginUserDetails(User user) {
         this.user = user;
@@ -48,7 +48,7 @@ public class LoginUserDetails implements UserDetails, CredentialsContainer {
 
     @Override // 認証完了後にSpring Securityから呼ばれ、保持しているパスワードハッシュを消去する
     public void eraseCredentials() {
-        user.setPassword(null);
+        this.user = user.toBuilder().password(null).build();
     }
 
 }
