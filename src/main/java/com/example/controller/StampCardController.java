@@ -1,6 +1,5 @@
 package com.example.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,12 +10,13 @@ import com.example.domain.User;
 import com.example.enums.StampRank;
 import com.example.service.StampService;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/stamp")
 public class StampCardController {
-
-    @Autowired
-    private StampService stampService;
+    private final StampService stampService;
 
     @RequestMapping("/showStampCard")
     public String showStampCard(@AuthenticationPrincipal LoginUserDetails loginUserDetails, Model model) {

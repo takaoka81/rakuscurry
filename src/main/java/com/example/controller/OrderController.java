@@ -10,7 +10,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,6 +29,7 @@ import com.example.service.OrderService;
 import com.example.service.StampService;
 
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 注文確認画面に遷移するためのコントローラー
@@ -38,6 +38,7 @@ import jakarta.servlet.http.HttpSession;
  *
  */
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("")
 public class OrderController {
 
@@ -48,17 +49,13 @@ public class OrderController {
 		return new OrderForm();
 	}
 
-	@Autowired
-	private OrderService service;
+	private final OrderService service;
 
-	@Autowired
-	private CartService cartService;
+	private final CartService cartService;
 
-	@Autowired
-	private StampService stampService;
+	private final StampService stampService;
 
-	@Autowired
-	private HttpSession session;
+	private final HttpSession session;
 
 	public OrderForm setUpOrderForm() {
 		return new OrderForm();
@@ -100,7 +97,7 @@ public class OrderController {
 	}
 
 	@RequestMapping("/orderCo")
-	public String orderCo(@AuthenticationPrincipal LoginUserDetails loginUserDetails, OrderForm form , Model model) {
+	public String orderCo(@AuthenticationPrincipal LoginUserDetails loginUserDetails, OrderForm form, Model model) {
 		/**
 		 * ログインユーザー情報を注文のお届け先情報にコピーする
 		 *
@@ -112,7 +109,7 @@ public class OrderController {
 		form.setDestinationZipcode(user.getZipcode());
 		form.setDestinationAddress(user.getAddress());
 		form.setDestinationTel(user.getTelephone());
-		
+
 		Order order = new Order();
 		BeanUtils.copyProperties(form, order);
 

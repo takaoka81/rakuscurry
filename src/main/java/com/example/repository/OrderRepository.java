@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -23,6 +22,8 @@ import com.example.domain.OrderTopping;
 import com.example.domain.Topping;
 import com.example.domain.User;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * オーダー内容をSQLとやりとりする
  * 
@@ -30,10 +31,9 @@ import com.example.domain.User;
  *
  */
 @Repository
+@RequiredArgsConstructor
 public class OrderRepository {
-
-	@Autowired
-	private NamedParameterJdbcTemplate template;
+	private final NamedParameterJdbcTemplate template;
 
 	// orders,users,order_items,items,order_toppings,toppingsのテーブル結合に使うResultSetExtractor
 	private static final ResultSetExtractor<List<Order>> ORDER_RESULTSET = (rs) -> {
@@ -77,9 +77,8 @@ public class OrderRepository {
 
 				// Userをセット
 				User user = new User.Builder()
-				.id(rs.getInt("u_id"))
-				.build();
-				
+						.id(rs.getInt("u_id"))
+						.build();
 
 				// Orderドメインが持っているuserフィールドに外部キーで紐づいているUserをセット
 				order.setUser(user);

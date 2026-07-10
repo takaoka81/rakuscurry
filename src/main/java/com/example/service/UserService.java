@@ -5,29 +5,26 @@ import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.domain.User;
 import com.example.repository.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
-@Transactional
+@RequiredArgsConstructor
 public class UserService {
 	private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-	@Autowired
-	private UserRepository repository;
+	private final UserRepository repository;
 
-	@Autowired
-	private MailSender sender;
+	private final MailSender sender;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+	private final PasswordEncoder passwordEncoder;
 
 	public Optional<User> findByUserId(Integer id) {
 		return repository.findByUserId(id);
@@ -47,8 +44,8 @@ public class UserService {
 	public void insert(User user) {
 
 		User encodedUser = user.toBuilder()
-			.password(passwordEncoder.encode(user.getPassword()))
-			.build();
+				.password(passwordEncoder.encode(user.getPassword()))
+				.build();
 		repository.insert(encodedUser);
 	}
 

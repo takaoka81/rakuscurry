@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -20,21 +19,20 @@ import com.example.service.ItemService;
 import com.example.service.StampService;
 
 import jakarta.servlet.ServletContext;
+import lombok.RequiredArgsConstructor;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("")
 public class ItemController {
 
 	private static final Logger logger = LoggerFactory.getLogger(ItemController.class);
 
-	@Autowired
-	private ServletContext application;
+	private final ServletContext application;
 
-	@Autowired
-	private ItemService itemService;
+	private final ItemService itemService;
 
-	@Autowired
-	private StampService stampService;
+	private final StampService stampService;
 
 	// 1ページに表示する従業員数は5名
 	private static final int VIEW_SIZE = 5;

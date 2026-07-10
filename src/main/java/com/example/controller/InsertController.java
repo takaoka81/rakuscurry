@@ -1,10 +1,7 @@
 package com.example.controller;
 
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,39 +15,39 @@ import com.example.form.InsertForm;
 import com.example.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
-
+import lombok.RequiredArgsConstructor;
 
 /**
  * ユーザー情報を登録するためのコントローラー
+ * 
  * @author matsunagadai
  *
  */
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/insert")
 public class InsertController {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(InsertController.class);
 
 	@ModelAttribute
 	public InsertForm setUpForm() {
 		return new InsertForm();
 	}
-	
-	@Autowired
-	private HttpSession session;
-	
-	@Autowired
-	private UserService userService;
-	
-	
+
+	private final HttpSession session;
+
+	private final UserService userService;
+
 	/**
 	 * ユーザー登録画面に遷移
+	 * 
 	 * @return
 	 */
 	@RequestMapping("")
 	public String toInsert() {
 		String email = (String) session.getAttribute("email");
-		if(email == null) {
+		if (email == null) {
 			return "redirect:/mailInsert";
 		}
 		return "register_user";
@@ -59,28 +56,29 @@ public class InsertController {
 	/**
 	 * フォームから受け取った情報をもとにユーザー登録を行う。
 	 * 登録完了後ログイン画面に遷移。
+	 * 
 	 * @param form
 	 * @return
 	 */
 	@RequestMapping("/insertUser")
 	public String insert(@Validated InsertForm form, BindingResult result, Model model) {
-		//セッションからメールアドレスを取り込む
-		if(session.getAttribute("email") == null) {
+		// セッションからメールアドレスを取り込む
+		if (session.getAttribute("email") == null) {
 			return "redirect:/mailInsert";
 		}
-		
-		//バリデーションチェックによるエラーがあればユーザー登録画面に遷移
-		if(result.hasErrors()) {
+
+		// バリデーションチェックによるエラーがあればユーザー登録画面に遷移
+		if (result.hasErrors()) {
 			return "register_user";
 		}
-		
-		//パスワードと確認用パスワードが不一致の場合エラー文をリクエストスコープに格納してユーザー登録画面に遷移
-		if(!(form.getPassword().equals(form.getConfirmPassword()))) {
+
+		// パスワードと確認用パスワードが不一致の場合エラー文をリクエストスコープに格納してユーザー登録画面に遷移
+		if (!(form.getPassword().equals(form.getConfirmPassword()))) {
 			model.addAttribute("passwordNotMatchError", "パスワードと確認用パスワードが不一致です");
 			return "register_user";
 		}
-				
-		//メールアドレスの値を挿入
+
+		// メールアドレスの値を挿入
 		String email = (String) session.getAttribute("email");
 		User user = new User.Builder()
 				.email(email)
@@ -91,15 +89,15 @@ public class InsertController {
 				.telephone(form.getTelephone())
 				.build();
 
-		//emailが既に登録の場合はSQLで例外が発生するのでtry-catchを行う。
-		//例外の際はエラー文をリクエストスコープに格納してユーザー登録画面に遷移
+		// emailが既に登録の場合はSQLで例外が発生するのでtry-catchを行う。
+		// 例外の際はエラー文をリクエストスコープに格納してユーザー登録画面に遷移
 		try {
 			userService.insert(user);
 			session.removeAttribute("email");
 			return "redirect:/toLogin";
 		} catch (DataIntegrityViolationException e) {
 			e.printStackTrace();
-			model.addAttribute("emailRegistedError","そのメールアドレスはすでに使われています");
+			model.addAttribute("emailRegistedError", "そのメールアドレスはすでに使われています");
 			return "register_user";
 		}
 	}

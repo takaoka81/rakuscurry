@@ -1,6 +1,7 @@
 package com.example.service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -9,7 +10,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -30,6 +30,7 @@ import com.example.repository.OrderItemRepository;
 import com.example.repository.OrderRepository;
 
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 
 /**
  * orderに関わる内容を行う
@@ -38,24 +39,19 @@ import jakarta.servlet.http.HttpSession;
  *
  */
 @Service
+@RequiredArgsConstructor
 public class OrderService {
-
 	private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
-	@Autowired
-	private UserService userService;
+	private final UserService userService;
 
-	@Autowired
-	private StampHistoryService stampHistoryService;
+	private final StampHistoryService stampHistoryService;
 
-	@Autowired
-	private OrderItemRepository orderItemRepository;
+	private final OrderItemRepository orderItemRepository;
 
-	@Autowired
-	private HttpSession session;
+	private final HttpSession session;
 
-	@Autowired
-	private OrderRepository orderRepository;
+	private final OrderRepository orderRepository;
 
 	@Value("${spring.mail.from}")
 	private String mailFrom;
@@ -63,8 +59,7 @@ public class OrderService {
 	@Value("${spring.mail.subject}")
 	private String mailSubject;
 
-	@Autowired
-	private MailSender sender;
+	private final MailSender sender;
 
 	/**
 	 * 注文詳細一件を取得
@@ -157,7 +152,7 @@ public class OrderService {
 	 * 引数で受け取ったemailに完了メールを送付
 	 * 
 	 * @param order 注文情報
-	 * @param to 宛先（ユーザーの登録されているメールアドレス）
+	 * @param to    宛先（ユーザーの登録されているメールアドレス）
 	 */
 	@Transactional
 	public void sendMail(Order order, String to) {
@@ -188,8 +183,9 @@ public class OrderService {
 	 */
 	private String loadMailTemplate() throws IOException {
 		Resource resource = new ClassPathResource("templates/mail/order_completion.txt");
-		String template = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
-		return template;
+		try (InputStream inputStream = resource.getInputStream()) {
+			return StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+		}
 	}
 
 	/**

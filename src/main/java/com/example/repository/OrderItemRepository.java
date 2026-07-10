@@ -1,8 +1,5 @@
 package com.example.repository;
 
-import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.jdbc.core.BeanPropertyRowMapper;
-//import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -12,6 +9,8 @@ import org.springframework.stereotype.Repository;
 
 import com.example.domain.OrderItem;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * order_itemsとやりとりする
  * 
@@ -19,10 +18,9 @@ import com.example.domain.OrderItem;
  *
  */
 @Repository
+@RequiredArgsConstructor
 public class OrderItemRepository {
-
-	@Autowired
-	private NamedParameterJdbcTemplate template;
+	private final NamedParameterJdbcTemplate template;
 
 	// private static final RowMapper<OrderItemRepository> ORDER_ITEM_ROW_MAPPER
 	// = new BeanPropertyRowMapper<>(OrderItemRepository.class);

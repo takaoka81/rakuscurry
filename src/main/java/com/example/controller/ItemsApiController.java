@@ -3,7 +3,6 @@ package com.example.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,18 +16,19 @@ import com.example.dto.ItemsResponse;
 import com.example.exception.MyApiSpecificException;
 import com.example.service.ItemService;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * 商品一覧情報を取得するためのコントローラー
  * 
  * @author ren.tsuchiya
  */
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/items")
 @CrossOrigin(origins = "*", methods = { RequestMethod.GET })
 public class ItemsApiController {
-
-    @Autowired
-    private ItemService itemService;
+    private final ItemService itemService;
 
     /**
      * 商品一覧情報を取得

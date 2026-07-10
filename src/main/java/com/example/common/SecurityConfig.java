@@ -2,7 +2,6 @@ package com.example.common;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,12 +20,13 @@ import com.example.domain.User;
 import com.example.service.CartService;
 
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
-        @Autowired
-        private CartService cartService;
+        private final CartService cartService;
 
         @Bean
         public PasswordEncoder passwordEncoder() {

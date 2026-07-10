@@ -1,6 +1,5 @@
 package com.example.repository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -10,16 +9,17 @@ import org.springframework.stereotype.Repository;
 
 import com.example.domain.StampHistory;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * stamp_historyを操作するrepositoryクラス
  *
  * @author masashi.saito
  */
 @Repository
+@RequiredArgsConstructor
 public class StampHistoryRepository {
-
-    @Autowired
-    private NamedParameterJdbcTemplate template;
+    private final NamedParameterJdbcTemplate template;
 
     private static final RowMapper<StampHistory> STAMP_HISTORY_ROW_MAPPER = (rs, i) -> {
         StampHistory stampHistory = new StampHistory();

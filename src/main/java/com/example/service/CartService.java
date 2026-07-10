@@ -11,7 +11,6 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +26,8 @@ import com.example.repository.OrderRepository;
 import com.example.repository.OrderToppingRepository;
 import com.example.repository.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * カート内に商品を入れる際に使うservice
  * 
@@ -34,24 +35,20 @@ import com.example.repository.UserRepository;
  *
  */
 @Service
+@RequiredArgsConstructor
 public class CartService {
 
 	private static final Logger logger = LoggerFactory.getLogger(CartService.class);
-
-	@Autowired
-	private OrderRepository orderRepository;
-
-	@Autowired
-	private OrderItemRepository orderItemRepository;
-
-	@Autowired
-	private OrderToppingRepository orderToppingRepository;
-
-	@Autowired
-	private UserRepository userRepository;
-
-	@Autowired
-	private StampService stampService;
+	
+	private final OrderRepository orderRepository;
+	
+	private final OrderItemRepository orderItemRepository;
+	
+	private final OrderToppingRepository orderToppingRepository;
+	
+	private final UserRepository userRepository;
+	
+	private final StampService stampService;
 
 	public ItemCartInForm setupForm() {
 		return new ItemCartInForm();

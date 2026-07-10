@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,18 +19,17 @@ import com.example.service.CartService;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("")
 public class CartController {
+	private final CartService service;
 
-	@Autowired
-	private CartService service;
+	private final HttpSession session;
 
-	@Autowired
-	private HttpSession session;
-	@Autowired
-	private ServletContext application;
+	private final ServletContext application;
 
 	public ItemCartInForm setupForm() {
 		return new ItemCartInForm();

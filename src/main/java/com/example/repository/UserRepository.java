@@ -2,7 +2,6 @@ package com.example.repository;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -14,8 +13,12 @@ import org.springframework.stereotype.Repository;
 import com.example.domain.User;
 import com.example.enums.UserStatus;
 
+import lombok.RequiredArgsConstructor;
+
 @Repository
+@RequiredArgsConstructor
 public class UserRepository {
+	private final NamedParameterJdbcTemplate template;
 
 	private static final RowMapper<User> USER_ROW_MAPPER = (rs, i) -> new User.Builder()
 			.id(rs.getInt("id"))
@@ -29,9 +32,6 @@ public class UserRepository {
 			.stampNowCount(rs.getInt("stamp_now_count"))
 			.stampAllCount(rs.getInt("stamp_all_count"))
 			.build();
-
-	@Autowired
-	private NamedParameterJdbcTemplate template;
 
 	public Optional<User> findByUserId(Integer id) {
 		String sql = """

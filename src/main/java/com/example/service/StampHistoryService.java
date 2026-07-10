@@ -1,11 +1,11 @@
 package com.example.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.domain.StampHistory;
 import com.example.repository.StampHistoryRepository;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * stamp_historyテーブルを操作するrepository
@@ -13,11 +13,9 @@ import com.example.repository.StampHistoryRepository;
  * @author masashi.saito
  */
 @Service
-@Transactional
+@RequiredArgsConstructor
 public class StampHistoryService {
-
-    @Autowired
-    private StampHistoryRepository stampHistoryRepository;
+    private final StampHistoryRepository stampHistoryRepository;
 
     /**
      * stamp_historyに対して追加処理を行います
