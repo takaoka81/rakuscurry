@@ -39,15 +39,15 @@ import lombok.RequiredArgsConstructor;
 public class CartService {
 
 	private static final Logger logger = LoggerFactory.getLogger(CartService.class);
-	
+
 	private final OrderRepository orderRepository;
-	
+
 	private final OrderItemRepository orderItemRepository;
-	
+
 	private final OrderToppingRepository orderToppingRepository;
-	
+
 	private final UserRepository userRepository;
-	
+
 	private final StampService stampService;
 
 	public ItemCartInForm setupForm() {
@@ -124,18 +124,15 @@ public class CartService {
 		if (toppingList == null || toppingList.isEmpty()) {
 			return;
 		}
+		List<OrderTopping> orderToppings = new ArrayList<>();
 		for (Topping topping : toppingList) {
 			OrderTopping ot = new OrderTopping();
 			ot.setOrderItemId(orderItemId);
 			ot.setToppingId(topping.getId());
-
-			if ("M".equals(size)) {
-				ot.setOrderPrice(topping.getPriceM());
-			} else {
-				ot.setOrderPrice(topping.getPriceL());
-			}
-			orderToppingRepository.insert(ot);
+			ot.setOrderPrice("M".equals(size) ? topping.getPriceM() : topping.getPriceL());
+			orderToppings.add(ot);
 		}
+		orderToppingRepository.insert(orderToppings);
 	}
 
 	/**
@@ -246,8 +243,8 @@ public class CartService {
 			subPrice = orderItem.getOrderPrice() * orderItem.getFreeCount();
 			orderItem.setDiscount(subPrice);
 			totalSubPrice += subPrice;
-			orderItemRepository.update(orderItem);
 		}
+		orderItemRepository.update(orderItems);
 		return totalPrice - totalSubPrice;
 	}
 

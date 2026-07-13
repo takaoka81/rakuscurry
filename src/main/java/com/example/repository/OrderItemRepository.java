@@ -1,5 +1,7 @@
 package com.example.repository;
 
+import java.util.List;
+
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -51,8 +53,10 @@ public class OrderItemRepository {
 	 * 
 	 * @param orderItem
 	 */
-	public void updateOrder(OrderItem orderItem) {
-		SqlParameterSource param = new BeanPropertySqlParameterSource(orderItem);
+	public void updateOrder(List<OrderItem> orderItem) {
+		SqlParameterSource[] param = orderItem.stream()
+			.map(BeanPropertySqlParameterSource :: new)
+			.toArray(SqlParameterSource[] :: new);
 
 		String sql = """
 				UPDATE
@@ -64,12 +68,14 @@ public class OrderItemRepository {
 				""";
 		;
 
-		template.update(sql, param);
+		template.batchUpdate(sql, param);
 
 	}
 
-	public void update(OrderItem orderItem) {
-		SqlParameterSource param = new BeanPropertySqlParameterSource(orderItem);
+	public void update(List<OrderItem> orderItem) {
+		SqlParameterSource[] param = orderItem.stream()
+				.map(BeanPropertySqlParameterSource::new)
+				.toArray(SqlParameterSource[]::new);
 
 		String sql = """
 				UPDATE
@@ -80,6 +86,6 @@ public class OrderItemRepository {
 					id=:id
 				""";
 
-		template.update(sql, param);
+		template.batchUpdate(sql, param);
 	}
 }

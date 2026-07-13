@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -92,12 +93,14 @@ public class OrderService {
 		orderRepository.update(order);
 		userService.updateStampCounts(user);
 		stampHistoryService.insert(stampHistory);
+		List<OrderItem> oi = new ArrayList<>();
 		for (OrderItem orderItem : order.getOrderItemList()) {
 			if (orderItem.getOrderPrice().equals(0)) {
 				orderItem.setOrderId(order.getId());
-				orderItemRepository.updateOrder(orderItem);
+				oi.add(orderItem);
 			}
 		}
+		orderItemRepository.updateOrder(oi);
 
 		// orderオブジェクトに商品情報をセットしておく（メール送信などで必要）
 		List<Order> loaded = orderRepository.orderLoad(order.getId());
