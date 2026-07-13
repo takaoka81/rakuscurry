@@ -96,7 +96,7 @@ public class InsertController {
 			session.removeAttribute("email");
 			return "redirect:/toLogin";
 		} catch (DataIntegrityViolationException e) {
-			e.printStackTrace();
+			logger.error("そのメールアドレスはすでに使われています" ,e);
 			model.addAttribute("emailRegistedError", "そのメールアドレスはすでに使われています");
 			return "register_user";
 		}

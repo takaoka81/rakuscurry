@@ -21,6 +21,7 @@ import com.example.domain.OrderItem;
 import com.example.domain.OrderTopping;
 import com.example.domain.Topping;
 import com.example.domain.User;
+import com.example.enums.Status;
 
 import lombok.RequiredArgsConstructor;
 
@@ -171,8 +172,8 @@ public class OrderRepository {
 				+ "t.price_m AS t_price_m, t.price_l AS t_price_l "
 				+ "FROM orders o "
 				+ "JOIN users u ON o.user_id = u.id "
-				+ "RIGHT JOIN order_items oi ON o.id = oi.order_id "
-				+ "RIGHT JOIN items i ON oi.item_id = i.id "
+				+ "LEFT JOIN order_items oi ON o.id = oi.order_id "
+				+ "LEFT JOIN items i ON oi.item_id = i.id "
 				+ "LEFT OUTER JOIN order_toppings ot ON oi.id = ot.order_item_id "
 				+ "LEFT OUTER JOIN toppings t ON ot.topping_id = t.id "
 				+ "WHERE o.id = :orderId AND o.status IN (1, 2) ORDER BY i.id DESC";
@@ -203,8 +204,8 @@ public class OrderRepository {
 				+ "t.price_m AS t_price_m, t.price_l AS t_price_l "
 				+ "FROM orders o "
 				+ "JOIN users u ON o.user_id = u.id "
-				+ "RIGHT JOIN order_items oi ON o.id = oi.order_id "
-				+ "RIGHT JOIN items i ON oi.item_id = i.id "
+				+ "LEFT JOIN order_items oi ON o.id = oi.order_id "
+				+ "LEFT JOIN items i ON oi.item_id = i.id "
 				+ "LEFT OUTER JOIN order_toppings ot ON oi.id = ot.order_item_id "
 				+ "LEFT OUTER JOIN toppings t ON ot.topping_id = t.id "
 				+ "WHERE o.user_id = :userId AND o.status IN (1,2) ORDER BY o.order_date DESC, o.id DESC, i.id DESC";
@@ -298,8 +299,11 @@ public class OrderRepository {
 	 */
 	public Integer insertOrder(Integer userId) {
 		String sql = "INSERT INTO orders (user_id, status, total_price) "
-				+ "VALUES (:userId, :status, total_price) RETURNING id";
-		SqlParameterSource param = new MapSqlParameterSource().addValue("userId", userId);
+				+ "VALUES (:userId, :status, :totalPrice) RETURNING id";
+		SqlParameterSource param = new MapSqlParameterSource()
+				.addValue("userId", userId)
+				.addValue("status", Status.CART.getCode())
+				.addValue("totalPrice", 0);
 		return template.queryForObject(sql, param, Integer.class);
 	}
 

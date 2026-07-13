@@ -55,7 +55,7 @@ public class ItemRepository {
 	 * @return
 	 */
 	public List<Item> findByName(String name) {
-		String findByNameSql = "SELECT * FROM items WHERE name like :name and deleted = false ORDER BY price_m;";
+		String findByNameSql = "SELECT id,name,description,price_m,price_l,image_path, deleted FROM items WHERE name like :name and deleted = false ORDER BY price_m;";
 		SqlParameterSource param = new MapSqlParameterSource().addValue("name", "%" + name + "%");
 		List<Item> itemList = template.query(findByNameSql, param, ITEM_ROW_MAPPER);
 		if (itemList.size() == 0) {
@@ -71,7 +71,7 @@ public class ItemRepository {
 	 * @return Item情報１件
 	 */
 	public Optional<Item> showItemDetail(Integer id) {
-		String showItemDetailSql = "SELECT * FROM items WHERE id = :id;";
+		String showItemDetailSql = "SELECT id,name,description,price_m,price_l,image_path, deleted FROM items WHERE id = :id;";
 
 		SqlParameterSource param = new MapSqlParameterSource().addValue("id", id);
 		try {
@@ -102,7 +102,7 @@ public class ItemRepository {
 	}
 
 	public Optional<Item> ApiShowItemDetail(Integer id) {
-		String sql = "SELECT * FROM items WHERE id = :id;";
+		String sql = "SELECT id,name,description,price_m,price_l,image_path, deleted FROM items WHERE id = :id;";
 		SqlParameterSource param = new MapSqlParameterSource("id", id);
 		List<Item> items = template.query(sql, param, ITEM_ROW_MAPPER);
 

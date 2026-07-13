@@ -70,7 +70,8 @@ public class UserRepository {
 
 	public Optional<User> findByMailAddress(String email) {
 
-		String sql = "SELECT * FROM users WHERE email=:email AND status = :status";
+		String sql = "SELECT id, status, name, email, password, zipcode, address, telephone,"
+		 + "stamp_now_count, stamp_all_count FROM users WHERE email=:email AND status = :status";
 
 		SqlParameterSource param = new MapSqlParameterSource()
 				.addValue("email", email)
