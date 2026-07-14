@@ -1,5 +1,6 @@
 package com.example.domain;
 
+import java.util.Collections;
 import java.util.List;
 
 public class OrderItem {
@@ -88,11 +89,11 @@ public class OrderItem {
 	}
 
 	public List<OrderTopping> getOrderTopping() {
-		return orderTopping;
+		return Collections.unmodifiableList(orderTopping);
 	}
 
 	public void setOrderTopping(List<OrderTopping> orderTopping) {
-		this.orderTopping = orderTopping;
+		this.orderTopping = List.copyOf(orderTopping);
 	}
 
 	@Override

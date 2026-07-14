@@ -1,5 +1,6 @@
 package com.example.domain;
 
+import java.util.Collections;
 import java.util.List;
 
 public class Item {
@@ -40,7 +41,7 @@ public class Item {
 		this.priceL = priceL;
 		this.imagePath = imagePath;
 		this.deleted = deleted;
-		this.toppingList = toppingList;
+		this.toppingList = List.copyOf(toppingList);
 	}
 
 	public int getId() {
@@ -100,11 +101,11 @@ public class Item {
 	}
 
 	public List<Topping> getToppingList() {
-		return toppingList; 
+		return Collections.unmodifiableList(toppingList); 
 	}
 
 	public void setToppingList(List<Topping> toppingList) {
-		this.toppingList = toppingList;
+		this.toppingList = List.copyOf(toppingList);
 	}
 
 	@Override

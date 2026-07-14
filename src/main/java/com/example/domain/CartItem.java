@@ -1,5 +1,6 @@
 package com.example.domain;
 
+import java.util.Collections;
 import java.util.List;
 
 public class CartItem {
@@ -62,11 +63,11 @@ public class CartItem {
 	}
 
 	public List<Topping> getToppingList() {
-		return toppingList;
+		return Collections.unmodifiableList(toppingList);
 	}
 
 	public void setToppingList(List<Topping> topping) {
-		this.toppingList = topping;
+		this.toppingList = List.copyOf(topping);
 	}
 
 	public Integer getSubTotal() {

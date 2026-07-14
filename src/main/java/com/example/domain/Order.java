@@ -66,10 +66,10 @@ public class Order {
 		this.totalPrice = totalPrice;
 	}
 	public Date getOrderDate() {
-		return orderDate;
+		return orderDate == null ? null : new Date(orderDate.getTime());
 	}
 	public void setOrderDate(Date orderDate) {
-		this.orderDate = orderDate;
+		this.orderDate = orderDate == null ? null : new Date(orderDate.getTime());
 	}
 	public String getDestinationName() {
 		return destinationName;
@@ -120,10 +120,10 @@ public class Order {
 		this.user = user;
 	}
 	public List<OrderItem> getOrderItemList() {
-		return orderItemList;
+		return List.copyOf(orderItemList);
 	}
 	public void setOrderItemList(List<OrderItem> orderItemList) {
-		this.orderItemList = orderItemList;
+		this.orderItemList = List.copyOf(orderItemList);
 	}
 	
 	@Override

@@ -48,6 +48,9 @@ public class OrderRepository {
 		// orderToppoingのListを作成。外部キーに紐づいてるテーブル毎に発行してしまう為初めはnullで宣言しておく
 		List<OrderTopping> orderTopping = null;
 
+		Order currentOrder = null;
+		OrderItem currentOrderItem = null;
+
 		// 前回のorderのidを入れる箱
 		int beforeIdNum = 0;
 
@@ -60,6 +63,10 @@ public class OrderRepository {
 
 			// 現在のidと前回のidが被ってないか確認
 			if (nowIdNum != beforeIdNum) {
+
+				if (currentOrder != null) {
+					currentOrder.setOrderItemList(orderItemList);
+				}
 
 				// orderオブジェクトにSQLのデータをセット
 				Order order = new Order();
@@ -86,15 +93,21 @@ public class OrderRepository {
 
 				// 既に宣言してるorderItemListに新規でArrayListをセット
 				orderItemList = new ArrayList<OrderItem>();
-				order.setOrderItemList(orderItemList);
 
 				orderList.add(order);
+				currentOrder = order;
 			}
 
 			// 現在のorderItemidを代入
 			int itemNow = rs.getInt("oi_id");
 			// 現在のorderItemidと前回のorderItemidが被ってないか確認
 			if (itemNow != itemBefore) {
+
+				// 前のorderItemのorderToppingListを確定させる
+				if (currentOrderItem != null) {
+					currentOrderItem.setOrderTopping(orderTopping);
+				}
+
 				// orderItemオブジェクトにSQLのデータをセット
 				OrderItem orderItem = new OrderItem();
 				orderItem.setId(rs.getInt("oi_id"));
@@ -120,9 +133,9 @@ public class OrderRepository {
 
 				// 既に宣言してるorderToppingListに新規でArrayListをセット
 				orderTopping = new ArrayList<OrderTopping>();
-				orderItem.setOrderTopping(orderTopping);
 
 				orderItemList.add(orderItem);
+				currentOrderItem = orderItem;
 			}
 
 			// orderToppingを持っていないorderItemにオブジェクトを作らないようにする
@@ -149,6 +162,13 @@ public class OrderRepository {
 			// 現在のOrderのidを代入
 			beforeIdNum = nowIdNum;
 		}
+		if (currentOrderItem != null) {
+			currentOrderItem.setOrderTopping(orderTopping);
+		}
+		if (currentOrder != null) {
+			currentOrder.setOrderItemList(orderItemList);
+		}
+
 		return orderList;
 	};
 
@@ -310,6 +330,7 @@ public class OrderRepository {
 	private final ResultSetExtractor<Order> orderResultSetExtractor = (rs) -> {
 		Order order = null;
 		Map<Integer, OrderItem> itemMap = new LinkedHashMap<>();
+		Map<Integer, List<OrderTopping>> toppingMap = new LinkedHashMap<>();
 
 		while (rs.next()) {
 			// 1. Orderの作成（ここはそのまま）
@@ -319,7 +340,6 @@ public class OrderRepository {
 				order.setUserId(rs.getInt("user_id"));
 				order.setStatus(rs.getInt("status"));
 				order.setTotalPrice(rs.getInt("o_total_price"));
-				order.setOrderItemList(new ArrayList<>());
 			}
 
 			// 2. OrderItemの処理（computeIfAbsentをやめて、ifでチェックする）
@@ -336,7 +356,6 @@ public class OrderRepository {
 					orderItem.setQuantity(rs.getInt("oi_quantity"));
 					orderItem.setSize(rs.getString("oi_size"));
 					orderItem.setDiscount(rs.getInt("oi_discount"));
-					orderItem.setOrderTopping(new ArrayList<>());
 
 					Item item = new Item();
 					item.setName(rs.getString("i_name"));
@@ -345,8 +364,7 @@ public class OrderRepository {
 
 					// Mapに保存
 					itemMap.put(oiId, orderItem);
-					// ★ここなら order が再代入された後でも、ラムダの外なのでエラーになりません！
-					order.getOrderItemList().add(orderItem);
+					toppingMap.put(oiId, new ArrayList<>());
 				}
 
 				// 3. トッピングの処理
@@ -363,9 +381,16 @@ public class OrderRepository {
 					topping.setPriceL(rs.getInt("t_price_l"));
 					orderTopping.setTopping(topping);
 
-					orderItem.getOrderTopping().add(orderTopping);
+					toppingMap.get(oiId).add(orderTopping);
 				}
 			}
+		}
+
+		if (order != null) {
+			for (Map.Entry<Integer, OrderItem> entry : itemMap.entrySet()) {
+				entry.getValue().setOrderTopping(toppingMap.get(entry.getKey()));
+			}
+			order.setOrderItemList(new ArrayList<>(itemMap.values()));
 		}
 		return order;
 	};
