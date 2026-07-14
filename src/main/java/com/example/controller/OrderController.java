@@ -1,7 +1,9 @@
 package com.example.controller;
 
 import java.security.SecureRandom;
-import java.text.SimpleDateFormat;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.common.SessionCart;
 import com.example.domain.LoginUserDetails;
 import com.example.domain.Order;
 import com.example.domain.StampHistory;
@@ -56,6 +59,8 @@ public class OrderController {
 	private final StampService stampService;
 
 	private final HttpSession session;
+
+	private final SessionCart sessionCart;
 
 	public OrderForm setUpOrderForm() {
 		return new OrderForm();
@@ -157,27 +162,15 @@ public class OrderController {
 			return "/order/order_confirm";
 		}
 
-		// 本日の日付を入手し配達時間をセット
-		Date checkTime = new Date();
-		Calendar timePlusThree = Calendar.getInstance();
+		// 配達日時（配達日 + 配達時刻）を組み立てて3時間後判定に使う
+		LocalDateTime deliveryDateTime = LocalDateTime.of(
+				form.getOrderDate().toLocalDate(),
+				LocalTime.of(form.getIntegerDeliveryTime(), 0));
+		Timestamp deliveryTime = Timestamp.valueOf(deliveryDateTime);
 
-		timePlusThree.setTime(checkTime);
-		timePlusThree.add(Calendar.HOUR_OF_DAY, 3);
-		checkTime = timePlusThree.getTime();
+		LocalDateTime checkDateTime = LocalDateTime.now().plusHours(3);
 
-		SimpleDateFormat year = new SimpleDateFormat("yyyy");
-		SimpleDateFormat month = new SimpleDateFormat("MM");
-		SimpleDateFormat day = new SimpleDateFormat("dd");
-
-		Integer deliveryYear = Integer.parseInt(year.format(timePlusThree.getTime()));
-		Integer deliveryMonth = Integer.parseInt(month.format(form.getOrderDate().getTime()));
-		Integer deliveryDay = Integer.parseInt(day.format(form.getOrderDate().getTime()));
-
-		@SuppressWarnings("deprecation")
-		Date deliveryTime = new Date(deliveryYear - 1900, deliveryMonth - 1, deliveryDay, form.getIntegerDeliveryTime(),
-				00, 00);
-
-		if (checkTime.after(deliveryTime)) {
+		if (checkDateTime.isAfter(deliveryDateTime)) {
 			model.addAttribute("errorDeliveryDate", "今から3時間後の日時をご入力ください");
 			return "/order/order_confirm";
 		}
@@ -195,7 +188,7 @@ public class OrderController {
 		// 郵便番号のハイフンを消してドメインにセット
 		order.setDestinationZipcode(form.getDestinationZipcode().replace("-", ""));
 
-		order.setDeliveryTime(service.parseDeliveryTime(form.getDeliveryTime()));
+		order.setDeliveryTime(deliveryTime);
 
 		Integer chengesStamps = stampService.getStampCountByOrder(order.getOrderItemList());
 		Integer addStamps = chengesStamps;
@@ -214,7 +207,7 @@ public class OrderController {
 
 		service.sendMail(order, user.getEmail());
 
-		session.removeAttribute("cartItemList");
+		sessionCart.clear();
 
 		session.removeAttribute("totalPrice");
 

@@ -28,6 +28,8 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
         private final CartService cartService;
 
+        private final SessionCart sessionCart;
+
         @Bean
         public PasswordEncoder passwordEncoder() {
                 return new BCryptPasswordEncoder();
@@ -76,14 +78,13 @@ public class SecurityConfig {
                         LoginUserDetails principal = (LoginUserDetails) authentication.getPrincipal();
                         User user = principal.getUser();
 
-                        @SuppressWarnings("unchecked")
-                        List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
+                        List<CartItem> cartItemList = sessionCart.getItems();
 
-                        if (cartItemList != null && !cartItemList.isEmpty()) {
+                        if (!cartItemList.isEmpty()) {
                                 for (CartItem item : cartItemList) {
                                         cartService.addItemToCart(item, user.getId());
                                 }
-                                session.removeAttribute("cartItemList");
+                                sessionCart.clear();
                                 session.removeAttribute("totalPrice");
                         }
 

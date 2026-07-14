@@ -3,9 +3,6 @@ package com.example.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,24 +103,6 @@ public class OrderService {
 		List<Order> loaded = orderRepository.orderLoad(order.getId());
 		if (loaded != null && !loaded.isEmpty()) {
 			order.setOrderItemList(loaded.get(0).getOrderItemList());
-		}
-	}
-
-	/**
-	 * フォームから受け取った配達時間（時のみの文字列）をTimestampに変換する
-	 *
-	 * @param deliveryTime "HH"形式の時刻文字列
-	 * @return 変換後のTimestamp
-	 */
-	public Timestamp parseDeliveryTime(String deliveryTime) {
-		SimpleDateFormat sdf = new SimpleDateFormat("HH");
-		try {
-			java.util.Date date = sdf.parse(deliveryTime);
-			logger.info(deliveryTime);
-			return new Timestamp(date.getTime());
-		} catch (ParseException e) {
-			logger.error("日付変換に失敗しました。deliverytime={}", deliveryTime, e);
-			throw new IllegalArgumentException("配達時間の形式が不正です: " + deliveryTime, e);
 		}
 	}
 

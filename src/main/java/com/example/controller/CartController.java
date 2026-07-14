@@ -1,6 +1,5 @@
 package com.example.controller;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
@@ -9,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.common.SessionCart;
 import com.example.domain.CartItem;
 import com.example.domain.LoginUserDetails;
 import com.example.domain.Order;
@@ -16,8 +16,8 @@ import com.example.domain.Topping;
 import com.example.domain.User;
 import com.example.form.ItemCartInForm;
 import com.example.service.CartService;
+import com.example.service.ItemService;
 
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
@@ -27,9 +27,11 @@ import lombok.RequiredArgsConstructor;
 public class CartController {
 	private final CartService service;
 
+	private final ItemService itemService;
+
 	private final HttpSession session;
 
-	private final ServletContext application;
+	private final SessionCart sessionCart;
 
 	public ItemCartInForm setupForm() {
 		return new ItemCartInForm();
@@ -42,8 +44,7 @@ public class CartController {
 		cartItem.setItemId(form.getId());
 		cartItem.setItemPrice(service.getPriceSize(form));
 
-		@SuppressWarnings("unchecked")
-		List<Topping> toppingList = (List<Topping>) application.getAttribute("toppingList");
+		List<Topping> toppingList = itemService.findAllTopping();
 		List<Topping> selectedToppings = service.getToppingIndex(toppingList, form.getToppingIndex());
 		cartItem.setToppingList(selectedToppings);
 
@@ -51,20 +52,10 @@ public class CartController {
 			User user = loginUserDetails.getUser();
 			service.addItemToCart(cartItem, user.getId());
 		} else {
-			saveToSessionCart(cartItem);
+			sessionCart.getItems().add(cartItem);
 		}
 
 		return "redirect:/showCart";
-	}
-
-	private void saveToSessionCart(CartItem cartItem) {
-		@SuppressWarnings("unchecked")
-		List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
-		if (cartItemList == null) {
-			cartItemList = new LinkedList<>();
-		}
-		cartItemList.add(cartItem);
-		session.setAttribute("cartItemList", cartItemList);
 	}
 
 	@RequestMapping("/showCart")
@@ -81,10 +72,10 @@ public class CartController {
 			}
 		} else {
 			// --- 未ログイン時の処理（カッコの構造を修正） ---
-			@SuppressWarnings("unchecked")
-			List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
+			List<CartItem> cartItemList = sessionCart.getItems();
+			model.addAttribute("cartItemList", cartItemList);
 
-			if (cartItemList == null || cartItemList.isEmpty()) {
+			if (cartItemList.isEmpty()) {
 				model.addAttribute("cartNothing", "カートに商品がありません");
 				session.setAttribute("totalPrice", 0);
 			} else {
@@ -121,10 +112,9 @@ public class CartController {
 			}
 		} else {
 			// --- 未ログインの場合（Sessionから削除） ---
-			@SuppressWarnings("unchecked")
-			List<CartItem> cartItemList = (List<CartItem>) session.getAttribute("cartItemList");
+			List<CartItem> cartItemList = sessionCart.getItems();
 
-			if (cartItemList != null && index != null && index < cartItemList.size()) {
+			if (index != null && index < cartItemList.size()) {
 				cartItemList.remove(index.intValue());
 
 				int total = 0;
@@ -133,7 +123,6 @@ public class CartController {
 				}
 				// 未ログイン時はここでセッションを更新しているため、反映されます
 				session.setAttribute("totalPrice", total);
-				session.setAttribute("cartItemList", cartItemList);
 			}
 		}
 

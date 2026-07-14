@@ -13,12 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.domain.Item;
 import com.example.domain.LoginUserDetails;
-import com.example.domain.Topping;
 import com.example.domain.User;
 import com.example.service.ItemService;
 import com.example.service.StampService;
 
-import jakarta.servlet.ServletContext;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -27,8 +25,6 @@ import lombok.RequiredArgsConstructor;
 public class ItemController {
 
 	private static final Logger logger = LoggerFactory.getLogger(ItemController.class);
-
-	private final ServletContext application;
 
 	private final ItemService itemService;
 
@@ -125,9 +121,7 @@ public class ItemController {
 		model.addAttribute("item", item);
 
 		// トッピング一覧を表示
-		List<Topping> toppingList = itemService.findAllTopping();
-
-		application.setAttribute("toppingList", toppingList);
+		model.addAttribute("toppingList", itemService.findAllTopping());
 		return "item/item_detail";
 	}
 }
