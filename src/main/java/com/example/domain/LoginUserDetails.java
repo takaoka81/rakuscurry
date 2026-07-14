@@ -13,6 +13,37 @@ public class LoginUserDetails implements UserDetails, CredentialsContainer {
     public LoginUserDetails(User user) {
         this.user = user;
     }
+    
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        // パスワードなどの可変項目を含むUser#hashCode()に委譲すると、
+        // eraseCredentials()でパスワードがnullに書き換わった際にhashCodeが変化してしまうため、
+        // 不変かつ一意なIDのみを使用する
+        result = prime * result + ((user == null) ? 0 : user.getId());
+        return result;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        LoginUserDetails other = (LoginUserDetails) obj;
+        if (user == null) {
+            if (other.user != null)
+                return false;
+        } else if (other.user == null || user.getId() != other.user.getId())
+            return false;
+        return true;
+    }
+
 
     public User getUser() {
         return user;

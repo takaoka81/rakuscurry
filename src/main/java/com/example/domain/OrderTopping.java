@@ -19,6 +19,51 @@ public class OrderTopping {
 	// 注文時金額
 	private Integer orderPrice;
 
+	
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		result = prime * result + toppingId;
+		result = prime * result + ((orderItemId == null) ? 0 : orderItemId.hashCode());
+		result = prime * result + ((topping == null) ? 0 : topping.hashCode());
+		result = prime * result + ((orderPrice == null) ? 0 : orderPrice.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		OrderTopping other = (OrderTopping) obj;
+		if (id != other.id)
+			return false;
+		if (toppingId != other.toppingId)
+			return false;
+		if (orderItemId == null) {
+			if (other.orderItemId != null)
+				return false;
+		} else if (!orderItemId.equals(other.orderItemId))
+			return false;
+		if (topping == null) {
+			if (other.topping != null)
+				return false;
+		} else if (!topping.equals(other.topping))
+			return false;
+		if (orderPrice == null) {
+			if (other.orderPrice != null)
+				return false;
+		} else if (!orderPrice.equals(other.orderPrice))
+			return false;
+		return true;
+	}
+
 	public int getId() {
 		return id;
 	}

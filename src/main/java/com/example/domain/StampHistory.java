@@ -27,6 +27,39 @@ public class StampHistory {
      */
     private int stampCountChanges;
 
+    
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + id;
+        result = prime * result + userId;
+        result = prime * result + orderId;
+        result = prime * result + stampCountChanges;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        StampHistory other = (StampHistory) obj;
+        if (id != other.id)
+            return false;
+        if (userId != other.userId)
+            return false;
+        if (orderId != other.orderId)
+            return false;
+        if (stampCountChanges != other.stampCountChanges)
+            return false;
+        return true;
+    }
+
     public StampHistory() {
     }
 

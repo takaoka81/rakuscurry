@@ -31,6 +31,78 @@ public class OrderItem {
 
 	private boolean isFree;
 
+	
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		result = prime * result + itemId;
+		result = prime * result + orderId;
+		result = prime * result + quantity;
+		result = prime * result + ((size == null) ? 0 : size.hashCode());
+		result = prime * result + ((orderPrice == null) ? 0 : orderPrice.hashCode());
+		result = prime * result + ((item == null) ? 0 : item.hashCode());
+		result = prime * result + ((orderTopping == null) ? 0 : orderTopping.hashCode());
+		result = prime * result + ((discount == null) ? 0 : discount.hashCode());
+		result = prime * result + ((freeCount == null) ? 0 : freeCount.hashCode());
+		result = prime * result + (isFree ? 1231 : 1237);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		OrderItem other = (OrderItem) obj;
+		if (id != other.id)
+			return false;
+		if (itemId != other.itemId)
+			return false;
+		if (orderId != other.orderId)
+			return false;
+		if (quantity != other.quantity)
+			return false;
+		if (size == null) {
+			if (other.size != null)
+				return false;
+		} else if (!size.equals(other.size))
+			return false;
+		if (orderPrice == null) {
+			if (other.orderPrice != null)
+				return false;
+		} else if (!orderPrice.equals(other.orderPrice))
+			return false;
+		if (item == null) {
+			if (other.item != null)
+				return false;
+		} else if (!item.equals(other.item))
+			return false;
+		if (orderTopping == null) {
+			if (other.orderTopping != null)
+				return false;
+		} else if (!orderTopping.equals(other.orderTopping))
+			return false;
+		if (discount == null) {
+			if (other.discount != null)
+				return false;
+		} else if (!discount.equals(other.discount))
+			return false;
+		if (freeCount == null) {
+			if (other.freeCount != null)
+				return false;
+		} else if (!freeCount.equals(other.freeCount))
+			return false;
+		if (isFree != other.isFree)
+			return false;
+		return true;
+	}
+
 	// ゲッターとセッター
 	public int getId() {
 		return id;
