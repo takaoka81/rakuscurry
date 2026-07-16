@@ -1,6 +1,5 @@
 package com.example.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -41,10 +40,9 @@ public class ItemsApiController {
             @RequestParam(required = false) String name) {
         try {
             List<Item> items = itemService.findByName(name);
-            List<ItemsResponse> itemsResponses = new ArrayList<>();
-            for (Item item : items) {
-                itemsResponses.add(new ItemsResponse(item));
-            }
+            List<ItemsResponse> itemsResponses = items.stream()
+                    .map(ItemsResponse::new)
+                    .toList();
             return ResponseEntity.ok(itemsResponses);
         } catch (RuntimeException e) {
             throw new MyApiSpecificException("Internal Server Error ");

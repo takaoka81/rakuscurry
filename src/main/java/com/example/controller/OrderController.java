@@ -28,6 +28,7 @@ import com.example.domain.StampHistory;
 import com.example.domain.User;
 import com.example.form.OrderForm;
 import com.example.service.CartService;
+import com.example.service.MailService;
 import com.example.service.OrderService;
 import com.example.service.StampService;
 
@@ -58,13 +59,11 @@ public class OrderController {
 
 	private final StampService stampService;
 
+	private final MailService mailService;
+
 	private final HttpSession session;
 
 	private final SessionCart sessionCart;
-
-	public OrderForm setUpOrderForm() {
-		return new OrderForm();
-	}
 
 	@RequestMapping("/toOrder")
 	public String toOrder(@AuthenticationPrincipal LoginUserDetails loginUserDetails, Model model) { // Modelを追加
@@ -99,26 +98,6 @@ public class OrderController {
 		session.setAttribute("token", token);
 		model.addAttribute("token", token);
 		return "order/order_confirm";
-	}
-
-	@RequestMapping("/orderCo")
-	public String orderCo(@AuthenticationPrincipal LoginUserDetails loginUserDetails, OrderForm form, Model model) {
-		/**
-		 * ログインユーザー情報を注文のお届け先情報にコピーする
-		 *
-		 * @param order 注文情報
-		 */
-		User user = loginUserDetails.getUser();
-		form.setDestinationName(user.getName());
-		form.setDestinationEmail(user.getEmail());
-		form.setDestinationZipcode(user.getZipcode());
-		form.setDestinationAddress(user.getAddress());
-		form.setDestinationTel(user.getTelephone());
-
-		Order order = new Order();
-		BeanUtils.copyProperties(form, order);
-
-		return "/order/order_confirm";
 	}
 
 	/**
@@ -205,7 +184,7 @@ public class OrderController {
 
 		// 完了メールを送信
 
-		service.sendMail(order, user.getEmail());
+		mailService.sendMail(order, user.getEmail());
 
 		sessionCart.clear();
 

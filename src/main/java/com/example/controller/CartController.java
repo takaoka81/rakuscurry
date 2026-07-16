@@ -79,10 +79,10 @@ public class CartController {
 				model.addAttribute("cartNothing", "カートに商品がありません");
 				session.setAttribute("totalPrice", 0);
 			} else {
-				int total = 0;
-				for (CartItem item : cartItemList) {
-					total += item.getSubTotal();
-				}
+				int total = cartItemList.stream()
+						.mapToInt(item -> item.getSubTotal())
+						.sum();
+
 				// /* 修正点：ここでの保存がHTMLの表示に直結します */
 				session.setAttribute("totalPrice", total);
 			}

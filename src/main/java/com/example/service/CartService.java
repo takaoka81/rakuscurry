@@ -124,14 +124,17 @@ public class CartService {
 		if (toppingList == null || toppingList.isEmpty()) {
 			return;
 		}
-		List<OrderTopping> orderToppings = new ArrayList<>();
-		for (Topping topping : toppingList) {
-			OrderTopping ot = new OrderTopping();
-			ot.setOrderItemId(orderItemId);
-			ot.setToppingId(topping.getId());
-			ot.setOrderPrice("M".equals(size) ? topping.getPriceM() : topping.getPriceL());
-			orderToppings.add(ot);
-		}
+		List<OrderTopping> orderToppings = toppingList.stream()
+				.map(topping -> {
+					OrderTopping ot = new OrderTopping();
+					ot.setOrderItemId(orderItemId);
+					ot.setToppingId(topping.getId());
+					ot.setOrderPrice("M".equals(size)
+							? topping.getPriceM()
+							: topping.getPriceL());
+					return ot;
+				})
+				.toList();
 		orderToppingRepository.insert(orderToppings);
 	}
 
@@ -238,9 +241,8 @@ public class CartService {
 		Integer totalPrice = 0;
 		Integer totalSubPrice = 0;
 		for (OrderItem orderItem : orderItems) {
-			Integer subPrice = 0;
 			totalPrice += orderItem.getOrderPrice() * orderItem.getQuantity();
-			subPrice = orderItem.getOrderPrice() * orderItem.getFreeCount();
+			Integer subPrice = orderItem.getOrderPrice() * orderItem.getFreeCount();
 			orderItem.setDiscount(subPrice);
 			totalSubPrice += subPrice;
 		}

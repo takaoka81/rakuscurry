@@ -1,0 +1,11 @@
+ALTER TABLE orders
+    ADD CONSTRAINT chk_orders_status
+    CHECK (status IN (0, 1, 2, 3, 4, 9));
+
+ALTER TABLE orders
+    ADD CONSTRAINT chk_pay_Juduge
+    CHECK (payment_method IN (1, 2));
+    
+ALTER TABLE users
+    ADD CONSTRAINT chk_users_status
+    CHECK (status IN (0, 1));
