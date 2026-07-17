@@ -123,6 +123,20 @@
                 </td>
               </tr>
             </th:block>
+            <tr th:if="${cartNothing == null}">
+              <td colspan="5">
+                <form th:action="@{/addItems}">
+                  <div id="itemContainer" th:attr="data-items=${itemListJson},data-toppings=${toppingListJson}">
+                  </div>
+                  <div class="text-center add-item-area">
+                    <button type="button" id="addItemBtn" class="btn btn-success">
+                      <span class="glyphicon glyphicon-plus"></span> 商品を追加
+                    </button>
+                    <button type="submit" class="btn btn-warning">カートに追加する</button>
+                  </div>
+                </form>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -161,6 +175,7 @@
     <script th:src="@{/js/auto_complete.js}"></script>
 
     <!--ハンバーガー機能追加-->
+    <script th:src="@{/js/add_item.js}"></script>
     <script th:src="@{/js/bootstrap.min.js}"></script>
 
 </body>

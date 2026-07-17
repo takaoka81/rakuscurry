@@ -1,6 +1,9 @@
 package com.example.controller;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -10,13 +13,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.common.SessionCart;
 import com.example.domain.CartItem;
+import com.example.domain.Item;
 import com.example.domain.LoginUserDetails;
 import com.example.domain.Order;
 import com.example.domain.Topping;
 import com.example.domain.User;
+import com.example.form.AddItemsForm;
 import com.example.form.ItemCartInForm;
 import com.example.service.CartService;
 import com.example.service.ItemService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +39,8 @@ public class CartController {
 	private final HttpSession session;
 
 	private final SessionCart sessionCart;
+
+	private final ObjectMapper objectMapper;
 
 	public ItemCartInForm setupForm() {
 		return new ItemCartInForm();
@@ -60,6 +69,9 @@ public class CartController {
 
 	@RequestMapping("/showCart")
 	public String showCart(@AuthenticationPrincipal LoginUserDetails loginUserDetails, Model model) {
+
+		model.addAttribute("itemListJson", buildItemListJson());
+		model.addAttribute("toppingListJson", buildToppingListJson());
 
 		if (loginUserDetails != null) {
 			// --- ログイン時の処理 ---
@@ -127,6 +139,86 @@ public class CartController {
 		}
 
 		return "redirect:/showCart";
+	}
+
+	@RequestMapping("/addItems")
+	public String addItems(@AuthenticationPrincipal LoginUserDetails loginUserDetails, AddItemsForm form) {
+
+		if (form.getItems() != null) {
+			for (AddItemsForm.Entry entry : form.getItems()) {
+				if (entry == null || entry.getProductId() == null || entry.getQuantity() == null) {
+					continue;
+				}
+
+				Item item = itemService.showItemDetail(entry.getProductId());
+				if (item == null) {
+					continue;
+				}
+				String size = entry.getSize() != null ? entry.getSize() : "M";
+
+				CartItem cartItem = new CartItem();
+				cartItem.setItemId(item.getId());
+				cartItem.setName(item.getName());
+				cartItem.setImagePath(item.getImagePath());
+				cartItem.setSize(size);
+				cartItem.setItemPrice("L".equals(size) ? item.getPriceL() : item.getPriceM());
+				cartItem.setQuantity(entry.getQuantity());
+				cartItem.setToppingList(resolveToppings(entry.getToppingIds()));
+
+				if (loginUserDetails != null) {
+					User user = loginUserDetails.getUser();
+					service.addItemToCart(cartItem, user.getId());
+				} else {
+					sessionCart.getItems().add(cartItem);
+				}
+			}
+		}
+
+		return "redirect:/showCart";
+	}
+
+	/**
+	 * 商品一覧をJS側でセレクトボックスを組み立てるためのJSON文字列に変換する
+	 */
+	private String buildItemListJson() {
+		List<Map<String, Object>> options = itemService.findAll().stream()
+				.filter(item -> !Boolean.TRUE.equals(item.getDeleted()))
+				.map(item -> Map.<String, Object>of("id", item.getId(), "name", item.getName()))
+				.collect(Collectors.toList());
+
+		try {
+			return objectMapper.writeValueAsString(options);
+		} catch (JsonProcessingException e) {
+			return "[]";
+		}
+	}
+
+	/**
+	 * トッピング一覧をJS側でチェックボックスを組み立てるためのJSON文字列に変換する
+	 */
+	private String buildToppingListJson() {
+		List<Map<String, Object>> options = itemService.findAllTopping().stream()
+				.map(topping -> Map.<String, Object>of("id", topping.getId(), "name", topping.getName()))
+				.collect(Collectors.toList());
+
+		try {
+			return objectMapper.writeValueAsString(options);
+		} catch (JsonProcessingException e) {
+			return "[]";
+		}
+	}
+
+	/**
+	 * 選択されたトッピングidから、実際のTopping一覧を絞り込む
+	 */
+	private List<Topping> resolveToppings(List<Integer> toppingIds) {
+		if (toppingIds == null || toppingIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		return itemService.findAllTopping().stream()
+				.filter(topping -> toppingIds.contains(topping.getId()))
+				.collect(Collectors.toList());
 	}
 
 }
