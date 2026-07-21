@@ -198,7 +198,7 @@ public class OrderItem {
 			return (itemPrice + toppingTotalPrice) * count - (itemPrice * freeCount);
 		}
 
-		if (discount > 0 && discount != null) {
+		if (discount != null && discount > 0) {
 			return (itemPrice + toppingTotalPrice) * count - discount;
 		}
 		// 4. 計算結果を返す
