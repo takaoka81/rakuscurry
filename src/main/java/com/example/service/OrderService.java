@@ -10,8 +10,7 @@ import com.example.domain.Order;
 import com.example.domain.OrderItem;
 import com.example.domain.StampHistory;
 import com.example.domain.User;
-import com.example.enums.PayJuduge;
-import com.example.enums.Status;
+import com.example.enums.PayJudge;
 import com.example.repository.OrderItemRepository;
 import com.example.repository.OrderRepository;
 
@@ -91,12 +90,23 @@ public class OrderService {
 	 * @param order
 	 * @return statusを整数で返す
 	 */
+
 	public Integer paymentMethodJudge(Order order) {
-		if (PayJuduge.fromCode(order.getPaymentMethod()) == PayJuduge.COD) {
-			return Status.ORDER.getCode();
-		} else {
-			return Status.PAYMENT_RECEIVED.getCode();
+
+		PayJudge payJudge = PayJudge.fromCode(order.getPaymentMethod());
+
+		PaymentProcessor processor;
+		switch (payJudge) {
+			case CREDIT_CARD:
+				processor = new CreditCardPaymentProcessor();
+				break;
+			case COD:
+				processor = new CodPaymentProcessor();
+				break;
+			default:
+				throw new IllegalArgumentException("不正な支払い方法です: " + payJudge);
 		}
+		return processor.pay();
 	}
 
 	/**

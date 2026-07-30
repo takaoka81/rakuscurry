@@ -33,5 +33,7 @@ public enum Status {
         throw new IllegalArgumentException("不正なstatusコードです: " + code);
     }
 
+    
+
 
 }

@@ -19,7 +19,7 @@ import org.springframework.util.StreamUtils;
 
 import com.example.domain.Order;
 import com.example.domain.OrderItem;
-import com.example.enums.PayJuduge;
+import com.example.enums.PayJudge;
 import com.example.repository.OrderRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -125,7 +125,7 @@ public class MailService {
 	 * @return
 	 */
 	private String buildMailBody(String template, Order order, String orderItemsText) {
-		String paymentMethod = PayJuduge.fromCode(order.getPaymentMethod()) == PayJuduge.COD ? "代金引換" : "クレジットカード";
+		String paymentMethod = PayJudge.fromCode(order.getPaymentMethod()) == PayJudge.COD ? "代金引換" : "クレジットカード";
 		return template.replace("${customerName}", order.getDestinationName())
 				.replace("${orderId}", String.valueOf(order.getId()))
 				.replace("${orderDate}", order.getDeliveryTime().toString())
