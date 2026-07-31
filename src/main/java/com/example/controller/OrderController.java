@@ -28,7 +28,6 @@ import com.example.domain.StampHistory;
 import com.example.domain.User;
 import com.example.form.OrderForm;
 import com.example.service.CartService;
-import com.example.service.MailService;
 import com.example.service.OrderService;
 import com.example.service.StampService;
 
@@ -58,8 +57,6 @@ public class OrderController {
 	private final CartService cartService;
 
 	private final StampService stampService;
-
-	private final MailService mailService;
 
 	private final HttpSession session;
 
@@ -181,10 +178,6 @@ public class OrderController {
 				.build();
 		StampHistory stampHistory = new StampHistory(user.getId(), order.getId(), chengesStamps);
 		service.order(order, user, stampHistory);
-
-		// 完了メールを送信
-
-		mailService.sendMail(order, user.getEmail());
 
 		sessionCart.clear();
 

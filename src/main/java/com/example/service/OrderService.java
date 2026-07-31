@@ -1,17 +1,16 @@
 package com.example.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.domain.Order;
-import com.example.domain.OrderItem;
 import com.example.domain.StampHistory;
 import com.example.domain.User;
 import com.example.enums.PayJudge;
-import com.example.repository.OrderItemRepository;
+import com.example.event.OrderRegisterEvent;
 import com.example.repository.OrderRepository;
 
 import jakarta.servlet.http.HttpSession;
@@ -27,15 +26,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OrderService {
 
-	private final UserService userService;
-
-	private final StampHistoryService stampHistoryService;
-
-	private final OrderItemRepository orderItemRepository;
-
 	private final HttpSession session;
 
 	private final OrderRepository orderRepository;
+
+	private final ApplicationEventPublisher publisher;
 
 	/**
 	 * 注文詳細一件を取得
@@ -66,22 +61,7 @@ public class OrderService {
 	public void order(Order order, User user, StampHistory stampHistory) {
 		order.setStatus(paymentMethodJudge(order));
 		orderRepository.update(order);
-		userService.updateStampCounts(user);
-		stampHistoryService.insert(stampHistory);
-		List<OrderItem> oi = new ArrayList<>();
-		for (OrderItem orderItem : order.getOrderItemList()) {
-			if (orderItem.getOrderPrice().equals(0)) {
-				orderItem.setOrderId(order.getId());
-				oi.add(orderItem);
-			}
-		}
-		orderItemRepository.updateOrder(oi);
-
-		// orderオブジェクトに商品情報をセットしておく（メール送信などで必要）
-		List<Order> loaded = orderRepository.orderLoad(order.getId());
-		if (loaded != null && !loaded.isEmpty()) {
-			order.setOrderItemList(loaded.get(0).getOrderItemList());
-		}
+		publisher.publishEvent(new OrderRegisterEvent(order, user, stampHistory));
 	}
 
 	/**
