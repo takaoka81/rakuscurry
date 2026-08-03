@@ -1,5 +1,8 @@
 package com.example.form;
 
+import com.example.validation.PhoneNumber;
+import com.example.validation.PostalCode;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -22,14 +25,14 @@ public class InsertForm {
 	private String email;
 	// 郵便番号
 	@NotBlank(message = "郵便番号を入力して下さい")
-	@Pattern(regexp = "^[0-9]{3}-[0-9]{4}$", message = "郵便番号はXXX-XXXXの形式で入力してください")
+	@PostalCode
 	private String zipcode;
 	// 住所
 	@NotBlank(message = "住所を入力して下さい")
 	private String address;
 	// 電話番号
 	@NotBlank(message = "電話番号を入力して下さい")
-	@Pattern(regexp = "^[0-9]+-[0-9]+-[0-9]+$", message = "電話番号はXXXX-XXXX-XXXXの形式で入力してください")
+	@PhoneNumber
 	private String telephone;
 
 	// パスワード

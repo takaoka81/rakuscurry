@@ -112,6 +112,16 @@ public class OrderController {
 		}
 		session.removeAttribute("token");
 
+		User user = loginUserDetails.getUser();
+
+		Order order = cartService.getCartByUserId(user.getId());
+
+		if (order == null) {
+			return "redirect:/toOrder"; // 万が一カートが取れなかった場合
+		}
+
+		model.addAttribute("order", order);
+
 		// 昨日の日付を取得し配達日と比較
 		Date date = new Date();
 		Calendar yesterday = Calendar.getInstance();
@@ -149,14 +159,6 @@ public class OrderController {
 		if (checkDateTime.isAfter(deliveryDateTime)) {
 			model.addAttribute("errorDeliveryDate", "今から3時間後の日時をご入力ください");
 			return "/order/order_confirm";
-		}
-
-		User user = loginUserDetails.getUser();
-
-		Order order = cartService.getCartByUserId(user.getId());
-
-		if (order == null) {
-			return "redirect:/toOrder"; // 万が一カートが取れなかった場合
 		}
 
 		BeanUtils.copyProperties(form, order);
