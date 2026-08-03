@@ -3,6 +3,9 @@ package com.example.domain;
 import java.util.Collections;
 import java.util.List;
 
+import com.example.form.ItemCartInForm;
+import com.example.service.CartService;
+
 public class CartItem {
 
 	// 商品Id
@@ -21,6 +24,17 @@ public class CartItem {
 	private Integer quantity;
 	// 商品の元々の金額
 	private Integer itemPrice;
+
+	public static CartItem form(ItemCartInForm form, CartService cartService) {
+		CartItem cartItem = new CartItem();
+		cartItem.itemId = form.getId();
+		cartItem.name = form.getName();
+		cartItem.imagePath = form.getImagePath();
+		cartItem.quantity = form.getQuantity();
+		cartItem.itemPrice = cartService.getPriceSize(form);
+		return cartItem;
+
+	}
 
 	@Override
 	public int hashCode() {

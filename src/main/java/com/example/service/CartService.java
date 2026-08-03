@@ -106,10 +106,7 @@ public class CartService {
 	 * @return OrderItemのID
 	 */
 	private Integer insertOrderItem(CartItem cartItem, Integer orderId) {
-		OrderItem orderItem = new OrderItem();
-		BeanUtils.copyProperties(cartItem, orderItem);
-		orderItem.setOrderId(orderId);
-		orderItem.setOrderPrice(cartItem.getItemPrice());
+		OrderItem orderItem = OrderItem.form(cartItem, orderId);
 		return orderItemRepository.order(orderItem);
 	}
 
@@ -124,17 +121,7 @@ public class CartService {
 		if (toppingList == null || toppingList.isEmpty()) {
 			return;
 		}
-		List<OrderTopping> orderToppings = toppingList.stream()
-				.map(topping -> {
-					OrderTopping ot = new OrderTopping();
-					ot.setOrderItemId(orderItemId);
-					ot.setToppingId(topping.getId());
-					ot.setOrderPrice("M".equals(size)
-							? topping.getPriceM()
-							: topping.getPriceL());
-					return ot;
-				})
-				.toList();
+		List<OrderTopping> orderToppings = OrderTopping.form(toppingList, orderItemId, size);
 		orderToppingRepository.insert(orderToppings);
 	}
 

@@ -1,5 +1,7 @@
 package com.example.domain;
 
+import java.util.List;
+
 /**
  * OrderToppingのドメイン
  * 
@@ -19,7 +21,21 @@ public class OrderTopping {
 	// 注文時金額
 	private Integer orderPrice;
 
-	
+	// 静的ファクトリーメソッド
+	public static List<OrderTopping> form(List<Topping> toppingList, Integer orderItemId, String size) {
+		List<OrderTopping> orderToppings = toppingList.stream()
+				.map(topping -> {
+					OrderTopping ot = new OrderTopping();
+					ot.setOrderItemId(orderItemId);
+					ot.setToppingId(topping.getId());
+					ot.setOrderPrice("M".equals(size)
+							? topping.getPriceM()
+							: topping.getPriceL());
+					return ot;
+				})
+				.toList();
+		return orderToppings;
+	}
 
 	@Override
 	public int hashCode() {

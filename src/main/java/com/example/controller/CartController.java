@@ -48,10 +48,7 @@ public class CartController {
 
 	@RequestMapping("/inCart")
 	public String inCart(@AuthenticationPrincipal LoginUserDetails loginUserDetails, ItemCartInForm form) {
-		CartItem cartItem = new CartItem();
-		BeanUtils.copyProperties(form, cartItem);
-		cartItem.setItemId(form.getId());
-		cartItem.setItemPrice(service.getPriceSize(form));
+		CartItem cartItem = CartItem.form(form, service);
 
 		List<Topping> toppingList = itemService.findAllTopping();
 		List<Topping> selectedToppings = service.getToppingIndex(toppingList, form.getToppingIndex());

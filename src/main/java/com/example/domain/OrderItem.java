@@ -31,7 +31,16 @@ public class OrderItem {
 
 	private boolean isFree;
 
-	
+	// 静的ファクトリーメソッド
+	public static OrderItem form(CartItem cartItem, Integer orderId){
+		OrderItem orderItem = new OrderItem();
+		orderItem.itemId = cartItem.getItemId();
+		orderItem.orderId = orderId;
+		orderItem.quantity = cartItem.getQuantity();
+		orderItem.size = cartItem.getSize();
+		orderItem.orderPrice = cartItem.getItemPrice();
+		return orderItem;
+	}
 
 	@Override
 	public int hashCode() {
