@@ -81,8 +81,34 @@ public class CartService {
 	}
 
 	/**
+	 * 複数商品をまとめてカート(DB)に登録するメソッド
+	 * カート確認・合計金額の再計算はループの外で1回だけ行い、商品件数分クエリが増えるN+1を避ける
+	 *
+	 * @param cartItems 画面から届いた商品情報のリスト
+	 * @param userId    ログインユーザーのID
+	 */
+	@Transactional
+	public void addItemsToCart(List<CartItem> cartItems, Integer userId) {
+		if (cartItems == null || cartItems.isEmpty()) {
+			return;
+		}
+
+		// 1. カート(Order)があるか確認（全商品で共通のため1回だけ）
+		Integer orderId = findOrCreatedId(userId);
+
+		// 2. 商品ごとに子(OrderItem)・孫(OrderTopping)を登録
+		for (CartItem cartItem : cartItems) {
+			Integer orderItemId = insertOrderItem(cartItem, orderId);
+			insertOrderTopping(cartItem.getToppingList(), orderItemId, cartItem.getSize());
+		}
+
+		// 3. 合計金額の再計算と更新（全商品登録後に1回だけ）
+		updateTotalPriceAfterAdd(orderId, userId);
+	}
+
+	/**
 	 * カート(Order)があるか確認
-	 * 
+	 *
 	 * @param userId
 	 * @return カートがあればカートID無ければ新規カートを作成したIDを返す
 	 */

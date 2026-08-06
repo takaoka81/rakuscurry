@@ -1,11 +1,11 @@
 package com.example.controller;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -141,34 +141,53 @@ public class CartController {
 	@RequestMapping("/addItems")
 	public String addItems(@AuthenticationPrincipal LoginUserDetails loginUserDetails, AddItemsForm form) {
 
-		if (form.getItems() != null) {
-			for (AddItemsForm.Entry entry : form.getItems()) {
-				if (entry == null || entry.getProductId() == null || entry.getQuantity() == null) {
-					continue;
-				}
+		if (form.getItems() == null || form.getItems().isEmpty()) {
+			return "redirect:/showCart";
+		}
 
-				Item item = itemService.showItemDetail(entry.getProductId());
-				if (item == null) {
-					continue;
-				}
-				String size = entry.getSize() != null ? entry.getSize() : "M";
+		// 商品・トッピングをそれぞれ1回のクエリでまとめて取得し、idをキーにしたMapへ詰める
+		// （ループ内で毎回DBに問い合わせるN+1を避けるため）
+		List<Integer> productIds = form.getItems().stream()
+				.filter(entry -> entry != null && entry.getProductId() != null && entry.getQuantity() != null)
+				.map(AddItemsForm.Entry::getProductId)
+				.distinct()
+				.collect(Collectors.toList());
 
-				CartItem cartItem = new CartItem();
-				cartItem.setItemId(item.getId());
-				cartItem.setName(item.getName());
-				cartItem.setImagePath(item.getImagePath());
-				cartItem.setSize(size);
-				cartItem.setItemPrice("L".equals(size) ? item.getPriceL() : item.getPriceM());
-				cartItem.setQuantity(entry.getQuantity());
-				cartItem.setToppingList(resolveToppings(entry.getToppingIds()));
+		Map<Integer, Item> itemMap = itemService.findByIds(productIds).stream()
+				.collect(Collectors.toMap(Item::getId, item -> item));
+		Map<Integer, Topping> toppingMap = itemService.findAllTopping().stream()
+				.collect(Collectors.toMap(Topping::getId, topping -> topping));
 
-				if (loginUserDetails != null) {
-					User user = loginUserDetails.getUser();
-					service.addItemToCart(cartItem, user.getId());
-				} else {
-					sessionCart.getItems().add(cartItem);
-				}
+		List<CartItem> cartItems = new ArrayList<>();
+
+		for (AddItemsForm.Entry entry : form.getItems()) {
+			if (entry == null || entry.getProductId() == null || entry.getQuantity() == null) {
+				continue;
 			}
+
+			Item item = itemMap.get(entry.getProductId());
+			if (item == null) {
+				continue;
+			}
+			String size = entry.getSize() != null ? entry.getSize() : "M";
+
+			CartItem cartItem = new CartItem();
+			cartItem.setItemId(item.getId());
+			cartItem.setName(item.getName());
+			cartItem.setImagePath(item.getImagePath());
+			cartItem.setSize(size);
+			cartItem.setItemPrice("L".equals(size) ? item.getPriceL() : item.getPriceM());
+			cartItem.setQuantity(entry.getQuantity());
+			cartItem.setToppingList(resolveToppings(entry.getToppingIds(), toppingMap));
+
+			cartItems.add(cartItem);
+		}
+
+		if (loginUserDetails != null) {
+			User user = loginUserDetails.getUser();
+			service.addItemsToCart(cartItems, user.getId());
+		} else {
+			sessionCart.getItems().addAll(cartItems);
 		}
 
 		return "redirect:/showCart";
@@ -207,14 +226,18 @@ public class CartController {
 
 	/**
 	 * 選択されたトッピングidから、実際のTopping一覧を絞り込む
+	 *
+	 * @param toppingIds 選択されたトッピングid
+	 * @param toppingMap idをキーにしたTopping一覧（呼び出し元で1回だけDBから取得したものを使い回す）
 	 */
-	private List<Topping> resolveToppings(List<Integer> toppingIds) {
+	private List<Topping> resolveToppings(List<Integer> toppingIds, Map<Integer, Topping> toppingMap) {
 		if (toppingIds == null || toppingIds.isEmpty()) {
 			return Collections.emptyList();
 		}
 
-		return itemService.findAllTopping().stream()
-				.filter(topping -> toppingIds.contains(topping.getId()))
+		return toppingIds.stream()
+				.map(toppingMap::get)
+				.filter(topping -> topping != null)
 				.collect(Collectors.toList());
 	}
 

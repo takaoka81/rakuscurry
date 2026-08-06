@@ -1,0 +1,12 @@
+-- ユーザーテーブルのメールに`idx_users_email`という名前の一意インデックスを作成する
+CREATE UNIQUE INDEX idx_users_email ON users(email);
+
+-- 外部キーには必ずインデックスを追加（JOIN や WHERE で使われる）
+CREATE INDEX idx_orders_user_id               ON orders(user_id);
+CREATE INDEX idx_order_items_order_id         ON order_items(order_id);
+CREATE INDEX idx_order_items_item_id          ON order_items(item_id);
+CREATE INDEX idx_order_toppings_topping_id    ON order_toppings(topping_id);
+CREATE INDEX idx_order_toppings_order_item_id ON order_toppings(order_item_id);
+
+-- よく絞り込みに使うカラム
+CREATE INDEX idx_orders_status ON orders(status);

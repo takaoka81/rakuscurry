@@ -52,6 +52,17 @@ public class ItemService {
 	}
 
 	/**
+	 * 商品IDのリストから該当する商品をまとめて取得する
+	 * （ループ内で1件ずつ検索するN+1を避けるため、まとめて取得してMap化できる形で返す）
+	 *
+	 * @param ids 商品IDのリスト
+	 * @return 該当する商品のリスト
+	 */
+	public List<Item> findByIds(List<Integer> ids) {
+		return repository.findByIds(ids);
+	}
+
+	/**
 	 * 登録されてるトッピングを全件表示
 	 * 
 	 * @return トッピングの全件リスト

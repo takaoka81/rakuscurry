@@ -83,6 +83,21 @@ public class ItemRepository {
 		}
 	}
 
+	/**
+	 * 商品IDのリストから該当する商品をまとめて検索する
+	 *
+	 * @param ids 商品IDのリスト
+	 * @return 該当する商品のリスト
+	 */
+	public List<Item> findByIds(List<Integer> ids) {
+		if (ids == null || ids.isEmpty()) {
+			return List.of();
+		}
+		String sql = "SELECT id,name,description,price_m,price_l,image_path, deleted FROM items WHERE id IN (:ids);";
+		SqlParameterSource param = new MapSqlParameterSource().addValue("ids", ids);
+		return template.query(sql, param, ITEM_ROW_MAPPER);
+	}
+
 	public void insert(Item item) {
 		SqlParameterSource param = new BeanPropertySqlParameterSource(item);
 		String sql = "INSERT INTO items (name, description, price_m, price_l, image_path, deleted)"
