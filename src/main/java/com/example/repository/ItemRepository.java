@@ -55,7 +55,7 @@ public class ItemRepository {
 	 * @return
 	 */
 	public List<Item> findByName(String name) {
-		String findByNameSql = "SELECT id,name,description,price_m,price_l,image_path, deleted FROM items WHERE name like :name and deleted = false ORDER BY price_m;";
+		String findByNameSql = "SELECT id,name,description,price_m,price_l,image_path, deleted FROM items WHERE name like :name and deleted = false ORDER BY price_m; LIMIT 100";
 		SqlParameterSource param = new MapSqlParameterSource().addValue("name", "%" + name + "%");
 		List<Item> itemList = template.query(findByNameSql, param, ITEM_ROW_MAPPER);
 		if (itemList.size() == 0) {
