@@ -13,7 +13,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
 
 import com.example.domain.Order;
@@ -47,7 +46,7 @@ public class SimpleMailService implements MailService {
 	 * @param order 注文情報
 	 * @param to    宛先（ユーザーの登録されているメールアドレス）
 	 */
-	
+
 	public void sendMail(Order order, String to) {
 		try {
 			// テンプレート読み込み

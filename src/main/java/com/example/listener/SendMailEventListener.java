@@ -2,8 +2,9 @@ package com.example.listener;
 
 import java.util.List;
 
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.example.domain.Order;
 import com.example.event.OrderRegisterEvent;
@@ -19,7 +20,7 @@ public class SendMailEventListener {
     private final MailService mailService;
 
     @org.springframework.core.annotation.Order(2)
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void sendMail(OrderRegisterEvent event) {
         Order order = event.getOrder();
         List<Order> loaded = orderRepository.orderLoad(order.getId());

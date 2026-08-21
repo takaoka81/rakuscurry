@@ -5,13 +5,11 @@ import org.slf4j.LoggerFactory;
 
 import com.example.domain.Order;
 
-public class LoggingMailServiceDecorator implements MailService {
-    private final MailService delegate;
-
+public class LoggingMailServiceDecorator extends MailServiceDecorator {
     private static final Logger logger = LoggerFactory.getLogger(LoggingMailServiceDecorator.class);
 
     public LoggingMailServiceDecorator(MailService delegate) {
-        this.delegate = delegate;
+        super(delegate);
     }
 
     @Override

@@ -2,12 +2,11 @@ package com.example.service;
 
 import com.example.domain.Order;
 
-public class RetryMailServiceDecorator implements MailService {
-    private final MailService delegate;
+public class RetryMailServiceDecorator extends MailServiceDecorator {
     private final int maxRetries;
-
-    public RetryMailServiceDecorator(MailService delegate, int maxRetries) {
-        this.delegate = delegate;
+    
+    public RetryMailServiceDecorator(MailService delegate, int maxRetries){
+        super(delegate);
         this.maxRetries = maxRetries;
     }
 

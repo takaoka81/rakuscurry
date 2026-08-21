@@ -1,6 +1,7 @@
 package com.example.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,10 @@ public class OrderService {
 	private final OrderRepository orderRepository;
 
 	private final ApplicationEventPublisher publisher;
+
+	private final Map<PayJudge, PaymentProcessor> strategies = Map.of(
+			PayJudge.CREDIT_CARD, new CreditCardPaymentProcessor(),
+			PayJudge.COD, new CodPaymentProcessor());
 
 	/**
 	 * 注文詳細一件を取得
@@ -75,16 +80,10 @@ public class OrderService {
 
 		PayJudge payJudge = PayJudge.fromCode(order.getPaymentMethod());
 
-		PaymentProcessor processor;
-		switch (payJudge) {
-			case CREDIT_CARD:
-				processor = new CreditCardPaymentProcessor();
-				break;
-			case COD:
-				processor = new CodPaymentProcessor();
-				break;
-			default:
-				throw new IllegalArgumentException("不正な支払い方法です: " + payJudge);
+		PaymentProcessor processor = strategies.get(payJudge);
+
+		if (processor == null) {
+			throw new IllegalArgumentException("不正な支払い方法です: " + payJudge);
 		}
 		return processor.pay();
 	}
