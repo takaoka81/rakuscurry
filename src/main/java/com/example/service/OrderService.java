@@ -13,6 +13,7 @@ import com.example.domain.User;
 import com.example.enums.PayJudge;
 import com.example.event.OrderRegisterEvent;
 import com.example.repository.OrderRepository;
+import com.example.service.Processor.PaymentProcessor;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +34,7 @@ public class OrderService {
 
 	private final ApplicationEventPublisher publisher;
 
-	private final Map<PayJudge, PaymentProcessor> strategies = Map.of(
-			PayJudge.CREDIT_CARD, new CreditCardPaymentProcessor(),
-			PayJudge.COD, new CodPaymentProcessor());
+	private final Map<PayJudge, PaymentProcessor> paymentProcessorMap;
 
 	/**
 	 * 注文詳細一件を取得
@@ -77,15 +76,13 @@ public class OrderService {
 	 */
 
 	public Integer paymentMethodJudge(Order order) {
-
 		PayJudge payJudge = PayJudge.fromCode(order.getPaymentMethod());
 
-		PaymentProcessor processor = strategies.get(payJudge);
-
+		PaymentProcessor processor = paymentProcessorMap.get(payJudge);
 		if (processor == null) {
-			throw new IllegalArgumentException("不正な支払い方法です: " + payJudge);
+			throw new IllegalArgumentException("対応する決済方法が見つかりません");
 		}
-		return processor.pay();
+		return processor.resolveStatus(order).getCode();
 	}
 
 	/**

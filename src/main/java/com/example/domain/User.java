@@ -210,87 +210,69 @@ public class User {
 		public User build() {
 			return new User(this);
 		}
+
+		public User buildForRegistration() {
+			if (name == null || name.isBlank()) {
+				throw new IllegalStateException("name は必須です");
+			}
+			if (email == null || email.isBlank()) {
+				throw new IllegalStateException("email は必須です");
+			}
+			if (password == null || password.isBlank()) {
+				throw new IllegalStateException("password は必須です");
+			}
+			if (zipcode == null || zipcode.isBlank()) {
+				throw new IllegalStateException("zipcode は必須です");
+			}
+			if (address == null || address.isBlank()) {
+				throw new IllegalStateException("address は必須です");
+			}
+			if (telephone == null || telephone.isBlank()) {
+				throw new IllegalStateException("telephone は必須です");
+			}
+			return new User(this);
+		}
 	}
 
-	// 以下getter及びsetter
+	// 以下getter
 	public int getId() {
 		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public UserStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(UserStatus status) {
-		this.status = status;
-	}
-
 	public String getName() {
 		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public String getPassword() {
 		return password;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
 	public String getEmail() {
 		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
 	}
 
 	public String getZipcode() {
 		return zipcode;
 	}
 
-	public void setZipcode(String zipcode) {
-		this.zipcode = zipcode;
-	}
-
 	public String getAddress() {
 		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
 	}
 
 	public String getTelephone() {
 		return telephone;
 	}
 
-	public void setTelephone(String telephone) {
-		this.telephone = telephone;
-	}
-
 	public Integer getStampNowCount() {
 		return stampNowCount;
 	}
 
-	public void setStampNowCount(Integer stampNowCount) {
-		this.stampNowCount = stampNowCount;
-	}
-
 	public Integer getStampAllCount() {
 		return stampAllCount;
-	}
-
-	public void setStampAllCount(Integer stampAllCount) {
-		this.stampAllCount = stampAllCount;
 	}
 
 	public Builder toBuilder() {

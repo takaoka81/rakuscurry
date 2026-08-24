@@ -21,7 +21,7 @@ import com.example.domain.OrderItem;
 import com.example.domain.OrderTopping;
 import com.example.domain.Topping;
 import com.example.domain.User;
-import com.example.enums.Status;
+import com.example.enums.OrderStatus;
 
 import lombok.RequiredArgsConstructor;
 
@@ -322,7 +322,7 @@ public class OrderRepository {
 				+ "VALUES (:userId, :status, :totalPrice) RETURNING id";
 		SqlParameterSource param = new MapSqlParameterSource()
 				.addValue("userId", userId)
-				.addValue("status", Status.CART.getCode())
+				.addValue("status", OrderStatus.CART.getCode())
 				.addValue("totalPrice", 0);
 		return template.queryForObject(sql, param, Integer.class);
 	}

@@ -87,7 +87,7 @@ public class InsertController {
 				.zipcode(form.getZipcode().replace("-", ""))
 				.address(form.getAddress())
 				.telephone(form.getTelephone())
-				.build();
+				.buildForRegistration();
 
 		// emailが既に登録の場合はSQLで例外が発生するのでtry-catchを行う。
 		// 例外の際はエラー文をリクエストスコープに格納してユーザー登録画面に遷移
@@ -96,8 +96,12 @@ public class InsertController {
 			session.removeAttribute("email");
 			return "redirect:/toLogin";
 		} catch (DataIntegrityViolationException e) {
-			logger.error("そのメールアドレスはすでに使われています" ,e);
+			logger.error("そのメールアドレスはすでに使われています", e);
 			model.addAttribute("emailRegistedError", "そのメールアドレスはすでに使われています");
+			return "register_user";
+		} catch (IllegalStateException e) {
+			logger.error("登録に必須の項目が不足しています", e);
+			model.addAttribute("insertError", "ユーザー登録に失敗しました");
 			return "register_user";
 		}
 	}
